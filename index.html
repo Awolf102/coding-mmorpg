@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ashes of the First Kingdom</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ TITLE SCREEN ============ -->
+<div id="screen-title" class="screen">
+  <canvas id="title-canvas"></canvas>
+  <div class="title-inner">
+    <div class="title-sub">A coding MMORPG of cinders and serpents</div>
+    <h1 class="title-main">ASHES <span>of the</span> FIRST KINGDOM</h1>
+    <div class="title-tag">Learn real Python by quest, blade, and flame.</div>
+    <div class="title-buttons">
+      <button id="btn-title-play" class="btn btn-big btn-flame">Enter the Realm</button>
+    </div>
+    <div class="title-footer">v1.0 &mdash; The Python Chronicle &mdash; saves are stored in this browser</div>
+  </div>
+</div>
+
+<!-- ============ CHARACTER SELECT ============ -->
+<div id="screen-select" class="screen hidden">
+  <div class="panel-stone select-panel">
+    <h2 class="gold-header">Choose Your Survivor</h2>
+    <div id="slot-list"></div>
+    <div class="row-center" style="margin-top:14px">
+      <button id="btn-select-back" class="btn">Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHARACTER CREATE ============ -->
+<div id="screen-create" class="screen hidden">
+  <div class="panel-stone create-panel">
+    <h2 class="gold-header">Forge Your Survivor</h2>
+    <div class="create-cols">
+      <div class="create-left">
+        <canvas id="create-preview" width="160" height="200"></canvas>
+        <input id="create-name" maxlength="14" placeholder="Name..." autocomplete="off">
+        <div class="appearance-rows" id="appearance-rows"></div>
+      </div>
+      <div class="create-right">
+        <div class="faction-label">Choose your Faction <span class="dim">(the language you will master)</span></div>
+        <div id="faction-list"></div>
+      </div>
+    </div>
+    <div class="row-center" style="margin-top:12px; gap:10px">
+      <button id="btn-create-back" class="btn">Back</button>
+      <button id="btn-create-go" class="btn btn-flame">Receive the Mark of the Flame</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ GAME ============ -->
+<div id="screen-game" class="screen hidden">
+  <div id="game-wrap">
+    <div id="viewport">
+      <canvas id="game-canvas" width="960" height="608"></canvas>
+      <div id="location-banner" class="hidden"></div>
+      <div id="hint-bar" class="hidden"></div>
+      <div id="chatbox">
+        <div id="chat-messages"></div>
+        <div id="chat-input-row">
+          <span class="chat-you" id="chat-name">You:</span>
+          <input id="chat-input" maxlength="80" placeholder="Press Enter to chat..." autocomplete="off">
+        </div>
+      </div>
+    </div>
+    <div id="sidebar">
+      <div id="minimap-wrap">
+        <canvas id="minimap" width="200" height="150"></canvas>
+        <div id="map-name"></div>
+        <div id="orb-row">
+          <div class="orb" id="orb-hp" title="Hitpoints">
+            <div class="orb-fill" id="orb-hp-fill"></div><span id="orb-hp-text">10</span>
+          </div>
+          <div class="orb orb-xp" id="orb-lv" title="Level">
+            <div class="orb-fill orb-xp-fill" id="orb-xp-fill"></div><span id="orb-lv-text">1</span>
+          </div>
+          <div id="coin-display" title="Coins"><span class="coin-icon"></span><span id="coin-text">0</span></div>
+        </div>
+      </div>
+      <div id="tab-bar"></div>
+      <div id="panel-area"></div>
+    </div>
+  </div>
+  <div id="modal-root"></div>
+  <div id="toast-root"></div>
+</div>
+
+<!-- ============ ENDING ============ -->
+<div id="screen-ending" class="screen hidden">
+  <canvas id="ending-canvas"></canvas>
+  <div class="title-inner" id="ending-inner"></div>
+</div>
+
+<div id="boot-error" class="hidden"></div>
+
+<!-- engine -->
+<script src="js/engine/audio.js"></script>
+<script src="js/engine/save.js"></script>
+<script src="js/engine/python.js"></script>
+<script src="js/engine/sprites.js"></script>
+<!-- data -->
+<script src="js/data/items.js"></script>
+<script src="js/data/enemies.js"></script>
+<script src="js/data/maps.js"></script>
+<script src="js/data/quests_act1.js"></script>
+<script src="js/data/quests_act2.js"></script>
+<script src="js/data/quests_act3.js"></script>
+<script src="js/data/quests_act4.js"></script>
+<script src="js/data/quests_act5.js"></script>
+<!-- game -->
+<script src="js/game/quests.js"></script>
+<script src="js/game/combat.js"></script>
+<script src="js/game/ui.js"></script>
+<script src="js/game/render.js"></script>
+<script src="js/game/main.js"></script>
+</body>
+</html>
