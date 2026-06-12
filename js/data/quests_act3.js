@@ -57,7 +57,9 @@ window.QUEST_DB.push(
       choices: ["Raises an IndexError", "Returns 30", "Returns nothing", "Adds a shelf"],
       answer: 0, why: "Indexes are 0,1,2 — there is no shelf 3. Python raises IndexError." },
     { type: "output", q: "Walking the stacks:", code: "for x in [2, 4]:\n    print(x * 2)",
-      answer: "4\n8", why: "The loop visits 2 then 4, doubling each." }
+      answer: "4\n8", why: "The loop visits 2 then 4, doubling each." },
+    { type: "tf", q: "True or False — `lst[1]` reads the FIRST item of a list.",
+      answer: false, why: "Shelves start at 0: lst[0] is the first item, lst[1] is the second." }
   ],
   challenge: {
     title: "Catalogue the Crate",
@@ -84,7 +86,8 @@ window.QUEST_DB.push(
       "Steps 1-3: print(len(relics)), print(relics[0]), print(relics[-1])",
       "Append BEFORE the loop, so the Flame Sigil is catalogued too.",
       "Full answer:\nprint(len(relics))\nprint(relics[0])\nprint(relics[-1])\nrelics.append(\"Flame Sigil\")\nfor r in relics:\n    print(\"Catalogued:\", r)"
-    ]
+    ],
+    explain: "Order mattered: count and read FIRST (the crate held 2 then), append BEFORE the loop (so the Flame Sigil gets catalogued too). `relics[0]` and `relics[-1]` read the two ends — negative indexes count backward — and the for loop walks the shelves in order without ever touching an index."
   },
   rewards: { xp: 200, coins: 60, items: [["flamewater_flask", 2]] }
 },
@@ -167,7 +170,8 @@ window.QUEST_DB.push(
       "Lines 1-3 are one word each: sum(depths), max(depths), min(depths).",
       "Line 4: print(depths[:3]) — printing a list shows its brackets. Line 5: print(13 in depths).",
       "Full answer:\nprint(sum(depths))\nprint(max(depths))\nprint(min(depths))\nprint(depths[:3])\nprint(13 in depths)"
-    ]
+    ],
+    explain: "`sum`, `max` and `min` each measure the whole list in one word — no loop needed. `depths[:3]` slices a COPY of the first three (empty start means 'from the edge'), and `13 in depths` is a True/False question Python answers directly, so printing it prints the verdict."
   },
   rewards: { xp: 220, coins: 65, items: [["ashguard_mail", 1]] }
 },
@@ -253,7 +257,8 @@ window.QUEST_DB.push(
       "Step 1 is len(souls) BEFORE adding Maren. Step 3: souls[\"Maren\"] = 0.",
       "The recital: for name, debt in souls.items(): print(f\"{name} owes {debt}\")",
       "Full answer:\nprint(len(souls))\nprint(souls.get(\"Unknown\", \"unjudged\"))\nsouls[\"Maren\"] = 0\nfor name, debt in souls.items():\n    print(f\"{name} owes {debt}\")"
-    ]
+    ],
+    explain: "`len` counted the pairs BEFORE Maren joined. `.get` returned your default instead of raising KeyError for the missing soul. Assigning to a new key simply adds the pair, and `.items()` hands the loop both halves of each pair, in the order they were written."
   },
   rewards: { xp: 240, coins: 70, items: [["watchmans_greatsword", 1]] }
 },
@@ -337,7 +342,8 @@ window.QUEST_DB.push(
       "set(sigils) drops the duplicates. len() of that is line 1.",
       "Line 2: print(sorted(unique)) — sorted returns a list, and printing it shows ['like', 'this'].",
       "Full answer:\nunique = set(sigils)\nprint(len(unique))\nprint(sorted(unique))\nprint(\"flame\" in unique)"
-    ]
+    ],
+    explain: "`set(sigils)` collapses every duplicate on contact — that's the whole distillation. Sets keep no order, so `sorted()` turns the survivors into a recitable list, and `in` asks the set its favorite question: instant membership, True or False."
   },
   rewards: { xp: 260, coins: 75, items: [["scribes_talisman", 1]] }
 },
@@ -402,7 +408,8 @@ window.QUEST_DB.push(
       "Tally: counts[r] = counts.get(r, 0) + 1 inside the loop.",
       "Then track the best: best = None; for k, v in counts.items(): if best is None or v > counts[best]: best = k",
       "Full answer:\ncounts = {}\nfor r in relics:\n    counts[r] = counts.get(r, 0) + 1\nbest = None\nfor k, v in counts.items():\n    if best is None or v > counts[best]:\n        best = k\nprint(best)\nprint(counts[best])"
-    ]
+    ],
+    explain: "`counts[r] = counts.get(r, 0) + 1` is the tally pattern: .get supplies 0 the first time a relic appears, +1 records the sighting, and the assignment writes it back. The second walk keeps whichever key holds the highest tally — best-so-far, the oldest trick in the audit."
   },
   rewards: { xp: 500, coins: 150, items: [["runic_warblade", 1], ["phoenix_draught", 1]], title: "Tidebreaker", unlocks: "Kingsfall Citadel" }
 }

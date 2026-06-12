@@ -21,6 +21,21 @@ window.Combat = (function () {
       .replace(/^\n+|\n+$/g, "").trim();
   }
 
+  /* Does `given` match `expected`? Exact match first; if the expected
+     answer is a sequence of single tokens (e.g. "0\n1\n2"), also accept
+     the same tokens separated by spaces or commas ("0 1 2", "0, 1, 2"). */
+  function answerMatches(expected, given) {
+    const exp = normalizeAnswer(expected);
+    const got = normalizeAnswer(given);
+    if (exp === got) return true;
+    const expLines = exp.split("\n");
+    if (expLines.length > 1 && expLines.every((l) => !/\s/.test(l))) {
+      const tokens = got.split(/[\s,]+/).filter(Boolean);
+      return tokens.join("\n") === expLines.join("\n");
+    }
+    return false;
+  }
+
   function start(ent) {
     if (active) return;
     const def = ent.def;
@@ -33,7 +48,7 @@ window.Combat = (function () {
 
     let questions;
     if (mode === "review") {
-      questions = Quests.reviewPool();
+      questions = Quests.reviewPool(def);
       if (!questions.length) {
         UI.chat("You don't yet know any words of power. Seek a quest first!", "chat-warn");
         return;
@@ -71,7 +86,7 @@ window.Combat = (function () {
     active = {
       ent, def, mode, quest, modal, anim,
       enemyHp: def.hp, enemyMax: def.hp,
-      questions: shuffle(questions), qi: 0
+      questions: shuffle(questions), qi: 0, followUp: null
     };
 
     modal.box.querySelector("#cb-flee").onclick = () => {
@@ -94,7 +109,16 @@ window.Combat = (function () {
     b.querySelector("#cb-my-hp").style.width = (s.hp / s.maxHp * 100) + "%";
     b.querySelector("#cb-my-hp-t").textContent = `${s.hp} / ${s.maxHp}`;
     const eq = Game.equipStats();
-    b.querySelector("#cb-weapon").textContent = `⚔ ${eq.weaponName} (${eq.dmg} dmg/answer)`;
+    const wEl = b.querySelector("#cb-weapon");
+    wEl.innerHTML = "";
+    const wItem = Game.state.equipment.weapon ? ITEMS[Game.state.equipment.weapon] : null;
+    if (wItem) {
+      const icon = UI.itemIconCanvas(wItem, 22);
+      icon.style.verticalAlign = "middle";
+      icon.style.marginRight = "4px";
+      wEl.appendChild(icon);
+    }
+    wEl.appendChild(document.createTextNode(`${wItem ? "" : "⚔ "}${eq.weaponName} (${eq.dmg} dmg/answer)`));
   }
 
   function currentQuestion() {
@@ -111,18 +135,33 @@ window.Combat = (function () {
 
   function nextQuestion() {
     const b = active.modal.box;
-    const q = currentQuestion();
-    active.qi++;
+    let q;
+    if (active.followUp) {
+      q = active.followUp;
+      active.followUp = null;
+    } else {
+      q = currentQuestion();
+      active.qi++;
+    }
     b.querySelector("#cb-feedback").classList.add("hidden");
     const qEl = b.querySelector("#cb-q");
-    let html = `<div>${UI.mdInline(q.q)}</div>`;
+    let html = q.drill ? `<div class="drill-tag">⚡ Redemption drill — the idea you just missed, in a new form</div>` : "";
+    html += `<div>${UI.mdInline(q.q)}</div>`;
     if (q.code) html += `<pre>${UI.escapeHtml(q.code)}</pre>`;
     qEl.innerHTML = html;
 
     const ansEl = b.querySelector("#cb-answers");
     ansEl.innerHTML = "";
 
-    if (q.type === "mc") {
+    if (q.type === "tf") {
+      for (const label of ["True", "False"]) {
+        const btn = document.createElement("button");
+        btn.className = "ans-btn";
+        btn.textContent = label;
+        btn.onclick = () => answer(q, (label === "True") === q.answer, q.answer ? "True" : "False");
+        ansEl.appendChild(btn);
+      }
+    } else if (q.type === "mc") {
       const order = shuffle(q.choices.map((c, i) => i));
       for (const i of order) {
         const btn = document.createElement("button");
@@ -143,10 +182,10 @@ window.Combat = (function () {
       go.className = "btn";
       go.textContent = "Cast";
       const submit = () => {
-        const given = normalizeAnswer(input.value);
-        if (!given) return;
-        const accepted = [q.answer].concat(q.accept || []).map(normalizeAnswer);
-        answer(q, accepted.includes(given), q.answer);
+        const given = input.value;
+        if (!normalizeAnswer(given)) return;
+        const accepted = [q.answer].concat(q.accept || []);
+        answer(q, accepted.some((a) => answerMatches(a, given)), q.answer);
       };
       go.onclick = submit;
       input.addEventListener("keydown", (e) => {
@@ -194,9 +233,12 @@ window.Combat = (function () {
       const died = Game.damage(dmg);
       AudioFX.wrong(); AudioFX.hurt();
       updateBars();
+      // re-test the missed concept right away, in a fresh form
+      active.followUp = Drills.variantFor(q);
       fb.className = "combat-feedback bad";
       fb.innerHTML = `<b>✖ The ${UI.escapeHtml(active.def.name)} strikes you! (-${dmg} HP)</b><br>` +
-        `Correct answer: <code>${UI.escapeHtml(String(correctDisplay))}</code><br>${UI.mdInline(q.why)}<br>`;
+        `Correct answer: <code>${UI.escapeHtml(String(correctDisplay))}</code><br>${UI.mdInline(q.why)}<br>` +
+        (active.followUp ? `<i class="drill-note">The Flame will test this idea again — watch closely.</i><br>` : "");
       if (died) {
         const btn = document.createElement("button");
         btn.className = "btn btn-danger";

@@ -385,7 +385,8 @@ window.Game = (function () {
       if (player.path.length) {
         next = player.path.shift();
       } else {
-        const d = dirFromKey();
+        let d = dirFromKey();
+        if (d && Renderer.remapDir) d = Renderer.remapDir(d); // camera-relative WASD
         if (d) {
           player.facing = d.f;
           const nx = player.x + d.dx, ny = player.y + d.dy;

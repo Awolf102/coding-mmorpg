@@ -15,7 +15,7 @@ window.QUEST_DB.push(
   acceptLabel: "I'll take the south path.",
   midDialogue: "Still hearing howls from the south woods. A ranger finishes the hunt.",
   returnDialogue: [
-    "Clean kills. The wood is quieter — listen.",
+    "Clean kills. The woods are quieter — listen.",
     "Last part of the law: prove you can read the howls themselves. Pass this trial and no fork in any road will ever stop you again."
   ],
   doneDialogue: "You decide like a ranger now. Quick, clean, no second-guessing. The deep forest is yours to walk.",
@@ -28,7 +28,7 @@ window.QUEST_DB.push(
       "An `if` takes a path only when its question is True. The path itself is **indented** (4 spaces):",
       ">>>hp = 3\nif hp < 5:\n    print(\"Drink a salve!\")   # indented = inside the if",
       "`else` is the other fork. `elif` adds more forks between them — Python takes the FIRST true path and skips the rest:",
-      ">>>howls = 7\nif howls >= 10:\n    print(\"The pack hunts\")\nelif howls >= 5:\n    print(\"Wolves stir\")\nelse:\n    print(\"The wood sleeps\")",
+      ">>>howls = 7\nif howls >= 10:\n    print(\"The pack hunts\")\nelif howls >= 5:\n    print(\"Wolves stir\")\nelse:\n    print(\"The woods sleep\")",
       "You can join questions: `and` needs both true, `or` needs either, `not` flips."
     ],
     fragments: [
@@ -59,32 +59,36 @@ window.QUEST_DB.push(
       answer: "False", why: "a and b are both 3, so 'not equal' is False." },
     { type: "mc", q: "What is True and False?",
       choices: ["False", "True", "Error", "Maybe"],
-      answer: 0, why: "`and` needs BOTH sides true. One is False, so the whole thing is False." }
+      answer: 0, why: "`and` needs BOTH sides true. One is False, so the whole thing is False." },
+    { type: "tf", q: "True or False — `=` and `==` do the same thing.",
+      answer: false, why: "= STORES a value in a name; == ASKS whether two values are equal. Mixing them up is the oldest blunder in the old tongue." }
   ],
   challenge: {
     title: "Reading the Howls",
-    story: "Yara closes her eyes. \"Count the howls. Ten or more — the pack hunts tonight. Five to nine — they stir. Fewer — the wood sleeps. Teach the Flame to read them.\"",
+    story: "Yara closes her eyes. \"Count the howls. Ten or more — the pack hunts tonight. Five to nine — they stir. Fewer — the woods sleep. Teach the Flame to read them.\"",
     prompt: [
       "You are **given** `howls` (an int).",
       "Print exactly one line:",
-      ">>>The pack hunts     (when howls is 10 or more)\nWolves stir        (when howls is 5 to 9)\nThe wood sleeps    (when howls is under 5)",
+      ">>>The pack hunts     (when howls is 10 or more)\nWolves stir        (when howls is 5 to 9)\nThe woods sleep    (when howls is under 5)",
       "Use `if`, `elif`, and `else`."
     ],
     mode: "program",
     given: "howls",
-    starter: "# howls is given.\n# 10+  -> The pack hunts\n# 5-9  -> Wolves stir\n# else -> The wood sleeps\n\nif howls >= 10:\n    \n",
+    starter: "# howls is given. Read the howls and print the right line.\n\n",
     tests: [
       { setup: "howls = 12", expectOut: "The pack hunts", label: "howls = 12" },
       { setup: "howls = 10", expectOut: "The pack hunts", label: "howls = 10 (the edge!)" },
+      { setup: "howls = 9", expectOut: "Wolves stir", label: "howls = 9 (just under the edge)" },
       { setup: "howls = 7", expectOut: "Wolves stir", label: "howls = 7" },
       { setup: "howls = 5", expectOut: "Wolves stir", label: "howls = 5 (the other edge)" },
-      { setup: "howls = 2", expectOut: "The wood sleeps", label: "howls = 2" }
+      { setup: "howls = 2", expectOut: "The woods sleep", label: "howls = 2" }
     ],
     hints: [
-      "Check the biggest threshold first: if howls >= 10:",
-      "elif howls >= 5: catches 5-9, because 10+ was already taken by the first branch.",
-      "Full answer:\nif howls >= 10:\n    print(\"The pack hunts\")\nelif howls >= 5:\n    print(\"Wolves stir\")\nelse:\n    print(\"The wood sleeps\")"
-    ]
+      "The thresholds: 10+ hunts, 5-9 stirs, under 5 sleeps. Check the biggest threshold first: if howls >= 10:",
+      "elif howls >= 5: catches 5-9, because 10+ was already taken by the first branch. else: catches the rest.",
+      "Full answer:\nif howls >= 10:\n    print(\"The pack hunts\")\nelif howls >= 5:\n    print(\"Wolves stir\")\nelse:\n    print(\"The woods sleep\")"
+    ],
+    explain: "The chain checks top to bottom and takes the FIRST true branch: `howls >= 10` claims 10 and up, so by the time `elif howls >= 5` is asked, only 5-9 can still be true — and `else` catches everything under 5. Order the forks from strictest to loosest and the ranges sort themselves."
   },
   rewards: { xp: 130, coins: 40, items: [["hardened_leather", 1]] }
 },
@@ -142,7 +146,9 @@ window.QUEST_DB.push(
       answer: "Hit 1\nHit 2\nHit 3", why: "range(1,4) gives 1,2,3; print(\"Hit\", i) puts a space between them." },
     { type: "mc", q: "What does total += 5 do?",
       choices: ["Adds 5 to total and stores it back", "Compares total to 5", "Prints 5", "Creates a loop"],
-      answer: 0, why: "+= is shorthand: total = total + 5." }
+      answer: 0, why: "+= is shorthand: total = total + 5." },
+    { type: "tf", q: "True or False — `range(5)` includes the number 5.",
+      answer: false, why: "range stops BEFORE its limit: range(5) gives 0, 1, 2, 3, 4." }
   ],
   challenge: {
     title: "Light the Ward Stones",
@@ -155,17 +161,18 @@ window.QUEST_DB.push(
     ],
     mode: "program",
     given: "n",
-    starter: "# n is given: the number of ward stones.\n# Print: Ward 1 lit ... Ward n lit, then: All wards burn\n\nfor i in range(1, n + 1):\n    \n",
+    starter: "# n is given: the number of ward stones.\n# Print: Ward 1 lit ... Ward n lit, then: All wards burn\n\n",
     tests: [
       { setup: "n = 3", expectOut: "Ward 1 lit\nWard 2 lit\nWard 3 lit\nAll wards burn", label: "three stones" },
       { setup: "n = 1", expectOut: "Ward 1 lit\nAll wards burn", label: "a single stone" },
       { setup: "n = 5", expectOut: "Ward 1 lit\nWard 2 lit\nWard 3 lit\nWard 4 lit\nWard 5 lit\nAll wards burn", label: "five stones" }
     ],
     hints: [
-      "range(1, n + 1) counts 1, 2, ..., n — the +1 matters because range stops early.",
+      "A for loop with range does the counting: range(1, n + 1) counts 1, 2, ..., n — the +1 matters because range stops early.",
       "Inside the loop: print(f\"Ward {i} lit\"). After the loop (NOT indented): the final line.",
       "Full answer:\nfor i in range(1, n + 1):\n    print(f\"Ward {i} lit\")\nprint(\"All wards burn\")"
-    ]
+    ],
+    explain: "`range(1, n + 1)` starts at 1 and stops just before n + 1 — exactly the stones 1 through n. The f-string speaks a different ward number each pass, and the final print sits UNindented, so it runs once, after the loop closes."
   },
   rewards: { xp: 150, coins: 45, items: [["scroll_of_insight", 2]] }
 },
@@ -224,7 +231,9 @@ window.QUEST_DB.push(
       answer: "16", why: "1→2→4→8→16. At 16, x < 10 is False. The last doubling happened before the check." },
     { type: "mc", q: "You don't know how many tries something needs. Which loop?",
       choices: ["while — repeat until the condition breaks", "for — always", "Neither", "Both are identical"],
-      answer: 0, why: "while shines when only the stopping condition is known, not the count." }
+      answer: 0, why: "while shines when only the stopping condition is known, not the count." },
+    { type: "tf", q: "True or False — a while loop checks its condition BEFORE every pass.",
+      answer: true, why: "If the condition is already False at the start, the body never runs at all." }
   ],
   challenge: {
     title: "When the Curse Breaks",
@@ -237,7 +246,7 @@ window.QUEST_DB.push(
     ],
     mode: "program",
     given: "hp, drain",
-    starter: "# hp and drain are given.\n# Count the nights until hp <= 0, then print the count.\n\nnights = 0\nwhile hp > 0:\n    \n",
+    starter: "# hp and drain are given.\n# Count the nights until hp <= 0, then print the count.\n\n",
     tests: [
       { setup: "hp = 10\ndrain = 3", expectOut: "4", label: "hp 10, drain 3" },
       { setup: "hp = 12\ndrain = 4", expectOut: "3", label: "hp 12, drain 4" },
@@ -245,10 +254,11 @@ window.QUEST_DB.push(
       { setup: "hp = 20\ndrain = 6", expectOut: "4", label: "hp 20, drain 6" }
     ],
     hints: [
-      "Inside the loop: drain the hp AND count the night: hp -= drain, nights += 1",
+      "Start a counter at 0, then loop: while hp > 0. Inside, drain the hp AND count the night: hp -= drain, nights += 1",
       "Print nights AFTER the loop ends (unindented).",
       "Full answer:\nnights = 0\nwhile hp > 0:\n    hp -= drain\n    nights += 1\nprint(nights)"
-    ]
+    ],
+    explain: "Every pass drains the curse and tallies one night; the moment hp sinks to 0 or below, the `while hp > 0` question turns False and the loop releases. The counter — started before, grown inside, read after — is the vigil's whole answer."
   },
   rewards: { xp: 170, coins: 50, items: [["wickfire_torchblade", 1]] }
 },
@@ -312,7 +322,8 @@ window.QUEST_DB.push(
       "Test the BOTH case first: if i % 3 == 0 and i % 5 == 0: — otherwise 15 would be caught by the 3-fork.",
       "The chain is: if (both) / elif (% 3) / elif (% 5) / else print(i).",
       "Full answer:\nfor i in range(1, n + 1):\n    if i % 3 == 0 and i % 5 == 0:\n        print(\"EmberAsh\")\n    elif i % 3 == 0:\n        print(\"Ember\")\n    elif i % 5 == 0:\n        print(\"Ash\")\n    else:\n        print(i)"
-    ]
+    ],
+    explain: "Order saves the law: 15 divides by BOTH 3 and 5, so the both-case must be checked first or the 3-fork would steal it. `i % 3 == 0` is the divisibility test — remainder zero means a clean split — and the elif chain takes only the first true branch each pass."
   },
   rewards: { xp: 350, coins: 100, items: [["emberforged_falchion", 1], ["ember_charm", 1]], title: "Embercounter", unlocks: "The Sunken Ruins" }
 }

@@ -59,7 +59,9 @@ window.QUEST_DB.push(
       choices: ["'flame'", "flame", "\"flame'", "(flame)"],
       answer: 0, why: "'flame' has matching single quotes. Mismatched or missing quotes break the spell." },
     { type: "output", q: "Careful — what does this speak?", code: "print(\"2 + 3\")",
-      answer: "2 + 3", why: "Quotes make it a string. Python speaks the characters 2 + 3 — it does not do the math." }
+      answer: "2 + 3", why: "Quotes make it a string. Python speaks the characters 2 + 3 — it does not do the math." },
+    { type: "tf", q: "True or False — `print(\"Ash\")` and `print('Ash')` speak the same word.",
+      answer: true, why: "Double or single quotes both make a string — just match the pair." }
   ],
   challenge: {
     title: "The Words of Kindling",
@@ -78,7 +80,8 @@ window.QUEST_DB.push(
       "Each line needs its own print(), like: print(\"Spark\")",
       "Capitals matter! The third line is all uppercase: print(\"ASHVEIL ENDURES\")",
       "Full answer:\nprint(\"Spark\")\nprint(\"Flame\")\nprint(\"ASHVEIL ENDURES\")"
-    ]
+    ],
+    explain: "Each `print()` speaks exactly one line, top to bottom — so three prints make three lines in order. The quotes hold the text exactly as written, and the Flame compared it character for character: spelling, spaces, and capitals all count."
   },
   rewards: { xp: 60, coins: 25, items: [["ashen_salve", 2]] }
 },
@@ -133,11 +136,13 @@ window.QUEST_DB.push(
       answer: "3", why: "7 / 2 is 3.5, but // floors it down to 3." },
     { type: "output", q: "Refilling the pouch:", code: "coins = 5\ncoins = coins + 2\nprint(coins)",
       answer: "7", why: "coins becomes its old value plus 2: 5 + 2 = 7." },
-    { type: "mc", q: "What does 2 ** 4 equal?",
+    { type: "mc", q: "What does `2 ** 4` equal?",
       choices: ["16", "8", "6", "24"],
-      answer: 0, why: "** is power. 2**4 = 2*2*2*2 = 16." },
+      answer: 0, why: "`**` is power. `2 ** 4` = `2*2*2*2` = 16." },
     { type: "output", q: "Doubling the stock:", code: "a = 4\na = a * 2\nprint(a)",
-      answer: "8", why: "a is rebuilt as 4 * 2 = 8." }
+      answer: "8", why: "a is rebuilt as 4 * 2 = 8." },
+    { type: "tf", q: "True or False — `7 / 2` gives `3.5` in Python.",
+      answer: true, why: "A single / always gives a decimal. Use // to drop the remainder instead." }
   ],
   challenge: {
     title: "Rebuild the Ledger",
@@ -161,7 +166,8 @@ window.QUEST_DB.push(
       "The variables already exist — just use them: swords * price",
       "Order of operations does the right thing here: multiplication happens before the + tax.",
       "Full answer:\nprint(swords * price + tax)"
-    ]
+    ],
+    explain: "`swords * price + tax` works because Python multiplies before it adds — the sale is totaled first, then the king's tax lands once on top. The variables were already filled by the ledger, so your one line works for ANY counts Tobin throws at it."
   },
   rewards: { xp: 80, coins: 30, items: [["militia_shortsword", 1]] }
 },
@@ -220,7 +226,9 @@ window.QUEST_DB.push(
     { type: "output", q: "The whisper:", code: "word = \"KINGDOM\"\nprint(word.lower())",
       answer: "kingdom", why: ".lower() makes every letter lowercase." },
     { type: "output", q: "A classic scribe's blunder:", code: "print(\"5\" + \"5\")",
-      answer: "55", why: "These are strings, not numbers — + glues them into \"55\"." }
+      answer: "55", why: "These are strings, not numbers — + glues them into \"55\"." },
+    { type: "tf", q: "True or False — without the `f` prefix, `print(\"Hail {name}\")` prints the braces literally.",
+      answer: true, why: "The f is what brings the braces to life. Without it, {name} is just eight ordinary characters." }
   ],
   challenge: {
     title: "The Hero's Introduction",
@@ -245,7 +253,8 @@ window.QUEST_DB.push(
       "Line 1 is an f-string: print(f\"I am {name}, bane of {foe}!\")",
       "You can call .upper() inside the braces: f\"{name.upper()} RISES!\"",
       "Full answer:\nprint(f\"I am {name}, bane of {foe}!\")\nprint(f\"{name.upper()} RISES!\")\nprint(len(name))"
-    ]
+    ],
+    explain: "f-strings swap each `{...}` for its living value, so one line of code introduces ANY hero. Tools run right inside the braces — `{name.upper()}` shouts whoever the name holds — and `len(name)` measures it, 4 for Bryn, 6 for Kaelis."
   },
   rewards: { xp: 100, coins: 35, items: [["padded_vest", 1]] }
 },
@@ -307,7 +316,8 @@ window.QUEST_DB.push(
       "Three f-strings, three prints. Line 1: print(f\"{hero} bears the {blade}!\")",
       "You can do math inside braces: f\"Flame power: {sparks * embers}\"",
       "Full answer:\nprint(f\"{hero} bears the {blade}!\")\nprint(f\"Flame power: {sparks * embers}\")\nprint(f\"{hero.upper()} PREVAILS!\")"
-    ]
+    ],
+    explain: "Three f-strings carried the whole rite: `{hero}` and `{blade}` drop stored values into a sentence, `{sparks * embers}` proves real math runs inside the braces, and `{hero.upper()}` calls a string tool mid-weave. Everything Act I taught, in three lines."
   },
   rewards: { xp: 200, coins: 60, items: [["keen_iron_edge", 1]], title: "Gatewarden", unlocks: "Emberwood Forest" }
 }

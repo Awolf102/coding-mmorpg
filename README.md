@@ -29,7 +29,8 @@ then open http://localhost:8000
 
 | Action | Input |
 |---|---|
-| Walk | **Click** the ground (yellow X marks the spot) or **WASD / arrows** |
+| Walk | **Click** the ground (golden ring marks the spot) or **WASD / arrows** (camera-relative) |
+| Camera | **Right-drag / middle-drag** to orbit · **scroll wheel** to zoom |
 | Talk / Fight | **Click** an NPC or monster (or press **E / Space** when adjacent) |
 | Quest with **!** | That NPC has a new chapter for you |
 | Sidebar tabs | Inventory 🎒 · Equipment ⚔ · Skills 📊 · Quests 📜 · Settings ⚙ |
@@ -75,7 +76,11 @@ At the end, the choice is yours: **restore** the kingdom, **destroy** the Flame,
 
 ## 🧱 Tech
 
-- Pure HTML/CSS/JS — no build step, no dependencies, no image assets (all art is procedural canvas).
+- Pure HTML/CSS/JS + a vendored copy of [Three.js](https://threejs.org) — no build step, no image assets.
+  The world is a **low-poly 3D scene** (RuneScape-style) generated from the tile maps: vertex-painted
+  terrain, merged prop geometry, animated water/lava shaders, per-act lighting & weather, and blocky
+  3D characters whose portraits are rendered live into the 2D UI. Item icons are painted procedurally
+  on canvas.
 - Python execution & grading: Pyodide (CPython in WebAssembly) with a sandboxed test harness,
   per-test timeouts (infinite-loop protection), and friendly error reporting.
 - More factions (JavaScript, C++, Rust) are data-driven: add a new quest file to `js/data/`.

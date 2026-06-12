@@ -82,7 +82,8 @@ window.QUEST_DB.push(
       "The whole body is one line starting with return.",
       "return strength * 2 + bonus — no print() anywhere.",
       "Full answer:\ndef strike(strength, bonus):\n    return strength * 2 + bonus"
-    ]
+    ],
+    explain: "`return` is why the drill-masters could test your function directly: it hands the computed number back to whoever called. A print would only have DISPLAYED it — the function would return None, and the army's math would collapse."
   },
   rewards: { xp: 300, coins: 85, items: [["citadel_plate", 1]] }
 },
@@ -165,7 +166,8 @@ window.QUEST_DB.push(
       "The counting shape: count = 0, loop the list, if lvl >= threshold: count += 1, return count.",
       "The default goes in the def line: def count_ready(levels, threshold=10):",
       "Full answer:\ndef count_ready(levels, threshold=10):\n    count = 0\n    for lvl in levels:\n        if lvl >= threshold:\n            count += 1\n    return count"
-    ]
+    ],
+    explain: "`threshold=10` in the def line makes a silent caller mean 10 — that's why count_ready([5, 12, 9, 30]) worked with one argument. Inside is the counting shape: start at 0, test every level, += 1 on a match, return after the loop. An empty muster simply never enters the loop and returns 0."
   },
   rewards: { xp: 320, coins: 90, items: [["pyreheart_cleaver", 1]] }
 },
@@ -251,7 +253,8 @@ window.QUEST_DB.push(
       "Shape: [lvl * 2 for lvl in levels if lvl >= 10]",
       "Return it directly — return [lvl * 2 for lvl in levels if lvl >= 10]",
       "Full answer:\ndef empower(levels):\n    return [lvl * 2 for lvl in levels if lvl >= 10]"
-    ]
+    ],
+    explain: "One comprehension, two jobs: the trailing `if lvl >= 10` chooses who marches, and the leading `lvl * 2` shapes the chosen. Recruits never enter the new list at all, and because the comprehension walks in order, the veterans keep their ranks."
   },
   rewards: { xp: 340, coins: 95, items: [["phoenix_draught", 2]] }
 },
@@ -334,7 +337,8 @@ window.QUEST_DB.push(
       "__init__ body: self.name = name and self.power = power",
       "rally: return f\"{self.name} stands!\" — strike: return self.power + bonus",
       "Full answer:\nclass Knight:\n    def __init__(self, name, power):\n        self.name = name\n        self.power = power\n\n    def rally(self):\n        return f\"{self.name} stands!\"\n\n    def strike(self, bonus):\n        return self.power + bonus"
-    ]
+    ],
+    explain: "`__init__` runs once per stamping and stores each knight's own name and power onto `self`. rally and strike read them back through self — so Bors answers with Bors's values and Mira with Mira's, from the same single piece of writing."
   },
   rewards: { xp: 360, coins: 100, items: [["serpent_sigil", 1]] }
 },
@@ -399,7 +403,8 @@ window.QUEST_DB.push(
       "take_damage: self.hp = max(0, self.hp - n) — max() keeps it from going negative.",
       "is_alive: return self.hp > 0 — the comparison already IS a True/False value.",
       "Full answer:\nclass Hero:\n    def __init__(self, name, hp):\n        self.name = name\n        self.hp = hp\n\n    def take_damage(self, n):\n        self.hp = max(0, self.hp - n)\n\n    def heal(self, n):\n        self.hp += n\n\n    def is_alive(self):\n        return self.hp > 0"
-    ]
+    ],
+    explain: "`max(0, self.hp - n)` is the floor-at-zero rite — overkill can't dig below the ground. And `self.hp > 0` already IS a True/False value, so is_alive returns the comparison itself, no if/else required. Methods mutate self's attributes; the object remembers between calls."
   },
   rewards: { xp: 800, coins: 250, items: [["kingless_blade", 1], ["mantle_of_embers", 1]], title: "Kingslayer", unlocks: "The Flame Sanctum" }
 }

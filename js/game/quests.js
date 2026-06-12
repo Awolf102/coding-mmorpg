@@ -83,6 +83,8 @@ window.Quests = (function () {
       AudioFX.quest();
       UI.toast(`Objective complete — return to ${npc.name}`, true);
       UI.updateHintBar(`💬 Return to ${npc.name} (${MAPS[q.map].name}) for your trial`);
+    } else {
+      UI.updateHintBar(`⚔ Slay ${ENEMIES[q.kills.enemy].name}s — ${r.kills}/${q.kills.count} slain`);
     }
     Game.save();
     UI.refresh();
@@ -143,13 +145,33 @@ window.Quests = (function () {
     }
   }
 
-  /* questions for "review" fights vs enemies outside the active quest */
-  function reviewPool() {
+  /* the quest a given enemy type belongs to (kill target or boss) */
+  function questForEnemy(enemyId) {
+    for (const id of order) {
+      const q = byId[id];
+      if ((q.kills && q.kills.enemy === enemyId) || (q.boss && q.bossEnemy === enemyId)) return q;
+    }
+    return null;
+  }
+
+  /* Questions for "review" fights vs enemies outside the active quest.
+     Scoped to the enemy's region: only quests of the same act, up to and
+     including the quest this enemy belongs to, and only ones the player
+     has started. A Grave Wisp re-asks Wisp and earlier Ruins questions —
+     never Act I material, never later monsters' material. */
+  function reviewPool(enemyDef) {
+    const tied = enemyDef ? questForEnemy(enemyDef.id) : null;
+    const cap = tied ? idx(tied.id) : order.length;
     const pool = [];
     for (const id of order) {
-      const r = rec(id);
-      if (r) pool.push(...byId[id].questions);
+      const q = byId[id];
+      if (!rec(id)) continue;
+      if (tied && (q.act !== tied.act || idx(id) > cap)) continue;
+      pool.push(...q.questions);
     }
+    if (pool.length) return pool;
+    // fallback: anything learned (e.g. region entered before its first quest)
+    for (const id of order) if (rec(id)) pool.push(...byId[id].questions);
     return pool;
   }
 

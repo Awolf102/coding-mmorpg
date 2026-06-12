@@ -1,3 +1,5 @@
+#for safety reasons
+
 .DS_Store
 __pycache__/
 *.pyc

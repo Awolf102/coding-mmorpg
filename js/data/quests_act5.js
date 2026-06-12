@@ -82,7 +82,8 @@ window.QUEST_DB.push(
       "Nest the loops: for row in grid: / for cell in row:",
       "Inside: if cell == 1: count += 1 (or simply count += cell).",
       "Full answer:\ndef count_embers(grid):\n    count = 0\n    for row in grid:\n        for cell in row:\n            if cell == 1:\n                count += 1\n    return count"
-    ]
+    ],
+    explain: "The outer loop hands you each row; the inner loop walks every cell of THAT row — so every cell is visited exactly once, in reading order. The counting shape rides on top: += 1 per ember, return after BOTH loops close."
   },
   rewards: { xp: 420, coins: 120, items: [["aegis_of_the_first", 1]] }
 },
@@ -167,7 +168,8 @@ window.QUEST_DB.push(
       "Sort first: ranked = sorted(champions, key=lambda c: c[1], reverse=True)",
       "Then extract names: return [c[0] for c in ranked]",
       "Full answer:\ndef rank_champions(champions):\n    ranked = sorted(champions, key=lambda c: c[1], reverse=True)\n    return [c[0] for c in ranked]"
-    ]
+    ],
+    explain: "`key=lambda c: c[1]` told sorted to judge each pair by its power, not its name; `reverse=True` put the strongest first. Then a comprehension plucked slot 0 from each ranked pair — sort by one column, return the other."
   },
   rewards: { xp: 450, coins: 130, items: [["flame_of_the_forgotten", 1]] }
 },
@@ -252,7 +254,8 @@ window.QUEST_DB.push(
       "Two lines of logic: if n <= 1: return 1, then the recursive return.",
       "The recursive case: return n * flame_chain(n - 1) — trust the smaller call.",
       "Full answer:\ndef flame_chain(n):\n    if n <= 1:\n        return 1\n    return n * flame_chain(n - 1)"
-    ]
+    ],
+    explain: "The base case (`n <= 1` → 1) is the floor the tower stands on — it answers without calling again, covering both 1 and the load-bearing 0. Every other call does ONE multiplication and trusts `flame_chain(n - 1)` for the rest: calls descend to the floor, answers climb back up."
   },
   rewards: { xp: 480, coins: 140, items: [["firstflame_edge", 1]] }
 },
@@ -322,7 +325,8 @@ window.QUEST_DB.push(
       "Nested loops: for i in range(len(runes)): for j in range(i + 1, len(runes)): if they sum to target, return [i, j].",
       "Dict way: keep seen = {value: index}; for each rune ask if (target - rune) is in seen.",
       "Full answer (either works):\ndef twin_marks(runes, target):\n    seen = {}\n    for i in range(len(runes)):\n        partner = target - runes[i]\n        if partner in seen:\n            return [seen[partner], i]\n        seen[runes[i]] = i"
-    ]
+    ],
+    explain: "Each rune asks one question: was my partner (`target - rune`) already seen? The dict remembers every value's index, so the moment the second twin walks past, both positions are known — one pass, and the earlier index comes out first because it went into `seen` first. (Nested loops with `j` starting at `i + 1` prove the same thing the honest way.)"
   },
   rewards: { xp: 1200, coins: 400, items: [["last_crown", 1], ["phoenix_draught", 2]], title: "Twinsbane" }
 },
@@ -395,7 +399,8 @@ window.QUEST_DB.push(
       "Brute force: loop every start i; walk forward adding chars to a set; break on a repeat; track the best length with max().",
       "Sliding window: keep last = {char: index} and a window start; on a repeat inside the window, move start past the old copy; best = max(best, i - start + 1).",
       "Full answer (brute force):\ndef clean_verse(s):\n    best = 0\n    for i in range(len(s)):\n        seen = set()\n        for ch in s[i:]:\n            if ch in seen:\n                break\n            seen.add(ch)\n        best = max(best, len(seen))\n    return best"
-    ]
+    ],
+    explain: "Whatever the approach, the heart is the same: keep a record of the clean stretch (a set of seen letters, or a dict of last positions), break or slide the moment a letter repeats, and let `max()` remember the longest clean breath ever found. The empty verse never enters the loop, so best stays 0 — every lesson of the Chronicle in one verse."
   },
   rewards: { xp: 3000, coins: 1000, items: [["eternal_brand", 1]], title: "Flamebearer", final: true }
 }

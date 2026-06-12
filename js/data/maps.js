@@ -89,7 +89,7 @@ window.MAPS = (function () {
       { type: "cinder_rat", x: 15, y: 27, wander: 3 },
       { type: "cinder_rat", x: 28, y: 25, wander: 3 },
       { type: "cinder_rat", x: 31, y: 27, wander: 3 },
-      { type: "ash_slime", x: 38, y: 15, wander: 3 },
+      { type: "ash_slime", x: 39, y: 18, wander: 3 },
       { type: "ash_slime", x: 41, y: 17, wander: 3 },
       { type: "ash_slime", x: 36, y: 18, wander: 3 },
       { type: "ember_imp", x: 6, y: 16, wander: 3 },
@@ -150,7 +150,7 @@ window.MAPS = (function () {
       { type: "restless_husk", x: 28, y: 21, wander: 3 },
       { type: "restless_husk", x: 33, y: 26, wander: 3 },
       { type: "restless_husk", x: 28, y: 25, wander: 3 },
-      { type: "restless_husk", x: 35, y: 21, wander: 3 }
+      { type: "restless_husk", x: 35, y: 24, wander: 3 }
     ];
     const portals = [
       { x: 2, y: 10, to: "village", tx: 42, ty: 10, req: null, label: "Ashveil Village" },

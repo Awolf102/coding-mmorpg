@@ -20,9 +20,15 @@ window.UI = (function () {
     safe = safe.replace(/<(\/?[bi])>/g, "$1");
     safe = escapeHtml(safe);
     safe = safe.replace(/(\/?[bi])/g, "<$1>");
-    out = safe
-      .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
-      .replace(/`([^`]+)`/g, "<code>$1</code>");
+    // code spans FIRST (their contents — e.g. `2**4` — must never be
+    // mistaken for **bold** markers), stashed so the bold pass skips them
+    const stash = [];
+    safe = safe.replace(/`([^`]+)`/g, (_, code) => {
+      stash.push(`<code>${code}</code>`);
+      return "\x01" + (stash.length - 1) + "\x02";
+    });
+    safe = safe.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+    out = safe.replace(/\x01(\d+)\x02/g, (_, i) => stash[i]);
     return out;
   }
   /* lesson/prompt bodies: array of paragraphs; ">>>" prefix = code block */
@@ -268,7 +274,9 @@ window.UI = (function () {
       row.className = "equip-slot";
       if (item) {
         row.appendChild(itemIconCanvas(item, 36));
-        row.innerHTML += `<div><div class="equip-kind">${kind}</div><div class="equip-name r-${item.rarity}">${escapeHtml(item.name)}</div></div>`;
+        const info = document.createElement("div");
+        info.innerHTML = `<div class="equip-kind">${kind}</div><div class="equip-name r-${item.rarity}">${escapeHtml(item.name)}</div>`;
+        row.appendChild(info);
         bindTooltip(row, () => itemTooltipHtml(item, kind === "weapon" ? "" : "Click to unequip"));
         if (kind !== "weapon") row.onclick = () => { AudioFX.click(); Game.unequip(kind); };
       } else {
@@ -325,9 +333,16 @@ window.UI = (function () {
         continue;
       }
       const icon = s === "done" ? "✔" : q.boss ? "☠" : "•";
+      let progress = "";
+      if (s === "active" && q.kills) {
+        const r = Game.state.quests[q.id];
+        const pct = Math.min(100, r.kills / q.kills.count * 100);
+        progress = `<div class="q-bar-outer"><div class="q-bar-inner" style="width:${pct}%"></div></div>
+          <div class="q-bar-label">${r.kills} / ${q.kills.count} slain</div>`;
+      }
       html += `<div class="quest-entry ${s === "done" ? "q-done" : ""}" data-q="${q.id}">
         <div class="q-name">${icon} ${escapeHtml(q.title)}</div>
-        <div class="q-obj">${escapeHtml(Quests.objectiveText(q, s))}</div>
+        <div class="q-obj">${escapeHtml(Quests.objectiveText(q, s))}</div>${progress}
       </div>`;
     }
     area.innerHTML = html;
@@ -605,11 +620,26 @@ window.UI = (function () {
         const before = ta.value.slice(0, s);
         const line = before.slice(before.lastIndexOf("\n") + 1);
         let indent = (line.match(/^\s*/) || [""])[0];
-        if (line.trimEnd().endsWith(":")) indent += "    ";
+        // plain Enter keeps the previous line's indent (plus one level after ":");
+        // Shift+Enter forces one level deeper than the previous line
+        if (e.shiftKey || line.trimEnd().endsWith(":")) indent += "    ";
         const insert = "\n" + indent;
         ta.value = before + insert + ta.value.slice(ta.selectionEnd);
         ta.selectionStart = ta.selectionEnd = s + insert.length;
         syncGutter();
+      } else if (e.key === "Backspace" && ta.selectionStart === ta.selectionEnd) {
+        // inside leading indentation, Backspace steps back a whole indent level
+        const s = ta.selectionStart;
+        const before = ta.value.slice(0, s);
+        const lineStart = before.lastIndexOf("\n") + 1;
+        const prefix = before.slice(lineStart);
+        if (prefix.length > 0 && /^ +$/.test(prefix)) {
+          e.preventDefault();
+          const remove = prefix.length % 4 || 4;
+          ta.value = ta.value.slice(0, s - remove) + ta.value.slice(s);
+          ta.selectionStart = ta.selectionEnd = s - remove;
+          syncGutter();
+        }
       }
     });
     syncGutter();
@@ -694,13 +724,24 @@ window.UI = (function () {
       results.innerHTML = html;
       if (all) {
         AudioFX.victory();
-        results.innerHTML += `\n<span class="t-pass"><b>🔥 The Flame accepts your rite!</b></span>`;
         runBtn.disabled = true;
-        setTimeout(() => {
+        results.innerHTML += `\n<span class="t-pass"><b>🔥 The Flame accepts your rite!</b></span>`;
+        if (ch.explain) {
+          results.innerHTML += `\n<div class="explain-box"><b>📖 Why it works</b><br>${mdInline(ch.explain)}</div>`;
+        }
+        const goBtn = document.createElement("button");
+        goBtn.className = "btn btn-flame";
+        goBtn.style.marginTop = "8px";
+        goBtn.textContent = isBoss ? "⚔ Strike the final blow" : "Claim your reward";
+        goBtn.onclick = () => {
+          AudioFX.click();
           m.close();
           if (isBoss) { if (opts.onWin) opts.onWin(); }
           else Quests.completeChallenge(quest);
-        }, 900);
+        };
+        results.appendChild(goBtn);
+        goBtn.focus();
+        results.scrollTop = results.scrollHeight;
       } else {
         AudioFX.wrong();
         if (isBoss && opts.onFail) {
