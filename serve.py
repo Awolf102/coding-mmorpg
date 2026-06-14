@@ -5,6 +5,7 @@ import http.server
 import socketserver
 import webbrowser
 import os
+import sys
 
 PORT = 8000
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -21,10 +22,11 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
     url = f"http://localhost:{PORT}"
     print(f"🔥 Ashes of the First Kingdom — serving at {url}")
     print("   (Ctrl+C to stop)")
-    try:
-        webbrowser.open(url)
-    except Exception:
-        pass
+    if sys.stdout.isatty():  # only pop a browser for a human at a terminal
+        try:
+            webbrowser.open(url)
+        except Exception:
+            pass
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

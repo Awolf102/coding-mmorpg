@@ -1,0 +1,238 @@
+[
+  {
+    "id": "cpp01",
+    "title": "The Words of Kindling",
+    "tests": [
+      { "stdin": "", "expectOut": "Spark\nFlame\nASHVEIL ENDURES", "label": "The rite of kindling" }
+    ],
+    "solution": "#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Spark\\n\";\n    cout << \"Flame\\n\";\n    cout << \"ASHVEIL ENDURES\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp02",
+    "title": "Rebuild the Ledger",
+    "tests": [
+      { "stdin": "3 10 4", "expectOut": "34", "label": "3 swords at 10c, tax 4" },
+      { "stdin": "7 12 9", "expectOut": "93", "label": "7 swords at 12c, tax 9" },
+      { "stdin": "0 50 2", "expectOut": "2", "label": "slow market day" }
+    ],
+    "solution": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int swords, price, tax;\n    cin >> swords >> price >> tax;\n    cout << swords * price + tax << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp03",
+    "title": "The Hero's Introduction",
+    "tests": [
+      { "stdin": "Bryn\nash", "expectOut": "I am Bryn, bane of ash!\nBRYN RISES!\n4", "label": "Bryn vs ash" },
+      { "stdin": "Kaelis\nthe dark", "expectOut": "I am Kaelis, bane of the dark!\nKAELIS RISES!\n6", "label": "Kaelis vs the dark" }
+    ],
+    "solution": "#include <iostream>\n#include <string>\n#include <cctype>\nusing namespace std;\n\nint main() {\n    string name, foe;\n    getline(cin, name);\n    getline(cin, foe);\n    cout << \"I am \" << name << \", bane of \" << foe << \"!\\n\";\n    string up = name;\n    for (char &c : up) c = toupper(c);\n    cout << up << \" RISES!\\n\";\n    cout << name.size() << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp04",
+    "title": "The Rite of Unbinding",
+    "tests": [
+      { "stdin": "Bryn\nDull Blade\n3 5", "expectOut": "Bryn bears the Dull Blade!\nFlame power: 15\nBRYN PREVAILS!", "label": "Bryn's rite" },
+      { "stdin": "Sora\nKeen Iron Edge\n7 2", "expectOut": "Sora bears the Keen Iron Edge!\nFlame power: 14\nSORA PREVAILS!", "label": "Sora's rite" }
+    ],
+    "solution": "#include <iostream>\n#include <string>\n#include <cctype>\nusing namespace std;\n\nint main() {\n    string hero, blade;\n    getline(cin, hero);\n    getline(cin, blade);\n    int sparks, embers;\n    cin >> sparks >> embers;\n    cout << hero << \" bears the \" << blade << \"!\\n\";\n    cout << \"Flame power: \" << sparks * embers << \"\\n\";\n    string up = hero;\n    for (char &c : up) c = toupper(c);\n    cout << up << \" PREVAILS!\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp05",
+    "title": "Reading the Howls",
+    "tests": [
+      { "stdin": "12", "expectOut": "The pack hunts", "label": "howls = 12" },
+      { "stdin": "10", "expectOut": "The pack hunts", "label": "howls = 10 (the edge!)" },
+      { "stdin": "7", "expectOut": "Wolves stir", "label": "howls = 7" },
+      { "stdin": "5", "expectOut": "Wolves stir", "label": "howls = 5 (the other edge)" },
+      { "stdin": "2", "expectOut": "The wood sleeps", "label": "howls = 2" }
+    ],
+    "solution": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int howls;\n    cin >> howls;\n    if (howls >= 10) cout << \"The pack hunts\\n\";\n    else if (howls >= 5) cout << \"Wolves stir\\n\";\n    else cout << \"The wood sleeps\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp06",
+    "title": "Light the Ward Stones",
+    "tests": [
+      { "stdin": "3", "expectOut": "Ward 1 lit\nWard 2 lit\nWard 3 lit\nAll wards burn", "label": "three stones" },
+      { "stdin": "1", "expectOut": "Ward 1 lit\nAll wards burn", "label": "a single stone" },
+      { "stdin": "5", "expectOut": "Ward 1 lit\nWard 2 lit\nWard 3 lit\nWard 4 lit\nWard 5 lit\nAll wards burn", "label": "five stones" }
+    ],
+    "solution": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    for (int i = 1; i <= n; i++) cout << \"Ward \" << i << \" lit\\n\";\n    cout << \"All wards burn\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp07",
+    "title": "When the Curse Breaks",
+    "tests": [
+      { "stdin": "10 3", "expectOut": "4", "label": "hp 10, drain 3" },
+      { "stdin": "12 4", "expectOut": "3", "label": "hp 12, drain 4" },
+      { "stdin": "1 1", "expectOut": "1", "label": "a weak curse" },
+      { "stdin": "20 6", "expectOut": "4", "label": "hp 20, drain 6" }
+    ],
+    "solution": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int hp, drain;\n    cin >> hp >> drain;\n    int nights = 0;\n    while (hp > 0) {\n        hp -= drain;\n        nights++;\n    }\n    cout << nights << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp08",
+    "title": "The Warden's Count",
+    "tests": [
+      { "stdin": "5", "expectOut": "1\n2\nEmber\n4\nAsh", "label": "n = 5" },
+      { "stdin": "15", "expectOut": "1\n2\nEmber\n4\nAsh\nEmber\n7\n8\nEmber\nAsh\n11\nEmber\n13\n14\nEmberAsh", "label": "n = 15 (the full law)" },
+      { "stdin": "3", "expectOut": "1\n2\nEmber", "label": "n = 3" }
+    ],
+    "solution": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    for (int i = 1; i <= n; i++) {\n        if (i % 3 == 0 && i % 5 == 0) cout << \"EmberAsh\\n\";\n        else if (i % 3 == 0) cout << \"Ember\\n\";\n        else if (i % 5 == 0) cout << \"Ash\\n\";\n        else cout << i << \"\\n\";\n    }\n    return 0;\n}"
+  },
+  {
+    "id": "cpp09",
+    "title": "Catalogue the Crate",
+    "tests": [
+      { "stdin": "2\nCrown Shard\nOld Coin", "expectOut": "2\nCrown Shard\nOld Coin\nCatalogued: Crown Shard\nCatalogued: Old Coin\nCatalogued: Flame Sigil", "label": "two relics" },
+      { "stdin": "3\nMask\nUrn\nBell", "expectOut": "3\nMask\nBell\nCatalogued: Mask\nCatalogued: Urn\nCatalogued: Bell\nCatalogued: Flame Sigil", "label": "three relics" }
+    ],
+    "solution": "#include <iostream>\n#include <vector>\n#include <string>\nusing namespace std;\n\nint main() {\n    int m;\n    cin >> m;\n    cin.ignore();\n    vector<string> relics(m);\n    for (int i = 0; i < m; i++) getline(cin, relics[i]);\n    cout << relics.size() << \"\\n\";\n    cout << relics.front() << \"\\n\";\n    cout << relics.back() << \"\\n\";\n    relics.push_back(\"Flame Sigil\");\n    for (const string &r : relics) cout << \"Catalogued: \" << r << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp10",
+    "title": "The Depth Survey",
+    "tests": [
+      { "stdin": "5\n5 13 2 8 21", "expectOut": "49\n21\n2\n5 13 2\nyes", "label": "the flooded vault" },
+      { "stdin": "4\n4 4 4 9", "expectOut": "21\n9\n4\n4 4 4\nno", "label": "the still pool" }
+    ],
+    "solution": "#include <iostream>\n#include <vector>\n#include <numeric>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> depths(n);\n    for (int i = 0; i < n; i++) cin >> depths[i];\n    cout << accumulate(depths.begin(), depths.end(), 0) << \"\\n\";\n    cout << *max_element(depths.begin(), depths.end()) << \"\\n\";\n    cout << *min_element(depths.begin(), depths.end()) << \"\\n\";\n    cout << depths[0] << \" \" << depths[1] << \" \" << depths[2] << \"\\n\";\n    bool has13 = find(depths.begin(), depths.end(), 13) != depths.end();\n    cout << (has13 ? \"yes\" : \"no\") << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp11",
+    "title": "The Ledger of Souls",
+    "tests": [
+      { "stdin": "2\nBryn 3\nSora 7\n3\nBryn\nMaren\nSora", "expectOut": "Bryn owes 3\nMaren unjudged\nSora owes 7", "label": "three queries" },
+      { "stdin": "1\nEdda 1\n2\nEdda\nGorm", "expectOut": "Edda owes 1\nGorm unjudged", "label": "one soul, two asked" }
+    ],
+    "solution": "#include <iostream>\n#include <string>\n#include <unordered_map>\nusing namespace std;\n\nint main() {\n    int m;\n    cin >> m;\n    unordered_map<string, int> souls;\n    for (int i = 0; i < m; i++) {\n        string name; int debt;\n        cin >> name >> debt;\n        souls[name] = debt;\n    }\n    int q;\n    cin >> q;\n    for (int i = 0; i < q; i++) {\n        string name;\n        cin >> name;\n        if (souls.count(name)) cout << name << \" owes \" << souls[name] << \"\\n\";\n        else cout << name << \" unjudged\\n\";\n    }\n    return 0;\n}"
+  },
+  {
+    "id": "cpp12",
+    "title": "Distill the True Sigils",
+    "tests": [
+      { "stdin": "5\nash flame ash oak flame", "expectOut": "3\nash flame oak\nyes", "label": "the forged sack" },
+      { "stdin": "3\na a a", "expectOut": "1\na\nno", "label": "one true name" }
+    ],
+    "solution": "#include <iostream>\n#include <string>\n#include <set>\nusing namespace std;\n\nint main() {\n    int m;\n    cin >> m;\n    set<string> uniq;\n    for (int i = 0; i < m; i++) {\n        string s;\n        cin >> s;\n        uniq.insert(s);\n    }\n    cout << uniq.size() << \"\\n\";\n    bool first = true;\n    for (const string &s : uniq) {\n        if (!first) cout << \" \";\n        cout << s;\n        first = false;\n    }\n    cout << \"\\n\";\n    cout << (uniq.count(\"flame\") ? \"yes\" : \"no\") << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp13",
+    "title": "The Final Audit",
+    "tests": [
+      { "stdin": "5\ncoin crown coin mask coin", "expectOut": "coin\n3", "label": "the coin hoard" },
+      { "stdin": "3\nurn urn mask", "expectOut": "urn\n2", "label": "the urn pair" },
+      { "stdin": "1\nsigil", "expectOut": "sigil\n1", "label": "a single relic" }
+    ],
+    "solution": "#include <iostream>\n#include <string>\n#include <unordered_map>\nusing namespace std;\n\nint main() {\n    int m;\n    cin >> m;\n    unordered_map<string, int> counts;\n    for (int i = 0; i < m; i++) {\n        string r;\n        cin >> r;\n        counts[r]++;\n    }\n    string best; int most = -1;\n    for (auto [k, v] : counts) {\n        if (v > most) { most = v; best = k; }\n    }\n    cout << best << \"\\n\" << most << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp14",
+    "title": "Codify the Strike",
+    "tests": [
+      { "stdin": "5 3", "expectOut": "13", "label": "strike(5, 3)" },
+      { "stdin": "0 7", "expectOut": "7", "label": "strike(0, 7)" },
+      { "stdin": "10 0", "expectOut": "20", "label": "strike(10, 0)" },
+      { "stdin": "12 6", "expectOut": "30", "label": "strike(12, 6)" }
+    ],
+    "solution": "#include <iostream>\nusing namespace std;\n\nint strike(int strength, int bonus) {\n    return strength * 2 + bonus;\n}\n\nint main() {\n    int strength, bonus;\n    cin >> strength >> bonus;\n    cout << strike(strength, bonus) << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp15",
+    "title": "The Garrison Count",
+    "tests": [
+      { "stdin": "4\n5 12 9 30\n25", "expectOut": "2\n1", "label": "default 10 (2), then >= 25 (1)" },
+      { "stdin": "3\n1 2 3\n2", "expectOut": "0\n2", "label": "default 10 (0), then >= 2 (2)" },
+      { "stdin": "0\n5", "expectOut": "0\n0", "label": "an empty muster" },
+      { "stdin": "1\n10\n10", "expectOut": "1\n1", "label": "exactly at the threshold" }
+    ],
+    "solution": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint count_ready(const vector<int>& levels, int threshold = 10) {\n    int count = 0;\n    for (int lvl : levels) {\n        if (lvl >= threshold) count++;\n    }\n    return count;\n}\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> levels(n);\n    for (int i = 0; i < n; i++) cin >> levels[i];\n    int threshold;\n    cin >> threshold;\n    cout << count_ready(levels) << \"\\n\";\n    cout << count_ready(levels, threshold) << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp16",
+    "title": "Empower the Veterans",
+    "tests": [
+      { "stdin": "3\n12 3 10", "expectOut": "24 20", "label": "two veterans" },
+      { "stdin": "2\n1 2", "expectOut": "", "label": "all recruits" },
+      { "stdin": "1\n10", "expectOut": "20", "label": "exactly level 10" },
+      { "stdin": "4\n30 9 15 2", "expectOut": "60 30", "label": "mixed muster" }
+    ],
+    "solution": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nvector<int> empower(const vector<int>& levels) {\n    vector<int> out;\n    for (int lvl : levels) {\n        if (lvl >= 10) out.push_back(lvl * 2);\n    }\n    return out;\n}\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> levels(n);\n    for (int i = 0; i < n; i++) cin >> levels[i];\n    vector<int> result = empower(levels);\n    bool first = true;\n    for (int v : result) {\n        if (!first) cout << \" \";\n        cout << v;\n        first = false;\n    }\n    cout << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp17",
+    "title": "Write the Knight",
+    "tests": [
+      { "stdin": "Mira 7 5", "expectOut": "Mira\n7\nMira stands!\n12", "label": "Mira the knight" },
+      { "stdin": "Bors 10 0", "expectOut": "Bors\n10\nBors stands!\n10", "label": "Bors the knight" }
+    ],
+    "solution": "#include <iostream>\n#include <string>\nusing namespace std;\n\nstruct Knight {\n    string name;\n    int power;\n\n    string rally() {\n        return name + \" stands!\";\n    }\n    int strike(int bonus) {\n        return power + bonus;\n    }\n};\n\nint main() {\n    string name; int power, bonus;\n    cin >> name >> power >> bonus;\n    Knight k{name, power};\n    cout << k.name << \"\\n\";\n    cout << k.power << \"\\n\";\n    cout << k.rally() << \"\\n\";\n    cout << k.strike(bonus) << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp18",
+    "title": "The Champion's Form",
+    "tests": [
+      { "stdin": "Bryn 30\n2\ndamage 10\ndamage 50", "expectOut": "0\ndead", "label": "overkill floors at 0, then dead" },
+      { "stdin": "Sora 5\n1\nheal 7", "expectOut": "12\nalive", "label": "heal 5 -> 12, alive" },
+      { "stdin": "Kael 30\n1\ndamage 10", "expectOut": "20\nalive", "label": "take 10 -> 20, alive" },
+      { "stdin": "Edda 10\n2\ndamage 4\nheal 1", "expectOut": "7\nalive", "label": "4 down, 1 up -> 7" }
+    ],
+    "solution": "#include <iostream>\n#include <string>\n#include <algorithm>\nusing namespace std;\n\nstruct Hero {\n    string name;\n    int hp;\n\n    void take_damage(int n) {\n        hp = max(0, hp - n);\n    }\n    void heal(int n) {\n        hp += n;\n    }\n    bool is_alive() {\n        return hp > 0;\n    }\n};\n\nint main() {\n    string name; int hp;\n    cin >> name >> hp;\n    Hero h{name, hp};\n    int k;\n    cin >> k;\n    for (int i = 0; i < k; i++) {\n        string cmd; int amt;\n        cin >> cmd >> amt;\n        if (cmd == \"damage\") h.take_damage(amt);\n        else h.heal(amt);\n    }\n    cout << h.hp << \"\\n\";\n    cout << (h.is_alive() ? \"alive\" : \"dead\") << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp19",
+    "title": "Count the Living Embers",
+    "tests": [
+      { "stdin": "2 2\n1 0\n0 1", "expectOut": "2", "label": "2x2 labyrinth" },
+      { "stdin": "1 3\n0 0 0", "expectOut": "0", "label": "a cold corridor" },
+      { "stdin": "2 3\n1 1 1\n1 1 1", "expectOut": "6", "label": "fully ablaze" },
+      { "stdin": "3 3\n0 1 0\n1 0 1\n0 1 0", "expectOut": "4", "label": "the ember cross" }
+    ],
+    "solution": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int rows, cols;\n    cin >> rows >> cols;\n    vector<vector<int>> grid(rows, vector<int>(cols));\n    for (int r = 0; r < rows; r++)\n        for (int c = 0; c < cols; c++)\n            cin >> grid[r][c];\n    int count = 0;\n    for (const auto& row : grid)\n        for (int cell : row)\n            if (cell == 1) count++;\n    cout << count << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp20",
+    "title": "Rank the Champions",
+    "tests": [
+      { "stdin": "3\nBryn 12\nSora 30\nEdda 7", "expectOut": "Sora\nBryn\nEdda", "label": "three champions" },
+      { "stdin": "1\nA 1", "expectOut": "A", "label": "a lineage of one" },
+      { "stdin": "2\nX 5\nY 9", "expectOut": "Y\nX", "label": "two rivals" },
+      { "stdin": "2\nKael 40\nMaren 41", "expectOut": "Maren\nKael", "label": "a close contest" }
+    ],
+    "solution": "#include <iostream>\n#include <string>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<pair<string, int>> champs(n);\n    for (int i = 0; i < n; i++) cin >> champs[i].first >> champs[i].second;\n    sort(champs.begin(), champs.end(), [](const auto& a, const auto& b) {\n        return a.second > b.second;\n    });\n    for (const auto& c : champs) cout << c.first << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp21",
+    "title": "Forge the Flame Chain",
+    "tests": [
+      { "stdin": "1", "expectOut": "1", "label": "one link" },
+      { "stdin": "4", "expectOut": "24", "label": "four links" },
+      { "stdin": "6", "expectOut": "720", "label": "six links" },
+      { "stdin": "0", "expectOut": "1", "label": "the empty chain" }
+    ],
+    "solution": "#include <iostream>\nusing namespace std;\n\nlong long flame_chain(int n) {\n    if (n <= 1) return 1;\n    return n * flame_chain(n - 1);\n}\n\nint main() {\n    int n;\n    cin >> n;\n    cout << flame_chain(n) << \"\\n\";\n    return 0;\n}"
+  },
+  {
+    "id": "cpp22",
+    "title": "The Riddle of the Twin Marks",
+    "tests": [
+      { "stdin": "4\n2 7 11 15\n9", "expectOut": "0 1", "label": "the classic" },
+      { "stdin": "3\n3 2 4\n6", "expectOut": "1 2", "label": "not always the first two" },
+      { "stdin": "2\n3 3\n6", "expectOut": "0 1", "label": "twin twins" },
+      { "stdin": "4\n1 5 9 13\n22", "expectOut": "2 3", "label": "deep in the list" },
+      { "stdin": "3\n5 75 25\n100", "expectOut": "1 2", "label": "the vault code" }
+    ],
+    "solution": "#include <iostream>\n#include <vector>\n#include <unordered_map>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> runes(n);\n    for (int i = 0; i < n; i++) cin >> runes[i];\n    int target;\n    cin >> target;\n    unordered_map<int,int> seen;\n    for (int i = 0; i < n; i++) {\n        int partner = target - runes[i];\n        if (seen.count(partner)) {\n            cout << seen[partner] << \" \" << i << \"\\n\";\n            return 0;\n        }\n        seen[runes[i]] = i;\n    }\n    return 0;\n}"
+  },
+  {
+    "id": "cpp23",
+    "title": "The Verse of Ascension",
+    "tests": [
+      { "stdin": "abcabcbb", "expectOut": "3", "label": "abcabcbb -> 3" },
+      { "stdin": "bbbbb", "expectOut": "1", "label": "bbbbb -> 1" },
+      { "stdin": "pwwkew", "expectOut": "3", "label": "pwwkew -> 3" },
+      { "stdin": "", "expectOut": "0", "label": "the empty verse" },
+      { "stdin": "firstking", "expectOut": "7", "label": "firstking -> 7 (rstking)" },
+      { "stdin": "au", "expectOut": "2", "label": "au -> 2" }
+    ],
+    "solution": "#include <iostream>\n#include <string>\n#include <unordered_map>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    string s;\n    getline(cin, s);\n    unordered_map<char,int> last;\n    int start = 0, best = 0;\n    for (int i = 0; i < (int)s.size(); i++) {\n        char ch = s[i];\n        if (last.count(ch) && last[ch] >= start)\n            start = last[ch] + 1;\n        last[ch] = i;\n        best = max(best, i - start + 1);\n    }\n    cout << best << \"\\n\";\n    return 0;\n}"
+  }
+]
