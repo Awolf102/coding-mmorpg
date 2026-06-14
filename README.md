@@ -1,11 +1,11 @@
 # 🔥 Ashes of the First Kingdom
 
-*A coding MMORPG. Learn real Python by quest, blade, and flame.*
+*A coding MMORPG. Learn real Python — or real C++ — by quest, blade, and flame.*
 
-An old-school-MMO-styled game (RuneScape-inspired) where the language of magic is **Python**.
-Pick your faction (a programming language), take quests from NPCs, fight monsters by
-answering Python questions, and defeat bosses by writing **real Python programs** that run
-in your browser and are graded against test cases.
+An old-school-MMO-styled game (RuneScape-inspired) where the language of magic is the one you choose.
+Pick your faction (a programming language — **Python** or **C++**), take quests from NPCs, fight
+monsters by answering questions, and defeat bosses by writing **real programs** that run in your
+browser and are graded against test cases.
 
 ---
 
@@ -21,9 +21,9 @@ then open http://localhost:8000
 
 **Or with no Python at all:** just open `index.html` in Chrome/Edge/Firefox.
 
-> 🌐 An internet connection is needed for the *Trials of Code* (the in-game Python editor) —
-> real Python runs in your browser via [Pyodide](https://pyodide.org) loaded from a CDN.
-> Everything else works offline. Saves are stored in your browser (localStorage), 3 character slots.
+> 🌐 An internet connection is needed for the *Trials of Code* — real Python runs in your browser
+> via [Pyodide](https://pyodide.org) (CDN), and real C++ compiles on the [Wandbox](https://wandbox.org)
+> forge. Everything else works offline. Saves are stored in your browser (localStorage), 3 character slots.
 
 ## 🎮 Controls
 
@@ -48,6 +48,22 @@ then open http://localhost:8000
 Boss trials are full programs: **FizzBuzz** (Act II), **most-frequent-element** (Act III),
 a **class with damage/heal logic** (Act IV), **Two Sum** (Act V), and the final boss —
 **Longest Substring Without Repeating Characters**, a genuine LeetCode-medium.
+
+## ⚙ The C++ Chronicle — 23 chapters, 5 acts
+
+The **Iron Concord** teaches **real, idiomatic C++** across the same five regions — the world is
+shared, but the Concord smith learns a different tongue (all trials compile on real GCC):
+
+| Act | Region | You learn |
+|---|---|---|
+| I | Ashveil Village | `#include`, `cout`, `int`/`double` & integer division, `cin`, `std::string` |
+| II | Emberwood Forest | `bool` & comparisons, `if/else if/else`, `for`, `while` |
+| III | The Sunken Ruins | `std::vector`, measuring (`accumulate`/`max_element`/`find`), `unordered_map`, `set` |
+| IV | Kingsfall Citadel | functions, default args & references, building vectors, `struct`/`class` & methods |
+| V | The Flame Sanctum | nested loops & 2D `vector<vector<int>>`, `std::sort` & lambdas, recursion |
+
+It ends on the same algorithms — FizzBuzz, most-frequent-element, a damage/heal class, **Two Sum**,
+and the finale **Longest Substring Without Repeating Characters** — written as real C++ read from stdin.
 
 ## ⚔ How combat teaches
 
@@ -78,4 +94,8 @@ At the end, the choice is yours: **restore** the kingdom, **destroy** the Flame,
 - Pure HTML/CSS/JS — no build step, no dependencies, no image assets (all art is procedural canvas).
 - Python execution & grading: Pyodide (CPython in WebAssembly) with a sandboxed test harness,
   per-test timeouts (infinite-loop protection), and friendly error reporting.
-- More factions (JavaScript, C++, Rust) are data-driven: add a new quest file to `js/data/`.
+- C++ execution & grading: real GCC on the [Wandbox](https://wandbox.org) compiler service, with a
+  stdin→stdout test harness, transient-overload retries, and friendly compile/runtime error reporting.
+- Factions are data-driven — one quest file per language in `js/data/` (e.g. `cpp_act1.js`), tagged
+  with a `faction` field. **Python** and **C++** ship full 23-chapter chronicles; JavaScript and Rust
+  remain sealed. To verify C++ reference solutions: `python3 tools/grade_cpp_challenges.py`.
