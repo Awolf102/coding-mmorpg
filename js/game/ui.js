@@ -1,6 +1,6 @@
 /* ============================================================
    UI — sidebar panels, chat, modals, dialogue, tome, shop,
-   reward screens, and the code-trial editor (Pyodide-backed).
+   reward screens, and the code-trial editor (Py/Cpp engines).
    ============================================================ */
 window.UI = (function () {
   let currentTab = "inventory";
@@ -294,7 +294,7 @@ window.UI = (function () {
     const pct = Math.min(100, (s.xp - prev) / (need - prev) * 100);
     const lessons = Quests.lessonsLearned();
     let mastery = "";
-    for (const q of window.QUEST_DB) {
+    for (const q of Quests.all()) {
       const r = Game.state.quests[q.id];
       const learned = !!r;
       const done = r && r.stage === "done";
@@ -302,7 +302,7 @@ window.UI = (function () {
         <div class="dot" ${done ? 'style="background:#ffd23f;box-shadow:0 0 6px #ffd23f88"' : ""}></div>
         <div class="m-name">${learned ? escapeHtml(q.lesson.title) : "??? — undiscovered"}</div></div>`;
     }
-    area.innerHTML = `<div class="panel-title">Skills — Way of the Serpent</div>
+    area.innerHTML = `<div class="panel-title">Skills — Way of the ${LANG.get(s.faction).wayOf}</div>
       <div style="font-size:11px;color:#cdbb92">${escapeHtml(s.name)}${s.titleEarned ? `, <span style="color:#ffd64f">${escapeHtml(s.titleEarned)}</span>` : ""}</div>
       <div class="stat-block" style="margin-top:8px">
         <div class="stat-line"><span>Level</span><b>${s.level}</b></div>
@@ -312,9 +312,9 @@ window.UI = (function () {
         <div class="stat-line"><span>Kills</span><b>${s.kills}</b></div>
         <div class="stat-line"><span>Bosses felled</span><b>${s.bossKills}</b></div>
         <div class="stat-line"><span>Deaths</span><b>${s.deaths}</b></div>
-        <div class="stat-line"><span>Lessons mastered</span><b>${lessons.filter(q => Game.state.quests[q.id].stage === "done").length} / ${window.QUEST_DB.length}</b></div>
+        <div class="stat-line"><span>Lessons mastered</span><b>${lessons.filter(q => Game.state.quests[q.id].stage === "done").length} / ${Quests.count()}</b></div>
       </div>
-      <div class="panel-title" style="margin-top:12px">Python Masteries</div>${mastery}`;
+      <div class="panel-title" style="margin-top:12px">${LANG.get(s.faction).name} Masteries</div>${mastery}`;
   }
 
   /* ---------------- quests panel ---------------- */
@@ -325,7 +325,7 @@ window.UI = (function () {
   function renderQuests(area) {
     let html = `<div class="panel-title">Quest Journal</div>`;
     let act = 0;
-    for (const q of window.QUEST_DB) {
+    for (const q of Quests.all()) {
       if (q.act !== act) { act = q.act; html += `<div class="q-act-header">${ACT_NAMES[act]}</div>`; }
       const s = Quests.stage(q.id);
       if (s === "locked") {
@@ -364,8 +364,8 @@ window.UI = (function () {
       <div class="setting-row"><span>How to play</span><button class="btn btn-small" id="set-help">Open</button></div>
       <div class="setting-row"><span>Save &amp; exit to title</span><button class="btn btn-small" id="set-exit">Exit</button></div>
       <div style="margin-top:14px;font-size:10px;color:#7e7050;line-height:1.6">
-        Ashes of the First Kingdom v1.0<br>The Python Chronicle.<br>
-        Python runs in your browser via Pyodide (internet required for code trials).
+        Ashes of the First Kingdom v1.0<br>${LANG.get(s.faction).chronicle}.<br>
+        ${LANG.get(s.faction).engineBlurb}
       </div>`;
     area.querySelector("#set-sound").onclick = (e) => {
       s.settings.sound = !s.settings.sound;
@@ -382,9 +382,9 @@ window.UI = (function () {
     modal(`<h2 class="gold-header">How to Play</h2>
       <div class="tome-body" style="max-height:60vh">
         <h3>Moving</h3><p><b>Click</b> anywhere walkable to travel there (a yellow marker shows your destination), or use <b>WASD / arrow keys</b>.</p>
-        <h3>Quests</h3><p>NPCs with a golden <b>!</b> have a quest. Quests teach a Python lesson, recorded in your <b>Tome</b> (Quest Journal → click the quest). Slaying quest monsters reveals extra Tome fragments.</p>
-        <h3>Combat</h3><p>Click a monster next to you to engage. Answer Python questions: correct answers strike with your weapon's damage; wrong answers hurt you (armor reduces the pain). Flee any time.</p>
-        <h3>Trials of Code</h3><p>When a quest's monsters are slain, return to the quest giver and write <b>real Python</b> in the editor. Run your code against the tests. Hints are available — the first is free.</p>
+        <h3>Quests</h3><p>NPCs with a golden <b>!</b> have a quest. Quests teach a ${LANG.get(Game.state.faction).name} lesson, recorded in your <b>Tome</b> (Quest Journal → click the quest). Slaying quest monsters reveals extra Tome fragments.</p>
+        <h3>Combat</h3><p>Click a monster next to you to engage. Answer ${LANG.get(Game.state.faction).name} questions: correct answers strike with your weapon's damage; wrong answers hurt you (armor reduces the pain). Flee any time.</p>
+        <h3>Trials of Code</h3><p>When a quest's monsters are slain, return to the quest giver and write <b>real ${LANG.get(Game.state.faction).name}</b> in the editor. Run your code against the tests. Hints are available — the first is free.</p>
         <h3>Bosses</h3><p>Bosses ask a gauntlet of questions, then demand a full program. Failed runs against a boss cost HP!</p>
         <h3>Gear</h3><p>Better weapons defeat monsters in fewer answers. Armor blunts wrong-answer damage. Charms boost XP and grant free hints. Buy from merchants, loot from monsters, earn from quests.</p>
       </div>
@@ -560,6 +560,7 @@ window.UI = (function () {
     const ch = quest.challenge;
     const isBoss = !!opts.boss;
     const draft = Game.state.codeDrafts[quest.id] || ch.starter;
+    const lang = LANG.get(Game.state.faction);
 
     let probHtml = `<h3>${escapeHtml(ch.title)}</h3>`;
     probHtml += `<p><i>${mdInline(ch.story)}</i></p>`;
@@ -583,7 +584,7 @@ window.UI = (function () {
             <button class="btn" id="ed-reset">Reset</button>
             <span class="py-status" id="ed-status"></span>
           </div>
-          <div class="code-results" id="ed-results"><span class="t-dim">${isBoss ? "⚠ Each failed run lets the boss strike you! " : ""}Write your Python, then Run. The Flame is watching.</span></div>
+          <div class="code-results" id="ed-results"><span class="t-dim">${isBoss ? "⚠ Each failed run lets the boss strike you! " : ""}${lang.write}</span></div>
         </div>
       </div>`,
       { className: "modal-code", closable: true, onClose: () => saveDraft() });
@@ -620,9 +621,9 @@ window.UI = (function () {
         const before = ta.value.slice(0, s);
         const line = before.slice(before.lastIndexOf("\n") + 1);
         let indent = (line.match(/^\s*/) || [""])[0];
-        // plain Enter keeps the previous line's indent (plus one level after ":");
+        // plain Enter keeps the previous line's indent (plus one level after ":" or "{");
         // Shift+Enter forces one level deeper than the previous line
-        if (e.shiftKey || line.trimEnd().endsWith(":")) indent += "    ";
+        if (e.shiftKey || line.trimEnd().endsWith(":") || line.trimEnd().endsWith("{")) indent += "    ";
         const insert = "\n" + indent;
         ta.value = before + insert + ta.value.slice(ta.selectionEnd);
         ta.selectionStart = ta.selectionEnd = s + insert.length;
@@ -686,10 +687,11 @@ window.UI = (function () {
       AudioFX.click();
       saveDraft();
       runBtn.disabled = true;
-      status.textContent = Py.getStatus() === "ready" ? "Casting..." : "Summoning the Serpent Spirit (first time takes a moment)...";
-      results.innerHTML = `<span class="t-dim">Running your Python...</span>`;
+      const Engine = Game.state.faction === "cpp" ? Cpp : Py;
+      status.textContent = Engine.getStatus() === "ready" ? lang.summonReady : lang.summonFirst;
+      results.innerHTML = `<span class="t-dim">${lang.running}</span>`;
       try {
-        const out = await Py.runChallenge(ch, ta.value, (msg) => { status.textContent = msg; });
+        const out = await Engine.runChallenge(ch, ta.value, (msg) => { status.textContent = msg; });
         status.textContent = "";
         renderResults(out);
       } catch (err) {

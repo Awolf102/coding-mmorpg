@@ -222,6 +222,7 @@ window.Game = (function () {
 
   function spawnBossIfNeeded() {
     for (const q of window.QUEST_DB) {
+      if ((q.faction || "python") !== state.faction) continue;
       if (!q.boss) continue;
       const r = state.quests[q.id];
       if (!r || r.stage !== "boss") continue;
@@ -261,7 +262,7 @@ window.Game = (function () {
         if (seen[ni] || Renderer.solidAt(nx, ny)) continue;
         // locked portals block pathing
         const portal = currentMap.portals.find((p) => p.x === nx && p.y === ny);
-        if (portal && portal.req && !Quests.isDone(portal.req)) continue;
+        if (portal && portal.req && !Quests.gateOpen(portal.req)) continue;
         seen[ni] = 1; prev[ni] = cur;
         queue.push(ni);
       }
@@ -340,8 +341,8 @@ window.Game = (function () {
       clickMarker = { x: t.x, y: t.y, until: performance.now() + 4000 };
     } else {
       const portal = currentMap.portals.find((p) => p.x === t.x && p.y === t.y);
-      if (portal && portal.req && !Quests.isDone(portal.req)) {
-        UI.chat(`The way to ${portal.label} is sealed. Complete "${Quests.get(portal.req).title}" first.`, "chat-warn");
+      if (portal && portal.req && !Quests.gateOpen(portal.req)) {
+        UI.chat(`The way to ${portal.label} is sealed. Complete "${Quests.gateQuest(portal.req).title}" first.`, "chat-warn");
       }
     }
   }
@@ -362,7 +363,7 @@ window.Game = (function () {
     // portal?
     const portal = currentMap.portals.find((p) => p.x === player.x && p.y === player.y);
     if (portal) {
-      if (!portal.req || Quests.isDone(portal.req)) {
+      if (!portal.req || Quests.gateOpen(portal.req)) {
         AudioFX.teleport();
         UI.chat(`You travel to ${portal.label}...`, "chat-sys");
         loadMap(portal.to, portal.tx, portal.ty);
@@ -391,7 +392,7 @@ window.Game = (function () {
           player.facing = d.f;
           const nx = player.x + d.dx, ny = player.y + d.dy;
           const portal = currentMap.portals.find((p) => p.x === nx && p.y === ny);
-          if (portal && portal.req && !Quests.isDone(portal.req)) {
+          if (portal && portal.req && !Quests.gateOpen(portal.req)) {
             // blocked gate
           } else if (!Renderer.solidAt(nx, ny)) next = { x: nx, y: ny };
         }
@@ -559,8 +560,10 @@ window.Game = (function () {
       if (s) {
         Sprites.drawPlayerInto(prev, s.appearance, 2.4);
         const done = Object.values(s.quests).filter((q) => q.stage === "done").length;
+        const slang = LANG.get(s.faction);
+        const stotal = window.QUEST_DB.filter((q) => (q.faction || "python") === (s.faction || "python")).length;
         info.innerHTML = `<div class="slot-name">${UI.escapeHtml(s.name)}${s.titleEarned ? ` «${UI.escapeHtml(s.titleEarned)}»` : ""}</div>
-          <div class="slot-meta">Level ${s.level} · ${MAPS[s.map].name} · ${done}/${window.QUEST_DB.length} chapters · 🐍 Python</div>`;
+          <div class="slot-meta">Level ${s.level} · ${MAPS[s.map].name} · ${done}/${stotal} chapters · ${slang.icon} ${slang.name}</div>`;
         row.onclick = () => { AudioFX.click(); enterGame(s); };
         const del = document.createElement("button");
         del.className = "btn btn-small btn-danger slot-del";
@@ -592,8 +595,8 @@ window.Game = (function () {
       desc: "The eldest speech of the Flame: readable as prose, deep as the ruins. Masters begin with print() and end by out-riddling kings. (Full campaign: 23 chapters, beginner → advanced.)" },
     { id: "javascript", icon: "🌐", name: "Weavers of the Web — JavaScript", sealed: true,
       desc: "Spinners of living glass between the world's towers. Their gates have not yet reopened." },
-    { id: "cpp", icon: "⚙", name: "The Iron Concord — C++", sealed: true,
-      desc: "Smiths who speak directly to the world's bones. Their forge still lies cold." },
+    { id: "cpp", icon: "⚙", name: "The Iron Concord — C++", sealed: false,
+      desc: "Smiths who speak directly to the world's bones — types, memory, and raw speed. They begin with cout and end out-forging kings with vectors, maps, sorting and recursion. (Full campaign: 23 chapters, beginner → advanced; trials compile real C++ online.)" },
     { id: "rust", icon: "🦀", name: "The Oxide Covenant — Rust", sealed: true,
       desc: "Zealots of memory safety, borrowed and never stolen. Sealed until a later age." }
   ];
@@ -708,7 +711,7 @@ window.Game = (function () {
       <div class="dlg-body">
         <p>A thousand years ago, the <b>First Kingdom</b> united every race beneath one banner, speaking a language of power fueled by the <b>Eternal Flame</b>. Then the Flame vanished — and the Kingdom fell in a single night.</p>
         <p>Now the Flame has returned. It wakes dead kings and drowned armies... and it has burned its mark into <b>your</b> hand.</p>
-        <p>The mark lets you speak the old tongue — what survivors call <b>Python</b>. Every monster slain teaches you a word of it. Every trial passed makes you stronger.</p>
+        <p>The mark lets you speak the old tongue — what survivors call <b>${LANG.get(state.faction).name}</b>. Every monster slain teaches you a word of it. Every trial passed makes you stronger.</p>
         <p><b>Find Elder Maren in the village square</b> — the NPC with the golden <b>!</b> — and begin. Click the ground to walk. Click creatures to face them.</p>
       </div>
       <div class="row-center" style="margin-top:12px">
@@ -778,9 +781,9 @@ window.Game = (function () {
       <div class="ep">${EPILOGUES[choice].map((p) => `<p>${p}</p>`).join("")}</div>
       <div style="color:#b9a888;font-size:13px;margin-bottom:22px">
         ${UI.escapeHtml(state.name)} «Flamebearer» — Level ${state.level} · ${state.kills} foes slain · ${state.bossKills} bosses felled ·
-        ${Object.values(state.quests).filter((q) => q.stage === "done").length}/${window.QUEST_DB.length} chapters mastered · ${mins} minutes in the Kingdom
+        ${Object.values(state.quests).filter((q) => q.stage === "done").length}/${Quests.count()} chapters mastered · ${mins} minutes in the Kingdom
       </div>
-      <div style="color:#7CFC00;font-size:14px;margin-bottom:26px">🐍 You have completed the Python Chronicle — from print() to LeetCode-medium. That is a real, marketable spell list.</div>
+      <div style="color:#7CFC00;font-size:14px;margin-bottom:26px">${LANG.get(state.faction).chronicleDone}</div>
       <div class="title-buttons">
         <button class="btn btn-big" id="end-wander">Keep wandering the Kingdom</button>
         <button class="btn btn-big btn-flame" id="end-title">Return to Title</button>

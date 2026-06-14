@@ -18,6 +18,11 @@ load("js/data/quests_act2.js");
 load("js/data/quests_act3.js");
 load("js/data/quests_act4.js");
 load("js/data/quests_act5.js");
+load("js/data/cpp_act1.js");
+load("js/data/cpp_act2.js");
+load("js/data/cpp_act3.js");
+load("js/data/cpp_act4.js");
+load("js/data/cpp_act5.js");
 
 let errors = 0;
 const err = (m) => { console.log("✗ " + m); errors++; };
@@ -78,12 +83,13 @@ for (const id of Object.keys(MAPS)) {
 
 /* ---- quests ---- */
 const seenIds = new Set();
-let prevAct = 0;
+const prevActByFaction = {};
 for (const q of QUEST_DB) {
   if (seenIds.has(q.id)) err(`duplicate quest id ${q.id}`);
   seenIds.add(q.id);
-  if (q.act < prevAct) err(`quest ${q.id} act out of order`);
-  prevAct = q.act;
+  const fac = q.faction || "python";
+  if (q.act < (prevActByFaction[fac] || 0)) err(`quest ${q.id} act out of order`);
+  prevActByFaction[fac] = q.act;
   if (!NPCS[q.npc]) err(`${q.id}: unknown npc ${q.npc}`);
   if (!MAPS[q.map]) err(`${q.id}: unknown map ${q.map}`);
   if (MAPS[q.map] && !MAPS[q.map].npcs.some((n) => n.id === q.npc)) err(`${q.id}: npc ${q.npc} not placed on map ${q.map}`);

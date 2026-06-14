@@ -2,20 +2,38 @@
    Quests — linear quest chain state machine.
    Stages: locked -> available -> active -> return -> done
            (boss quests: locked -> available -> boss -> done)
+
+   Faction-aware: the world (maps, NPCs, monsters) is shared, but
+   each character only sees the chain for their faction. A quest's
+   `faction` field selects the chain (missing => "python"). The
+   per-faction {order, byId} is built lazily and memoized.
    ============================================================ */
 window.Quests = (function () {
-  const order = window.QUEST_DB.map((q) => q.id);
-  const byId = {};
-  for (const q of window.QUEST_DB) byId[q.id] = q;
+  const cache = {}; // faction -> { order, byId }
 
-  function get(id) { return byId[id]; }
-  function idx(id) { return order.indexOf(id); }
+  function faction() {
+    return (window.Game && Game.state && Game.state.faction) || "python";
+  }
+  function build(f) {
+    const qs = window.QUEST_DB.filter((q) => (q.faction || "python") === f);
+    const byId = {};
+    for (const q of qs) byId[q.id] = q;
+    return { order: qs.map((q) => q.id), byId };
+  }
+  function active() {
+    const f = faction();
+    return cache[f] || (cache[f] = build(f));
+  }
+
+  function get(id) { return active().byId[id]; }
+  function idx(id) { return active().order.indexOf(id); }
 
   function rec(id) { return Game.state.quests[id] || null; }
 
   function stage(id) {
     const r = rec(id);
     if (r) return r.stage;
+    const order = active().order;
     const i = idx(id);
     if (i === 0) return "available";
     const prev = rec(order[i - 1]);
@@ -24,10 +42,25 @@ window.Quests = (function () {
 
   function isDone(id) { const r = rec(id); return !!r && r.stage === "done"; }
 
+  /* Portal gates store a canonical (py-prefixed) quest id; remap it to
+     the active faction's equivalent by its shared chapter number so a
+     C++ character's cpp04 opens the same gate py04 opens for Python. */
+  function remapReq(reqId) {
+    const num = String(reqId).replace(/^[a-z]+/i, ""); // "py04" -> "04"
+    const prefix = faction() === "python" ? "py" : faction();
+    return prefix + num;
+  }
+  function gateOpen(reqId) { return isDone(remapReq(reqId)); }
+  function gateQuest(reqId) { return active().byId[remapReq(reqId)] || null; }
+
+  /* The active faction's quests, in order (for journals/skill lists). */
+  function all() { return active().order.map((id) => active().byId[id]); }
+  function count() { return active().order.length; }
+
   /* The quest an NPC currently wants to talk about (first non-done in order). */
   function questForNpc(npcId) {
-    for (const id of order) {
-      const q = byId[id];
+    for (const id of active().order) {
+      const q = active().byId[id];
       if (q.npc !== npcId) continue;
       const s = stage(id);
       if (s === "done" || s === "locked") continue;
@@ -92,24 +125,24 @@ window.Quests = (function () {
   }
 
   function activeKillQuest() {
-    for (const id of order) {
+    for (const id of active().order) {
       const r = rec(id);
-      if (r && r.stage === "active") return byId[id];
+      if (r && r.stage === "active") return active().byId[id];
     }
     return null;
   }
 
   function currentQuest() {
-    for (const id of order) {
+    for (const id of active().order) {
       const s = stage(id);
-      if (s !== "done" && s !== "locked") return { quest: byId[id], stage: s };
+      if (s !== "done" && s !== "locked") return { quest: active().byId[id], stage: s };
     }
     return null;
   }
 
   function bossQuestFor(enemyId) {
-    for (const id of order) {
-      const q = byId[id];
+    for (const id of active().order) {
+      const q = active().byId[id];
       const r = rec(id);
       if (q.boss && q.bossEnemy === enemyId && r && r.stage === "boss") return q;
     }
@@ -147,8 +180,8 @@ window.Quests = (function () {
 
   /* the quest a given enemy type belongs to (kill target or boss) */
   function questForEnemy(enemyId) {
-    for (const id of order) {
-      const q = byId[id];
+    for (const id of active().order) {
+      const q = active().byId[id];
       if ((q.kills && q.kills.enemy === enemyId) || (q.boss && q.bossEnemy === enemyId)) return q;
     }
     return null;
@@ -161,22 +194,22 @@ window.Quests = (function () {
      never Act I material, never later monsters' material. */
   function reviewPool(enemyDef) {
     const tied = enemyDef ? questForEnemy(enemyDef.id) : null;
-    const cap = tied ? idx(tied.id) : order.length;
+    const cap = tied ? idx(tied.id) : active().order.length;
     const pool = [];
-    for (const id of order) {
-      const q = byId[id];
+    for (const id of active().order) {
+      const q = active().byId[id];
       if (!rec(id)) continue;
       if (tied && (q.act !== tied.act || idx(id) > cap)) continue;
       pool.push(...q.questions);
     }
     if (pool.length) return pool;
     // fallback: anything learned (e.g. region entered before its first quest)
-    for (const id of order) if (rec(id)) pool.push(...byId[id].questions);
+    for (const id of active().order) if (rec(id)) pool.push(...active().byId[id].questions);
     return pool;
   }
 
   function lessonsLearned() {
-    return order.filter((id) => rec(id)).map((id) => byId[id]);
+    return active().order.filter((id) => rec(id)).map((id) => active().byId[id]);
   }
 
   function objectiveText(q, s) {
@@ -191,7 +224,12 @@ window.Quests = (function () {
     return "Locked.";
   }
 
-  return { order, byId, get, idx, stage, isDone, questForNpc, npcMarker, accept, onKill,
-           activeKillQuest, currentQuest, bossQuestFor, completeChallenge, reviewPool,
-           lessonsLearned, objectiveText };
+  return {
+    get order() { return active().order; },
+    get byId() { return active().byId; },
+    get, idx, stage, isDone, gateOpen, gateQuest, all, count,
+    questForNpc, npcMarker, accept, onKill,
+    activeKillQuest, currentQuest, bossQuestFor, completeChallenge, reviewPool,
+    lessonsLearned, objectiveText
+  };
 })();
