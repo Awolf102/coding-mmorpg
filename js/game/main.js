@@ -17,6 +17,7 @@ window.Game = (function () {
   let lastT = 0;
   let saveTimer = 0, chatterTimer = 12;
   let uidCounter = 1;
+  let zoneState = null; // sub-zone the player is currently in (discovery banners)
 
   /* ============ leveling / economy ============ */
   function xpForLevel(l) {
@@ -125,6 +126,15 @@ window.Game = (function () {
     const w = state.equipment.weapon ? ITEMS[state.equipment.weapon] : null;
     return w ? (w.tint || "#b9c2c9") : null;
   }
+  /* what the equipped gear looks like in 3D (fed to the renderer) */
+  function weaponVisual() {
+    const w = state.equipment.weapon ? ITEMS[state.equipment.weapon] : null;
+    return w ? { model: w.model || "sword", tint: w.tint || "#b9c2c9", rarity: w.rarity, flame: !!w.flame } : null;
+  }
+  function armorVisual() {
+    const a = state.equipment.armor ? ITEMS[state.equipment.armor] : null;
+    return a ? { model: a.model || "vest", tint: a.tint || "#8a6a3a", rarity: a.rarity } : null;
+  }
 
   /* ============ hp / death ============ */
   function heal(n) {
@@ -176,7 +186,14 @@ window.Game = (function () {
     "first time past the ruins, this place is HUGE",
     "tip: armor makes wrong answers hurt way less",
     "someone explain self to me like I'm five",
-    "the bridge crowd today is unreal"
+    "the bridge crowd today is unreal",
+    "Bram's stew at the Kindled Crown is worth the walk, trust",
+    "don't fish off Penna's pier at night. just don't",
+    "anyone selling glimmercap spores? need 3 for a charm",
+    "got lost in the Boneyard AGAIN, send a map",
+    "the banners in the Great Hall move when you're not looking",
+    "wolf den cleared in 4 mins, new record??",
+    "PSA: the Mire eats boots. and confidence"
   ];
   function makeWalker(map) {
     const skins = ["#d8a878", "#b87f50", "#8d5524", "#e8c8a0"];
@@ -209,12 +226,13 @@ window.Game = (function () {
     entities = { npcs: [], enemies: [], walkers: [] };
     for (const n of currentMap.npcs) entities.npcs.push({ def: NPCS[n.id], x: n.x, y: n.y });
     for (const e of currentMap.enemies) entities.enemies.push(makeEnemy(e));
-    const walkerCount = id === "village" ? 4 : id === "sanctum" ? 1 : 2;
+    const walkerCount = id === "village" ? 5 : id === "sanctum" ? 1 : 2;
     for (let i = 0; i < walkerCount; i++) entities.walkers.push(makeWalker(currentMap));
     player.x = tx; player.y = ty;
     player.px = tx * T; player.py = ty * T;
     player.path = []; player.moving = false;
     pendingInteract = null;
+    zoneState = zoneAt(tx, ty); // suppress the banner for the zone you arrive in
     spawnBossIfNeeded();
     UI.showBanner(currentMap.name);
     save();
@@ -358,6 +376,23 @@ window.Game = (function () {
     return null;
   }
 
+  /* WoW-style sub-zone discovery banners */
+  function zoneAt(x, y) {
+    if (!currentMap || !currentMap.zones) return null;
+    for (const z of currentMap.zones)
+      if (x >= z.x && x < z.x + z.w && y >= z.y && y < z.y + z.h) return z.name;
+    return null;
+  }
+  function checkZone() {
+    const zn = zoneAt(player.x, player.y);
+    if (zn === zoneState) return;
+    zoneState = zn;
+    if (zn) {
+      UI.showBanner(zn);
+      UI.chat(`You have entered ${zn}.`, "chat-story");
+    }
+  }
+
   function checkArrival() {
     // portal?
     const portal = currentMap.portals.find((p) => p.x === player.x && p.y === player.y);
@@ -369,6 +404,7 @@ window.Game = (function () {
         return;
       }
     }
+    checkZone();
     // pending interaction?
     if (pendingInteract && player.path.length === 0) {
       const t = pendingInteract;
@@ -836,7 +872,7 @@ window.Game = (function () {
     get clickMarker() { return clickMarker; },
     xpForLevel, addXp, addCoins,
     addItem, removeItem, hasItem, isEquipped, clickInventory, unequip,
-    equipStats, weaponTint, heal, damage, onDeath,
+    equipStats, weaponTint, weaponVisual, armorVisual, heal, damage, onDeath,
     loadMap, spawnBossIfNeeded, killEnemy,
     save, exitToTitle, beginEnding, maybeAmbientReply
   };

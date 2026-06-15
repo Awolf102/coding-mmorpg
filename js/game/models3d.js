@@ -101,7 +101,110 @@ window.Models3D = (function () {
   }
 
   /* ============================================================
-     HUMANOID — blocky MMO style, ~1.6 units tall.
+     WEAPON FORGE — one silhouette per weapon class, grip at the
+     origin, blade up +y. Slightly oversized, the way MMO weapons
+     read at a distance. vis: {model, tint, rarity, flame}
+     ============================================================ */
+  const RARITY_SCALE = { common: 1, uncommon: 1.04, rare: 1.08, epic: 1.13, legendary: 1.2, mythic: 1.28 };
+
+  function buildWeapon(vis) {
+    const tint = vis.tint || "#b9c2c9";
+    const g = new THREE.Group();
+    const steel = new THREE.MeshLambertMaterial({ color: tint, emissive: new THREE.Color(tint).multiplyScalar(0.18) });
+    const dark = lam(shade(tint, -60));
+    const wood = lam("#5a3f1d");
+    const gold = lam("#c8a04a");
+    switch (vis.model) {
+      case "club": {
+        cyl(g, 0.045, 0.06, 0.55, 6, wood, 0, 0.2, 0);
+        box(g, 0.17, 0.26, 0.17, steel, 0, 0.55, 0).rotation.y = 0.6;
+        box(g, 0.2, 0.07, 0.2, dark, 0, 0.46, 0).rotation.y = 0.3;
+        ball(g, 0.05, wood, 0, -0.08, 0, 6, 5);
+        break;
+      }
+      case "sabre": {
+        box(g, 0.06, 0.4, 0.03, steel, 0, 0.32, 0);
+        box(g, 0.055, 0.32, 0.028, steel, -0.045, 0.66, 0).rotation.z = 0.22;
+        cone(g, 0.04, 0.13, 4, steel, -0.115, 0.85, 0).rotation.z = 0.38;
+        cyl(g, 0.085, 0.085, 0.035, 8, gold, 0, 0.1, 0);
+        box(g, 0.05, 0.17, 0.05, wood, 0, 0, 0);
+        ball(g, 0.04, gold, 0, -0.1, 0, 6, 5);
+        break;
+      }
+      case "greatsword": {
+        box(g, 0.1, 0.78, 0.04, steel, 0, 0.55, 0);
+        box(g, 0.035, 0.66, 0.045, shade(tint, 26), 0, 0.5, 0); // fuller
+        cone(g, 0.07, 0.18, 4, steel, 0, 1.02, 0);
+        box(g, 0.3, 0.06, 0.09, gold, 0, 0.14, 0);
+        cone(g, 0.045, 0.1, 4, gold, -0.17, 0.14, 0).rotation.z = Math.PI / 2;
+        cone(g, 0.045, 0.1, 4, gold, 0.17, 0.14, 0).rotation.z = -Math.PI / 2;
+        box(g, 0.055, 0.26, 0.055, dark, 0, -0.02, 0);
+        ball(g, 0.055, gold, 0, -0.17, 0, 6, 5);
+        break;
+      }
+      case "cleaver": {
+        box(g, 0.09, 0.52, 0.035, steel, 0.01, 0.38, 0);
+        box(g, 0.17, 0.34, 0.03, steel, 0.06, 0.47, 0);   // broad belly
+        box(g, 0.05, 0.4, 0.04, dark, -0.045, 0.34, 0);   // blunt spine
+        box(g, 0.2, 0.05, 0.07, dark, 0, 0.11, 0);
+        box(g, 0.05, 0.18, 0.05, wood, 0, 0, 0);
+        ball(g, 0.045, dark, 0, -0.1, 0, 6, 5);
+        break;
+      }
+      case "warblade": {
+        const bodyM = lam(shade(tint, -40));
+        box(g, 0.08, 0.64, 0.035, bodyM, 0, 0.44, 0);
+        cone(g, 0.055, 0.14, 4, bodyM, 0, 0.83, 0);
+        for (let i = 0; i < 3; i++)                        // runes of the old tongue
+          box(g, 0.035, 0.07, 0.045, glow(tint), 0, 0.24 + i * 0.18, 0).castShadow = false;
+        box(g, 0.24, 0.05, 0.07, dark, 0, 0.1, 0);
+        box(g, 0.05, 0.18, 0.05, dark, 0, 0, 0);
+        ball(g, 0.045, lam(tint), 0, -0.1, 0, 6, 5);
+        const halo = makeGlowSprite(tint, 0.55, 0.3);
+        halo.position.y = 0.45;
+        g.add(halo);
+        break;
+      }
+      case "brand": {
+        // not forged — remembered. A sword-shaped tongue of the Eternal Flame.
+        const coreM = glow(tint);
+        const casing = lam("#2a1410");
+        box(g, 0.09, 0.3, 0.045, casing, 0, 0.22, 0);
+        for (let i = 0; i < 4; i++) {
+          const fb = box(g, 0.085 - i * 0.015, 0.2, 0.03, coreM, (i % 2 ? -1 : 1) * 0.02, 0.4 + i * 0.15, 0);
+          fb.rotation.z = (i % 2 ? -1 : 1) * 0.16;
+          fb.castShadow = false;
+        }
+        cone(g, 0.045, 0.16, 4, coreM, 0, 1.02, 0).castShadow = false;
+        box(g, 0.24, 0.06, 0.08, casing, 0, 0.1, 0);
+        box(g, 0.05, 0.18, 0.05, casing, 0, 0, 0);
+        const halo = makeGlowSprite(tint, 1.0, 0.5);
+        halo.position.y = 0.55;
+        g.add(halo);
+        break;
+      }
+      default: { // sword
+        box(g, 0.07, 0.6, 0.032, steel, 0, 0.42, 0);
+        box(g, 0.026, 0.5, 0.038, shade(tint, 26), 0, 0.38, 0); // fuller
+        cone(g, 0.05, 0.13, 4, steel, 0, 0.785, 0);
+        box(g, 0.2, 0.05, 0.07, gold, 0, 0.1, 0);
+        box(g, 0.05, 0.17, 0.05, wood, 0, 0, 0);
+        ball(g, 0.042, gold, 0, -0.1, 0, 6, 5);
+      }
+    }
+    if (vis.flame && vis.model !== "brand") {
+      cone(g, 0.05, 0.16, 5, glow("#ffd23f"), 0, vis.model === "greatsword" ? 1.06 : 0.8, 0).castShadow = false;
+      const halo = makeGlowSprite(0xff8a2a, 0.7, 0.4);
+      halo.position.y = 0.5;
+      g.add(halo);
+    }
+    g.scale.setScalar(RARITY_SCALE[vis.rarity] || 1);
+    return g;
+  }
+
+  /* ============================================================
+     HUMANOID — heroic low-poly MMO build, ~1.7 units tall:
+     broad shoulders, tapered torso, chunky fists and boots.
      look: {skin, hair, hairStyle 0..3, shirt, pants, robe,
             hat (wizard|hood|crown|helm), hatColor, plume, weaponTint}
      ============================================================ */
@@ -109,141 +212,227 @@ window.Models3D = (function () {
     look = look || {};
     const skin = look.skin || "#d8a878";
     const g = new THREE.Group();
+    const body = new THREE.Group(); // bobs with the gait; yaw stays on g
+    g.add(body);
     const parts = { armL: null, armR: null, legL: null, legR: null, torso: null };
 
     if (look.robe) {
       const robe = look.robe;
-      cyl(g, 0.27, 0.46, 1.0, 7, robe, 0, 0.52, 0);
-      cyl(g, 0.47, 0.475, 0.09, 7, shade(robe, -30), 0, 0.085, 0);
-      box(g, 0.52, 0.16, 0.3, shade(robe, -8), 0, 0.99, 0);
-      // arms (sleeves)
-      parts.armL = new THREE.Group(); parts.armL.position.set(-0.31, 0.93, 0);
-      parts.armR = new THREE.Group(); parts.armR.position.set(0.31, 0.93, 0);
+      cyl(body, 0.28, 0.5, 1.08, 7, robe, 0, 0.56, 0);
+      cyl(body, 0.51, 0.515, 0.09, 7, shade(robe, -30), 0, 0.085, 0);
+      box(body, 0.58, 0.18, 0.34, shade(robe, -8), 0, 1.06, 0);   // shoulder mantle
+      cyl(body, 0.36, 0.36, 0.06, 7, shade(robe, -40), 0, 0.78, 0); // rope belt
+      // arms (sleeves with flared cuffs)
+      parts.armL = new THREE.Group(); parts.armL.position.set(-0.33, 1.0, 0);
+      parts.armR = new THREE.Group(); parts.armR.position.set(0.33, 1.0, 0);
       for (const a of [parts.armL, parts.armR]) {
-        box(a, 0.14, 0.34, 0.16, shade(robe, -14), 0, -0.15, 0);
-        box(a, 0.115, 0.16, 0.13, skin, 0, -0.39, 0);
-        g.add(a);
+        box(a, 0.15, 0.34, 0.17, shade(robe, -14), 0, -0.16, 0);
+        box(a, 0.18, 0.14, 0.19, shade(robe, -24), 0, -0.38, 0);
+        box(a, 0.11, 0.12, 0.12, skin, 0, -0.49, 0);
+        body.add(a);
       }
     } else {
       const shirt = look.shirt || "#7a3000";
       const pants = look.pants || "#3a2c18";
-      // legs
-      parts.legL = new THREE.Group(); parts.legL.position.set(-0.115, 0.47, 0);
-      parts.legR = new THREE.Group(); parts.legR.position.set(0.115, 0.47, 0);
+      // legs: thigh + heavy boot
+      parts.legL = new THREE.Group(); parts.legL.position.set(-0.13, 0.5, 0);
+      parts.legR = new THREE.Group(); parts.legR.position.set(0.13, 0.5, 0);
       for (const l of [parts.legL, parts.legR]) {
-        box(l, 0.17, 0.36, 0.19, pants, 0, -0.18, 0);
-        box(l, 0.18, 0.13, 0.22, "#2a2118", 0, -0.41, 0.012);
-        g.add(l);
+        box(l, 0.19, 0.34, 0.21, pants, 0, -0.16, 0);
+        box(l, 0.2, 0.16, 0.27, "#2a2118", 0, -0.42, 0.02);
+        body.add(l);
       }
-      // torso + belt
-      parts.torso = box(g, 0.46, 0.52, 0.27, shirt, 0, 0.73, 0);
-      box(g, 0.48, 0.07, 0.29, "#2a2118", 0, 0.5, 0);
-      box(g, 0.07, 0.07, 0.3, "#c8a04a", 0, 0.5, 0);
-      // shoulders
-      box(g, 0.56, 0.1, 0.28, shade(shirt, -18), 0, 0.95, 0);
-      // arms
-      parts.armL = new THREE.Group(); parts.armL.position.set(-0.3, 0.93, 0);
-      parts.armR = new THREE.Group(); parts.armR.position.set(0.3, 0.93, 0);
+      // tapered torso: narrow waist under a broad chest
+      box(body, 0.38, 0.2, 0.26, shade(shirt, -10), 0, 0.62, 0);
+      parts.torso = box(body, 0.52, 0.38, 0.3, shirt, 0, 0.89, 0);
+      // belt + buckle
+      box(body, 0.42, 0.08, 0.28, "#2a2118", 0, 0.72, 0);
+      box(body, 0.08, 0.08, 0.29, "#c8a04a", 0, 0.72, 0);
+      // shoulder slab
+      box(body, 0.64, 0.12, 0.3, shade(shirt, -18), 0, 1.06, 0);
+      // arms: sleeve, forearm, fist
+      parts.armL = new THREE.Group(); parts.armL.position.set(-0.36, 1.04, 0);
+      parts.armR = new THREE.Group(); parts.armR.position.set(0.36, 1.04, 0);
       for (const a of [parts.armL, parts.armR]) {
-        box(a, 0.13, 0.32, 0.15, shade(shirt, -14), 0, -0.14, 0);
-        box(a, 0.11, 0.18, 0.13, skin, 0, -0.38, 0);
-        g.add(a);
+        box(a, 0.15, 0.28, 0.17, shade(shirt, -14), 0, -0.12, 0);
+        box(a, 0.13, 0.18, 0.15, skin, 0, -0.33, 0);
+        box(a, 0.13, 0.12, 0.15, shade(skin, -14), 0, -0.47, 0.01); // fist
+        body.add(a);
       }
     }
 
-    // head + neck
-    box(g, 0.13, 0.08, 0.13, skin, 0, 1.0, 0);
-    box(g, 0.34, 0.32, 0.32, skin, 0, 1.18, 0);
+    // neck + head (chunky, reads at a distance)
+    box(body, 0.14, 0.08, 0.14, skin, 0, 1.14, 0);
+    box(body, 0.36, 0.34, 0.34, skin, 0, 1.33, 0);
 
     // face (skip when full helm)
     if (look.hat !== "helm") {
-      box(g, 0.05, 0.055, 0.02, "#20140c", -0.075, 1.2, 0.165);
-      box(g, 0.05, 0.055, 0.02, "#20140c", 0.075, 1.2, 0.165);
+      box(body, 0.055, 0.06, 0.02, "#20140c", -0.08, 1.35, 0.175);
+      box(body, 0.055, 0.06, 0.02, "#20140c", 0.08, 1.35, 0.175);
+      box(body, 0.2, 0.025, 0.02, shade(skin, -32), 0, 1.41, 0.175); // brow line
     }
 
     // hair
     const hc = look.hair || "#3a2412";
     const style = look.hairStyle == null ? 0 : look.hairStyle;
     if (style !== 3 && look.hat !== "helm") {
-      box(g, 0.37, 0.09, 0.36, hc, 0, 1.33, -0.005);
-      box(g, 0.37, 0.1, 0.06, hc, 0, 1.3, 0.15);
-      box(g, 0.37, 0.2, 0.07, hc, 0, 1.22, -0.15); // hugs the back of the head
+      box(body, 0.39, 0.1, 0.38, hc, 0, 1.49, -0.005);
+      box(body, 0.39, 0.1, 0.07, hc, 0, 1.46, 0.16);
+      box(body, 0.39, 0.22, 0.08, hc, 0, 1.37, -0.16); // hugs the back of the head
       if (style === 1) { // long
-        box(g, 0.37, 0.42, 0.09, hc, 0, 1.12, -0.17);
-        box(g, 0.07, 0.3, 0.3, hc, -0.165, 1.16, -0.02);
-        box(g, 0.07, 0.3, 0.3, hc, 0.165, 1.16, -0.02);
+        box(body, 0.39, 0.44, 0.1, hc, 0, 1.26, -0.18);
+        box(body, 0.08, 0.32, 0.32, hc, -0.175, 1.3, -0.02);
+        box(body, 0.08, 0.32, 0.32, hc, 0.175, 1.3, -0.02);
       }
       if (style === 2) { // wild
-        box(g, 0.16, 0.14, 0.16, hc, -0.1, 1.43, 0.04).rotation.z = 0.4;
-        box(g, 0.14, 0.16, 0.14, hc, 0.09, 1.45, -0.06).rotation.z = -0.35;
-        box(g, 0.12, 0.13, 0.12, hc, 0.02, 1.46, 0.09).rotation.x = 0.3;
+        box(body, 0.17, 0.15, 0.17, hc, -0.1, 1.59, 0.04).rotation.z = 0.4;
+        box(body, 0.15, 0.17, 0.15, hc, 0.09, 1.61, -0.06).rotation.z = -0.35;
+        box(body, 0.13, 0.14, 0.13, hc, 0.02, 1.62, 0.09).rotation.x = 0.3;
       }
     }
 
     // hats
-    let topY = 1.52;
+    let topY = 1.68;
     const hcol = look.hatColor || "#3a3270";
     if (look.hat === "wizard") {
-      cyl(g, 0.36, 0.36, 0.05, 8, hcol, 0, 1.345, 0);
-      const c = cone(g, 0.26, 0.58, 8, hcol, 0.02, 1.64, 0);
+      cyl(body, 0.38, 0.38, 0.05, 8, hcol, 0, 1.5, 0);
+      const c = cone(body, 0.27, 0.6, 8, hcol, 0.02, 1.81, 0);
       c.rotation.z = -0.1;
-      topY = 1.95;
+      topY = 2.12;
     } else if (look.hat === "hood") {
-      box(g, 0.4, 0.36, 0.36, hcol, 0, 1.21, -0.035);
-      box(g, 0.42, 0.26, 0.12, hcol, 0, 1.0, -0.16);
-      box(g, 0.07, 0.34, 0.34, hcol, -0.185, 1.16, -0.02);
-      box(g, 0.07, 0.34, 0.34, hcol, 0.185, 1.16, -0.02);
-      topY = 1.45;
+      box(body, 0.42, 0.38, 0.38, hcol, 0, 1.36, -0.035);
+      box(body, 0.44, 0.28, 0.13, hcol, 0, 1.14, -0.17);
+      box(body, 0.08, 0.36, 0.36, hcol, -0.195, 1.31, -0.02);
+      box(body, 0.08, 0.36, 0.36, hcol, 0.195, 1.31, -0.02);
+      topY = 1.6;
     } else if (look.hat === "crown") {
-      addCrown(g, 1.4);
-      topY = 1.62;
+      addCrown(body, 1.55);
+      topY = 1.78;
     } else if (look.hat === "helm") {
-      box(g, 0.38, 0.36, 0.36, "#98a1ab", 0, 1.19, 0);
-      box(g, 0.31, 0.05, 0.025, "#15120c", 0, 1.2, 0.18);
-      box(g, 0.06, 0.13, 0.05, "#7d858e", 0, 1.1, 0.18);
+      box(body, 0.4, 0.38, 0.38, "#98a1ab", 0, 1.34, 0);
+      box(body, 0.33, 0.05, 0.025, "#15120c", 0, 1.36, 0.19);
+      box(body, 0.06, 0.14, 0.05, "#7d858e", 0, 1.25, 0.19);
+      box(body, 0.42, 0.06, 0.4, "#7d858e", 0, 1.17, 0); // flared rim
       if (look.plume) {
-        box(g, 0.05, 0.16, 0.26, look.plume, 0, 1.45, -0.04);
-        box(g, 0.05, 0.13, 0.18, look.plume, 0, 1.36, -0.22);
+        box(body, 0.05, 0.17, 0.28, look.plume, 0, 1.62, -0.04);
+        box(body, 0.05, 0.14, 0.2, look.plume, 0, 1.52, -0.24);
       }
-      topY = 1.55;
+      topY = 1.72;
     }
 
-    // weapon (right hand)
-    let weapon = null, bladeMat = null;
+    /* ----- held weapon: parented to the right arm so it swings
+       with the stride instead of hovering at the hip ----- */
+    let weapon = null, weaponKey = "";
+    function setWeapon(vis) {
+      const key = vis ? [vis.model, vis.tint, vis.rarity, vis.flame ? 1 : 0].join("|") : "";
+      if (key === weaponKey) return;
+      weaponKey = key;
+      if (weapon) { parts.armR.remove(weapon); weapon = null; }
+      if (!vis) return;
+      weapon = buildWeapon(vis);
+      weapon.position.set(0.02, look.robe ? -0.52 : -0.5, 0.04);
+      weapon.rotation.x = 0.14; // blade tips forward, clear of the leg
+      weapon.rotation.z = -0.1;
+      parts.armR.add(weapon);
+    }
+    // legacy tint-only callers (knights, look.weaponTint) get a plain sword
     function setWeaponTint(tint) {
-      if (!tint) { if (weapon) { g.remove(weapon); weapon = null; } return; }
-      if (!weapon) {
-        weapon = new THREE.Group();
-        bladeMat = new THREE.MeshLambertMaterial({ color: tint, emissive: new THREE.Color(tint).multiplyScalar(0.22) });
-        const blade = box(weapon, 0.055, 0.6, 0.028, bladeMat, 0, 0.47, 0);
-        blade.material = bladeMat;
-        cone(weapon, 0.04, 0.09, 4, bladeMat, 0, 0.8, 0).material = bladeMat;
-        box(weapon, 0.17, 0.05, 0.06, "#b08d4f", 0, 0.14, 0);
-        box(weapon, 0.05, 0.16, 0.05, "#5a3f1d", 0, 0.04, 0);
-        ball(weapon, 0.04, "#d8b75a", 0, -0.05, 0, 6, 5);
-        weapon.position.set(0.36, 0.42, 0.05);
-        weapon.rotation.z = -0.14;
-        g.add(weapon);
-      } else {
-        bladeMat.color.set(tint);
-        bladeMat.emissive.set(tint).multiplyScalar(0.22);
+      setWeapon(tint ? { model: "sword", tint: tint } : null);
+    }
+
+    /* ----- worn armor overlays (player gear made visible) ----- */
+    let armorMeshes = [], armorKey = "";
+    function setArmor(vis) {
+      const key = vis ? vis.model + "|" + vis.tint : "";
+      if (key === armorKey) return;
+      armorKey = key;
+      for (const o of armorMeshes) o.parent && o.parent.remove(o);
+      armorMeshes = [];
+      if (!vis || look.robe) return;
+      const tint = vis.tint || "#8a6a3a";
+      const M = armorMeshes;
+      switch (vis.model) {
+        case "cloak": {
+          M.push(box(body, 0.5, 0.06, 0.36, tint, 0, 1.1, -0.04)); // clasped collar
+          const cape = box(body, 0.5, 0.78, 0.05, shade(tint, -10), 0, 0.72, -0.22);
+          cape.rotation.x = 0.1; M.push(cape);
+          for (let i = 0; i < 3; i++)                               // ragged hem
+            M.push(box(body, 0.13, 0.12, 0.05, shade(tint, -22), -0.16 + i * 0.16, 0.32 - (i % 2) * 0.05, -0.26));
+          break;
+        }
+        case "vest": {
+          M.push(box(body, 0.55, 0.4, 0.33, tint, 0, 0.89, 0));
+          M.push(box(body, 0.56, 0.05, 0.34, shade(tint, -26), 0, 0.8, 0)); // quilted seams
+          M.push(box(body, 0.56, 0.05, 0.34, shade(tint, -26), 0, 0.98, 0));
+          break;
+        }
+        case "leather": {
+          M.push(box(body, 0.55, 0.4, 0.33, tint, 0, 0.89, 0));
+          const s1 = box(body, 0.08, 0.46, 0.35, shade(tint, -32), -0.1, 0.9, 0); s1.rotation.z = 0.5; M.push(s1);
+          const s2 = box(body, 0.08, 0.46, 0.35, shade(tint, -32), 0.1, 0.9, 0); s2.rotation.z = -0.5; M.push(s2);
+          M.push(box(body, 0.66, 0.13, 0.32, shade(tint, -14), 0, 1.07, 0)); // mantle
+          for (const a of [parts.armL, parts.armR])
+            M.push(box(a, 0.15, 0.16, 0.17, shade(tint, -8), 0, -0.34, 0)); // bracers
+          M.push(box(body, 0.14, 0.14, 0.1, shade(tint, -20), 0.18, 0.66, 0.16)); // belt pouch
+          break;
+        }
+        case "mail": {
+          M.push(box(body, 0.55, 0.4, 0.33, tint, 0, 0.89, 0));
+          M.push(box(body, 0.4, 0.18, 0.3, shade(tint, -16), 0, 0.58, 0)); // mail skirt
+          M.push(box(body, 0.66, 0.13, 0.32, shade(tint, -24), 0, 1.07, 0));
+          for (const a of [parts.armL, parts.armR])
+            M.push(box(a, 0.17, 0.26, 0.19, shade(tint, -8), 0, -0.12, 0)); // mail sleeves
+          break;
+        }
+        case "plate": case "aegis": {
+          M.push(box(body, 0.55, 0.4, 0.33, tint, 0, 0.89, 0));
+          M.push(box(body, 0.07, 0.42, 0.345, shade(tint, 22), 0, 0.89, 0)); // center ridge
+          M.push(box(body, 0.45, 0.1, 0.33, shade(tint, -18), 0, 0.66, 0));  // faulds
+          for (const a of [parts.armL, parts.armR]) {
+            M.push(box(a, 0.2, 0.16, 0.22, shade(tint, 10), 0, 0.02, 0));   // pauldron
+            M.push(box(a, 0.16, 0.16, 0.18, shade(tint, -6), 0, -0.34, 0)); // gauntlet cuff
+          }
+          if (vis.model === "aegis") {
+            const crest = box(body, 0.12, 0.12, 0.03, glow("#ffd23f"), 0, 0.92, 0.175);
+            crest.rotation.z = Math.PI / 4; crest.castShadow = false; M.push(crest);
+            for (const a of [parts.armL, parts.armR])
+              M.push(cone(a, 0.05, 0.12, 4, "#ffd23f", 0, 0.13, 0)); // crowned pauldrons
+          }
+          break;
+        }
+        case "mantle": {
+          M.push(box(body, 0.52, 0.07, 0.37, tint, 0, 1.09, -0.03));
+          const cape = box(body, 0.5, 0.78, 0.05, shade(tint, -24), 0, 0.72, -0.22);
+          cape.rotation.x = 0.1; M.push(cape);
+          const trim = box(body, 0.5, 0.1, 0.052, glow("#ffb35a"), 0, 0.34, -0.255);
+          trim.rotation.x = 0.1; trim.castShadow = false; M.push(trim);
+          for (const sx of [-0.2, 0.2]) {
+            const emb = box(body, 0.07, 0.07, 0.07, glow("#ff8a2a"), sx, 1.12, -0.02);
+            emb.castShadow = false; M.push(emb);
+          }
+          break;
+        }
       }
     }
-    if (look.weaponTint) setWeaponTint(look.weaponTint);
 
     g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+    if (look.weaponTint) setWeaponTint(look.weaponTint);
 
     function setWalk(t, moving) {
       const s = moving ? Math.sin(t * 9) : 0;
       const sway = Math.sin(t * 1.7) * 0.04;
-      if (parts.legL) { parts.legL.rotation.x = s * 0.7; parts.legR.rotation.x = -s * 0.7; }
-      parts.armL.rotation.x = -s * 0.55;
-      parts.armR.rotation.x = s * 0.55 + (moving ? 0 : sway * 0.5);
-      parts.armL.rotation.z = moving ? 0.06 : 0.05 + sway;
-      parts.armR.rotation.z = moving ? -0.06 : -0.05 - sway;
+      if (parts.legL) { parts.legL.rotation.x = s * 0.75; parts.legR.rotation.x = -s * 0.75; }
+      parts.armL.rotation.x = -s * 0.6;
+      // the weapon arm swings shorter, keeping the blade under control
+      parts.armR.rotation.x = s * (weapon ? 0.32 : 0.6) + (moving ? 0 : sway * 0.5);
+      parts.armL.rotation.z = moving ? 0.07 : 0.05 + sway;
+      parts.armR.rotation.z = (moving ? -0.07 : -0.05 - sway) - (weapon ? 0.05 : 0);
+      // heel-strike bob + a touch of forward lean while striding
+      body.position.y = moving ? Math.abs(Math.sin(t * 9)) * 0.045 : (sway + 0.04) * 0.3;
+      body.rotation.x = moving ? 0.05 : 0;
     }
 
-    return { group: g, setWalk, setWeaponTint, height: topY + 0.1 };
+    return { group: g, inner: body, setWalk, setWeapon, setArmor, setWeaponTint, height: topY + 0.1 };
   }
 
   /* ============================================================
@@ -404,9 +593,9 @@ window.Models3D = (function () {
           skin: accent, shirt: body, pants: shade(body, -22),
           hat: "helm", plume: sp.plume || "#c43e0c", weaponTint: "#cfd6dd"
         });
-        // breastplate sheen + glowing visor eyes
-        box(h.group, 0.5, 0.2, 0.3, shade(body, 26), 0, 0.88, 0);
-        glowEyes(h.group, eye, 0.075, 1.2, 0.185, 0.04);
+        // breastplate sheen + glowing visor eyes (on the inner body so they bob with the gait)
+        box(h.inner, 0.56, 0.2, 0.34, shade(body, 26), 0, 0.9, 0);
+        glowEyes(h.inner, eye, 0.075, 1.36, 0.2, 0.04);
         g.add(h.group);
         baseH = h.height;
         animate = (t, moving) => h.setWalk(t, moving);

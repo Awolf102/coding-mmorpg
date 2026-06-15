@@ -83,6 +83,48 @@ window.NPCS = {
     lines: ["Words are power. Literal power, in the old tongue.",
             "I have ink, parchment, and questions. Mostly questions."]
   },
+  bram: {
+    id: "bram", name: "Innkeep Bram", title: "Keeper of the Kindled Crown", shop: "bram",
+    look: { skin: "#e8b88a", hair: "#6a3a1a", hairStyle: 2, shirt: "#7a5a17", pants: "#3a2c18" },
+    lines: ["Beds are clean, stew is hot, and the roof only leaks when it rains.",
+            "The Crown's hearth hasn't gone out since the Flame returned. I'm not brave enough to let it."]
+  },
+  lyrell: {
+    id: "lyrell", name: "Lyrell the Bard", title: "Voice of the Common Room",
+    look: { skin: "#c89060", hair: "#e8d23f", hairStyle: 1, shirt: "#5a3a7a", pants: "#3a2c18" },
+    lines: ["🎵 The kingdom fell, the kingdom burns, the for-loop spins, the while returns... 🎵",
+            "Every tavern needs a song. Every song needs a tragedy. Lucky me — we're standing in one."]
+  },
+  hilda: {
+    id: "hilda", name: "Smith Hilda", title: "Anvil of Ashveil", shop: "hilda",
+    look: { skin: "#b87f50", hair: "#c0392b", hairStyle: 2, shirt: "#6e3526", pants: "#2a2118" },
+    lines: ["Iron doesn't care about the end of the world. It only cares if you heat it evenly.",
+            "That gate-thing rattles my anvil every night. Somebody ought to feed it a sword."]
+  },
+  oswin: {
+    id: "oswin", name: "Farmer Oswin", title: "Of Greenrow Farm",
+    look: { skin: "#d8a878", hair: "#8a7a5a", hairStyle: 0, shirt: "#3f6230", pants: "#3a2c18" },
+    lines: ["Greenrow's soil is half ash now. Things still grow. Stubbornness, mostly.",
+            "Rats got into the turnips again. Big as dogs, eyes like coals."]
+  },
+  penna: {
+    id: "penna", name: "Penna", title: "Fisher of the Ashveil Run",
+    look: { skin: "#b87f50", hair: "#1a1a2a", hairStyle: 1, shirt: "#3a5a5e", pants: "#2a2118", hat: "hood", hatColor: "#2c4448" },
+    lines: ["The river still gives fish. They glow a little now, but they fry up fine.",
+            "Saw something pale drift under the bridge last new moon. Didn't cast again 'til sunrise."]
+  },
+  roske: {
+    id: "roske", name: "Gatewarden Roske", title: "Watcher of Easthold",
+    look: { skin: "#d8a878", hair: "#3a2412", hairStyle: 0, shirt: "#5a6a8a", pants: "#2a2e3a", hat: "helm" },
+    lines: ["The Bastion holds. As long as you don't ask what it holds against.",
+            "Past this gate it's all embers and teeth, friend. Mind your footing."]
+  },
+  pip: {
+    id: "pip", name: "Pip", title: "Future Archmage (Self-Declared)",
+    look: { skin: "#e8c8a0", hair: "#6a3a1a", hairStyle: 2, shirt: "#2e4a7a", pants: "#3a2c18" },
+    lines: ["When I grow up I'm going to learn the old tongue and print my OWN name!",
+            "Elder Maren says the Flame is sleeping in your hand. Can I see it?? Please?"]
+  },
   yara: {
     id: "yara", name: "Ranger Yara", title: "Warden of Emberwood",
     look: { skin: "#b87f50", hair: "#3a2412", hairStyle: 2, shirt: "#3f6230", pants: "#3a2c18", hat: "hood", hatColor: "#2c481f" },
@@ -100,6 +142,18 @@ window.NPCS = {
     look: { skin: "#a87850", hair: "#1a1a1a", hairStyle: 0, shirt: "#7a5a17", pants: "#2a2118", hat: "hood", hatColor: "#5a4a17" },
     lines: ["Everything's flammable if you believe in yourself.",
             "Buy a blade. The trees have teeth out here."]
+  },
+  fenna: {
+    id: "fenna", name: "Scout Fenna", title: "Eyes of Ranger's Rest",
+    look: { skin: "#c89060", hair: "#3a2412", hairStyle: 1, shirt: "#46602c", pants: "#3a2c18", hat: "hood", hatColor: "#2c481f" },
+    lines: ["Three wolf packs between here and the ruins. I count them so you don't have to.",
+            "Yara taught me everything. Mostly: 'step where I step.'"]
+  },
+  mott: {
+    id: "mott", name: "Forager Mott", title: "Connoisseur of Questionable Caps",
+    look: { skin: "#d8a878", hair: "#cfcfcf", hairStyle: 2, shirt: "#55653e", pants: "#3a2c18" },
+    lines: ["The glowing mushrooms are safe to eat. The REALLY glowing ones... less so.",
+            "The sprites guard the hollow like it owes them money."]
   },
   nyra: {
     id: "nyra", name: "Archivist Nyra", title: "Reader of Drowned Pages",
@@ -119,6 +173,18 @@ window.NPCS = {
     lines: ["Pulled all this up from the deep myself. Mind the barnacles.",
             "The drowned don't haggle. You shouldn't either."]
   },
+  edda: {
+    id: "edda", name: "Edda", title: "Elder of the Dry Quarter",
+    look: { skin: "#d8a878", hair: "#cfcfcf", hairStyle: 1, robe: "#4e6260", hat: "hood", hatColor: "#3a4a48" },
+    lines: ["We dried out this corner of the ruins one bucket at a time. Welcome to the Quarter.",
+            "Don't sleep past the lantern line. The wisps sing, and you'll want to follow."]
+  },
+  ronn: {
+    id: "ronn", name: "Diver Ronn", title: "Who Robs the Drowned",
+    look: { skin: "#a87850", hair: "#1a1a2a", hairStyle: 0, shirt: "#2e5a5e", pants: "#2a2a2a" },
+    lines: ["I dive the drowned halls for salvage. The dead don't need their spoons.",
+            "The King's hall is across the causeway. The water there... it watches."]
+  },
   edric: {
     id: "edric", name: "Castellan Edric", title: "Last Officer of Kingsfall",
     look: { skin: "#d8a878", hair: "#8a7a5a", hairStyle: 0, shirt: "#5a6a8a", pants: "#2a2e3a", hat: "helm" },
@@ -137,6 +203,18 @@ window.NPCS = {
     lines: ["Steel listens if you shout at it hot enough.",
             "Wear plate. The dead swing hard."]
   },
+  brakka: {
+    id: "brakka", name: "Sergeant Brakka", title: "Of the Last Bastion",
+    look: { skin: "#8d5524", hair: "#1a1a1a", hairStyle: 0, shirt: "#5a6a8a", pants: "#2a2e3a", hat: "helm" },
+    lines: ["Hold the line! Even if the line is two tents and a soup pot.",
+            "The spectral knights drill at dusk on the west wall. Old habits outlive the soldier."]
+  },
+  tam: {
+    id: "tam", name: "Squire Tam", title: "Polisher of Other People's Glory",
+    look: { skin: "#e8c8a0", hair: "#6a3a1a", hairStyle: 0, shirt: "#7a8aa8", pants: "#2a2e3a" },
+    lines: ["I polish the Castellan's armor. The armor in the yard polishes itself. Unsettling.",
+            "One day I'll be a knight. A LIVING one, thank you very much."]
+  },
   herald: {
     id: "herald", name: "The Last Herald", title: "Voice of the Eternal Flame",
     look: { skin: "#e8c8a0", hair: "#ffd23f", hairStyle: 1, robe: "#9a6a17", hat: null },
@@ -154,6 +232,12 @@ window.NPCS = {
     look: { skin: "#d8a878", hair: "#3a3a3a", hairStyle: 0, shirt: "#7a3000", pants: "#2a2118", hat: "hood", hatColor: "#5e1f12" },
     lines: ["Last shop before the end of the world. Stock up.",
             "The Flame doesn't take coin. I do."]
+  },
+  vesna: {
+    id: "vesna", name: "Pilgrim Vesna", title: "Who Walked from Ashveil",
+    look: { skin: "#e8c8a0", hair: "#f0e8d0", hairStyle: 1, robe: "#8a4a17", hat: "hood", hatColor: "#5e3026" },
+    lines: ["I walked here from Ashveil with one candle. The Flame kept it lit the whole way.",
+            "Pilgrims bring questions. The Flame answers in homework."]
   },
   flame: {
     id: "flame", name: "The Eternal Flame", title: "That Which Remains",

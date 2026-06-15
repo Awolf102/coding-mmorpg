@@ -30,7 +30,29 @@ window.Sprites = (function () {
     "m": { solid: false, mini: "#566036" },  // marsh
     "l": { solid: true,  mini: "#d4541b" },  // lava
     "x": { solid: true,  mini: "#0c0a0a" },  // void
-    "F": { solid: true,  mini: "#ff8a2a" }   // brazier flame
+    "F": { solid: true,  mini: "#ff8a2a" },  // brazier flame
+    /* --- themed world dressing --- */
+    "a": { solid: false, mini: "#4f463c" },  // ash / scorched ground
+    "e": { solid: false, mini: "#5a5148" },  // bone-littered ground
+    "*": { solid: false, mini: "#6fa04a" },  // flower bed
+    "C": { solid: true,  mini: "#9a8a3a" },  // crop rows
+    "o": { solid: true,  mini: "#8a8a8a" },  // village well
+    "M": { solid: true,  mini: "#a04a3a" },  // market stall
+    "L": { solid: true,  mini: "#caa84a" },  // lamp post
+    "A": { solid: true,  mini: "#4a4a4e" },  // anvil & forge
+    "B": { solid: true,  mini: "#7a5c34" },  // barrels & crates
+    "Y": { solid: true,  mini: "#6a6a52" },  // tent
+    "O": { solid: true,  mini: "#9a9588" },  // runestone / standing stone
+    "u": { solid: true,  mini: "#8a8a82" },  // statue
+    "n": { solid: true,  mini: "#7a3030" },  // banner pole
+    "+": { solid: true,  mini: "#6e6e66" },  // gravestone
+    "i": { solid: true,  mini: "#ffba5a" },  // glowing crystal
+    "T": { solid: true,  mini: "#3a322c" },  // dead / charred tree
+    "Q": { solid: true,  mini: "#caa23a" },  // throne
+    "k": { solid: true,  mini: "#6a4a2a" },  // lectern & books
+    "j": { solid: true,  mini: "#7a7a7e" },  // weapon rack
+    "q": { solid: true,  mini: "#7ad88a" },  // glowing mushrooms
+    "^": { solid: true,  mini: "#2a2226" }   // obsidian spike
   };
 
   function hash(x, y) {

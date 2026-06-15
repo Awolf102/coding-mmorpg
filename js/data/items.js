@@ -92,6 +92,34 @@ window.ITEMS = {
                        desc: "Unrolls into a free hint during any trial of code." }
 };
 
+/* ---------- 3D look of equipment when worn (inventory icons unaffected) ----------
+   weapon model: sword | club | sabre | greatsword | cleaver | warblade | brand
+   armor  model: cloak | vest | leather | mail | plate | mantle | aegis
+   flame: the blade smolders with living embers */
+(function () {
+  const WEAPON_MODELS = {
+    dull_blade: "sword", splintered_cudgel: "club", militia_shortsword: "sword",
+    keen_iron_edge: "sword", soldiers_sabre: "sabre", wickfire_torchblade: ["sword", true],
+    emberforged_falchion: "cleaver", watchmans_greatsword: "greatsword",
+    runic_warblade: "warblade", pyreheart_cleaver: ["cleaver", true],
+    dawnpiercer: "sword", cinderfall: ["greatsword", true], ashen_vow: "sword",
+    kingless_blade: "greatsword", sovereigns_ruin: "sabre",
+    flame_of_the_forgotten: ["sword", true], emberwake: ["sabre", true],
+    firstflame_edge: ["greatsword", true], eternal_brand: ["brand", true]
+  };
+  const ARMOR_MODELS = {
+    tattered_cloak: "cloak", padded_vest: "vest", hardened_leather: "leather",
+    ashguard_mail: "mail", citadel_plate: "plate",
+    mantle_of_embers: "mantle", aegis_of_the_first: "aegis"
+  };
+  for (const id in WEAPON_MODELS) {
+    const v = WEAPON_MODELS[id];
+    ITEMS[id].model = Array.isArray(v) ? v[0] : v;
+    if (Array.isArray(v) && v[1]) ITEMS[id].flame = true;
+  }
+  for (const id in ARMOR_MODELS) ITEMS[id].model = ARMOR_MODELS[id];
+})();
+
 /* loot tables per act: [itemId, weight] — rolled on enemy kill (small chance) */
 window.LOOT_TABLES = {
   1: [["ashen_salve", 60], ["splintered_cudgel", 15], ["padded_vest", 15], ["scroll_of_insight", 10]],
@@ -104,6 +132,8 @@ window.LOOT_TABLES = {
 /* shop inventories by npc id */
 window.SHOPS = {
   tobin:   ["ashen_salve", "scroll_of_insight", "padded_vest", "militia_shortsword", "splintered_cudgel"],
+  bram:    ["ashen_salve", "flamewater_flask", "scroll_of_insight"],
+  hilda:   ["splintered_cudgel", "militia_shortsword", "keen_iron_edge", "padded_vest"],
   wick:    ["ashen_salve", "flamewater_flask", "scroll_of_insight", "keen_iron_edge", "hardened_leather", "wickfire_torchblade"],
   korr:    ["flamewater_flask", "scroll_of_insight", "soldiers_sabre", "ashguard_mail", "emberforged_falchion", "ember_charm"],
   vulka:   ["flamewater_flask", "phoenix_draught", "scroll_of_insight", "watchmans_greatsword", "citadel_plate", "runic_warblade", "scribes_talisman"],

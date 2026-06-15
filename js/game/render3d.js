@@ -31,7 +31,7 @@ window.Renderer = (function () {
   const ENVS = {
     1: { skyTop: 0x5e9fd8, skyHor: 0xf2d8a8, fog: 0xc9bd96, fogN: 26, fogF: 66,
          hemiSky: 0xfff2da, hemiGnd: 0x6a5a40, hemiI: 0.78, sunC: 0xffeac2, sunI: 1.0,
-         sunDir: [-0.55, 1, 0.4], water: [0x2c6b94, 0x67a8c8], particle: null },
+         sunDir: [-0.55, 1, 0.4], water: [0x2c6b94, 0x67a8c8], particle: "pollen" },
     2: { skyTop: 0x5b88b8, skyHor: 0xc2d49a, fog: 0x9db387, fogN: 16, fogF: 50,
          hemiSky: 0xeaf2cf, hemiGnd: 0x42523a, hemiI: 0.7, sunC: 0xf2ffd9, sunI: 0.85,
          sunDir: [-0.4, 1, 0.55], water: [0x29586c, 0x4e8b8c], particle: "fireflies" },
@@ -50,14 +50,49 @@ window.Renderer = (function () {
   const GROUND = {
     g: "#5d8a3f", G: "#3f672c", p: "#a48d58", d: "#7c6945", s: "#cdb87e",
     S: "#8b8674", c: "#6f6b5c", m: "#566036", b: "#8a6a3e",
-    w: "#1d4866", l: "#2a0a03", x: "#070605"
+    w: "#1d4866", l: "#2a0a03", x: "#070605",
+    a: "#564a3c", e: "#5d5246", "*": "#5d8a3f"
   };
-  const PROPCH = "trfhRDWPF";       // props use the map's walk-tile ground color
-  const NATURAL = "gGdsmtrf";       // gets bigger height noise
+  const PROPCH = "trfhRDWPFCoMLABYOun+iTQkjq^"; // solid props standing on ground
+  const NATURAL = "gGdsmtrfae*T^q+";            // gets bigger height noise
 
-  function groundColor(ch) {
-    if (PROPCH.includes(ch)) return GROUND[map.walk] || GROUND.g;
-    return GROUND[ch] || GROUND.g;
+  /* per-map building & dressing palette (overridable via map.theme) */
+  const DEFAULT_THEME = {
+    wall: "#71716f", wall2: "#84847e", trim: "#54544e",
+    roof: "#7c4030", roof2: "#94503a", roofTrim: "#5e2f22", ridge: "#54281c",
+    door: "#553718", door2: "#6b4a22",
+    banner: "#7a2030", canvas: "#6a6a52", rune: "#ffb35a", crystal: "#7be0ff"
+  };
+  let TH = DEFAULT_THEME;
+
+  /* props inherit the dominant walkable ground around them, so a charred
+     tree in an ash field sits on ash, not on the map's default grass */
+  let groundGrid = null;
+  function resolveGround(x, y) {
+    const ch = tileAt(x, y);
+    if (!PROPCH.includes(ch)) return GROUND[ch] || GROUND[map.walk] || GROUND.g;
+    const counts = {};
+    for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]]) {
+      const nch = tileAt(x + dx, y + dy);
+      if (PROPCH.includes(nch) || "wlxb".includes(nch) || !GROUND[nch]) continue;
+      counts[nch] = (counts[nch] || 0) + 1;
+    }
+    let best = null, bestN = 0;
+    for (const k in counts) if (counts[k] > bestN) { best = k; bestN = counts[k]; }
+    return GROUND[best || map.walk] || GROUND.g;
+  }
+  function buildGroundGrid() {
+    groundGrid = [];
+    for (let y = 0; y < H; y++) {
+      const row = [];
+      for (let x = 0; x < W; x++) row.push(resolveGround(x, y));
+      groundGrid.push(row);
+    }
+  }
+  function groundColorAt(x, y) {
+    if (x < 0) x = 0; if (y < 0) y = 0;
+    if (x >= W) x = W - 1; if (y >= H) y = H - 1;
+    return groundGrid[y][x];
   }
   function baseHeight(ch) {
     if (ch === "w") return -0.5;
@@ -197,7 +232,9 @@ window.Renderer = (function () {
     worldGroup = new THREE.Group();
     scene.add(worldGroup);
 
+    TH = Object.assign({}, DEFAULT_THEME, m.theme || {});
     buildHeights();
+    buildGroundGrid();
     worldGroup.add(buildTerrain());
     buildLiquids();
     buildProps();
@@ -229,7 +266,7 @@ window.Renderer = (function () {
         if (adj.includes("b")) { heights[cy * (W + 1) + cx] = 0; continue; }
         let sum = 0;
         for (const ch of adj) sum += baseHeight(ch);
-        let amp = adj.every((ch) => NATURAL.includes(ch)) ? 0.17 : 0.045;
+        let amp = adj.every((ch) => NATURAL.includes(ch)) ? 0.22 : 0.045;
         if (adj.some((ch) => "wlx".includes(ch))) amp = 0.03;
         heights[cy * (W + 1) + cx] = sum / 4 + (hash(cx * 3 + 7, cy * 5 + 3) - 0.5) * amp;
       }
@@ -255,8 +292,8 @@ window.Renderer = (function () {
         pos.push(cx, cornerH(cx, cy), cy);
         // corner color = average of adjacent tile colors + gentle patchiness
         c.setRGB(0, 0, 0);
-        const adj = [tileAt(cx - 1, cy - 1), tileAt(cx, cy - 1), tileAt(cx - 1, cy), tileAt(cx, cy)];
-        for (const ch of adj) { cc.set(groundColor(ch)); c.r += cc.r / 4; c.g += cc.g / 4; c.b += cc.b / 4; }
+        const adj = [groundColorAt(cx - 1, cy - 1), groundColorAt(cx, cy - 1), groundColorAt(cx - 1, cy), groundColorAt(cx, cy)];
+        for (const col of adj) { cc.set(col); c.r += cc.r / 4; c.g += cc.g / 4; c.b += cc.b / 4; }
         const v = 0.9 + hash(cx, cy) * 0.2;
         const patch = 0.94 + hash(cx >> 2, cy >> 2) * 0.12;
         col.push(c.r * v * patch, c.g * v * patch, c.b * v * patch);
@@ -272,8 +309,23 @@ window.Renderer = (function () {
     geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
     geo.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
     geo.setIndex(idx);
-    geo.computeVertexNormals();
-    terrainMesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ vertexColors: true }));
+    /* shatter into facets: flat-shaded triangles with mostly per-face color,
+       so the ground reads as deliberately low-poly as the models standing on it */
+    const flat = geo.toNonIndexed();
+    const ca = flat.attributes.color;
+    for (let i = 0; i < ca.count; i += 3) {
+      const f = i / 3;
+      const j = 0.93 + hash(f * 7 + 1, f * 13 + 5) * 0.14;
+      const r = ((ca.getX(i) + ca.getX(i + 1) + ca.getX(i + 2)) / 3) * j;
+      const g = ((ca.getY(i) + ca.getY(i + 1) + ca.getY(i + 2)) / 3) * j;
+      const b = ((ca.getZ(i) + ca.getZ(i + 1) + ca.getZ(i + 2)) / 3) * j;
+      for (let k = i; k < i + 3; k++) {
+        // keep a whisper of the corner gradient so zone borders still blend
+        ca.setXYZ(k, ca.getX(k) * 0.25 + r * 0.75, ca.getY(k) * 0.25 + g * 0.75, ca.getZ(k) * 0.25 + b * 0.75);
+      }
+    }
+    flat.computeVertexNormals();
+    terrainMesh = new THREE.Mesh(flat, new THREE.MeshLambertMaterial({ vertexColors: true }));
     terrainMesh.receiveShadow = true;
     terrainMesh.name = "terrain";
     return terrainMesh;
@@ -400,14 +452,16 @@ window.Renderer = (function () {
       this.col.push(c.r, c.g, c.b);
     }
   };
-  Bucket.prototype.build = function () {
+  Bucket.prototype.build = function (selfLit) {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.Float32BufferAttribute(this.pos, 3));
     geo.setAttribute("normal", new THREE.Float32BufferAttribute(this.nor, 3));
     geo.setAttribute("color", new THREE.Float32BufferAttribute(this.col, 3));
-    const mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ vertexColors: true }));
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    const mesh = new THREE.Mesh(geo, selfLit
+      ? new THREE.MeshBasicMaterial({ vertexColors: true })
+      : new THREE.MeshLambertMaterial({ vertexColors: true }));
+    mesh.castShadow = !selfLit;
+    mesh.receiveShadow = !selfLit;
     return mesh;
   };
 
@@ -417,8 +471,9 @@ window.Renderer = (function () {
   }
 
   function buildProps() {
-    const B = new Bucket();
-    const dark = map.act >= 3;
+    const B = new Bucket();          // lit geometry
+    const G = new Bucket();          // self-lit geometry (runes, crystals, mushroom caps)
+    const glows = [];                // soft halo sprites added after merge
     for (let y = 0; y < H; y++) {
       for (let x = 0; x < W; x++) {
         const ch = map.tiles[y][x];
@@ -456,22 +511,26 @@ window.Renderer = (function () {
             break;
           }
           case "h": case "D": {
-            const wallC = mixHex(dark ? "#4e5252" : "#71716f", dark ? "#5e6260" : "#84847e", h1);
+            const wallC = mixHex(TH.wall, TH.wall2, h1);
             B.add("box", wallC, cx, 0.8, cz, 1.001, 1.6, 1.001, 0, 0);
-            B.add("box", mixHex("#54544e", "#646458", h2), cx, 1.66, cz, 1.04, 0.12, 1.04, 0, 0);
+            B.add("box", mixHex(TH.trim, Sprites.shade(TH.trim, 14), h2), cx, 1.66, cz, 1.04, 0.12, 1.04, 0, 0);
             if (ch === "D") {
-              B.add("box", "#553718", cx, 0.62, cz + 0.49, 0.6, 1.24, 0.1, 0, 0);
-              B.add("box", "#6b4a22", cx, 0.6, cz + 0.52, 0.46, 1.1, 0.08, 0, 0);
+              B.add("box", TH.door, cx, 0.62, cz + 0.49, 0.6, 1.24, 0.1, 0, 0);
+              B.add("box", TH.door2, cx, 0.6, cz + 0.52, 0.46, 1.1, 0.08, 0, 0);
               B.add("box", "#d8b75a", cx + 0.16, 0.6, cz + 0.57, 0.05, 0.05, 0.03, 0, 0);
+            } else if (h3 > 0.55 && y > 0 && map.tiles[y - 1][x] === "R") {
+              // house front: shuttered window with a warm lit pane
+              B.add("box", TH.trim, cx, 1.02, cz + 0.51, 0.4, 0.42, 0.05, 0, 0);
+              G.add("box", "#ffd98a", cx, 1.02, cz + 0.53, 0.26, 0.28, 0.03, 0, 0);
             }
             break;
           }
           case "R": {
-            const roofC = mixHex("#7c4030", "#94503a", h1);
+            const roofC = mixHex(TH.roof, TH.roof2, h1);
             B.add("box", roofC, cx, 1.05, cz, 1.001, 2.1, 1.001, 0, 0);
-            B.add("box", mixHex("#5e2f22", "#6e3a2a", h2), cx, 2.16, cz, 1.05, 0.12, 1.05, 0, 0);
+            B.add("box", mixHex(TH.roofTrim, Sprites.shade(TH.roofTrim, 12), h2), cx, 2.16, cz, 1.05, 0.12, 1.05, 0, 0);
             // ridge cap on top
-            B.add("box", "#54281c", cx, 2.3, cz, 0.55, 0.18, 0.55, 0, 0);
+            B.add("box", TH.ridge, cx, 2.3, cz, 0.55, 0.18, 0.55, 0, 0);
             break;
           }
           case "W": {
@@ -530,23 +589,243 @@ window.Renderer = (function () {
             }
             break;
           }
+          case "a": {
+            // scorched earth: charred stumps and cinder rocks
+            if (h1 > 0.74) B.add("cyl6", "#2e2722", cx + (h2 - 0.5) * 0.6, gh + 0.12, cz + (h3 - 0.5) * 0.6, 0.08, 0.2 + h2 * 0.22, 0.08, 0, (h3 - 0.5) * 0.5);
+            if (h2 > 0.84) B.add("dodec", "#3a322a", cx + (h3 - 0.5) * 0.6, gh + 0.05, cz + (h1 - 0.5) * 0.6, 0.13, 0.09, 0.13, h1 * 6, 0);
+            break;
+          }
+          case "e": {
+            // old bones half-buried in the dirt
+            if (h1 > 0.3) {
+              B.add("box", "#cfc6b0", cx + (h2 - 0.5) * 0.5, gh + 0.05, cz + (h3 - 0.5) * 0.5, 0.32, 0.05, 0.07, h1 * 6, 0);
+              B.add("box", "#bfb6a0", cx + (h3 - 0.5) * 0.6, gh + 0.05, cz + (h2 - 0.5) * 0.6, 0.22, 0.05, 0.06, h2 * 6, 0);
+            }
+            if (h1 > 0.66) B.add("ico", "#d8d0bc", cx + (h2 - 0.5) * 0.4, gh + 0.09, cz + (h3 - 0.5) * 0.4, 0.17, 0.14, 0.19, h3 * 6, 0);
+            if (h2 > 0.8) B.add("cone", "#cfc6b0", cx + (h1 - 0.5) * 0.5, gh + 0.12, cz - (h3 - 0.5) * 0.5, 0.05, 0.26, 0.05, 0, 0.6 + h3);
+            break;
+          }
+          case "*": {
+            // tended flower bed
+            const FLW = ["#e8d23f", "#d86a8a", "#e07a3a", "#c8e0ff", "#b070d8"];
+            for (let i = 0; i < 4; i++) {
+              const fx = cx + (hash(x * 5 + i, y * 3 + i * 7) - 0.5) * 0.8;
+              const fz = cz + (hash(x * 9 + i * 3, y * 7 + i) - 0.5) * 0.8;
+              const fy = heightAt(fx, fz);
+              B.add("cone", "#4d7a36", fx, fy + 0.11, fz, 0.07, 0.22, 0.07, 0, 0);
+              B.add("box", FLW[Math.floor(hash(x + i * 11, y + i * 5) * FLW.length)], fx, fy + 0.24, fz, 0.09, 0.08, 0.09, i * 1.2, 0);
+            }
+            break;
+          }
+          case "C": {
+            // crop rows on tilled soil
+            B.add("box", "#5e4a2e", cx, gh + 0.05, cz, 0.96, 0.12, 0.96, 0, 0);
+            for (let i = 0; i < 3; i++)
+              B.add("cone", mixHex("#7a9a3a", "#a8b84a", hash(x * 3 + i, y + i * 7)), cx - 0.3 + i * 0.3, gh + 0.34, cz + (h1 - 0.5) * 0.3, 0.1, 0.44 + h2 * 0.16, 0.1, 0, (h3 - 0.5) * 0.2);
+            if (h1 > 0.78) B.add("ico", "#d8843a", cx + 0.26, gh + 0.17, cz + 0.28, 0.17, 0.13, 0.17, h2 * 6, 0);
+            break;
+          }
+          case "o": {
+            // village well
+            B.add("cyl", mixHex("#84847e", "#96968c", h1), cx, gh + 0.3, cz, 0.8, 0.6, 0.8, 0, 0);
+            B.add("cyl", "#1a2530", cx, gh + 0.61, cz, 0.6, 0.04, 0.6, 0, 0);
+            B.add("box", "#5e4426", cx - 0.42, gh + 0.95, cz, 0.1, 1.3, 0.1, 0, 0);
+            B.add("box", "#5e4426", cx + 0.42, gh + 0.95, cz, 0.1, 1.3, 0.1, 0, 0);
+            B.add("box", "#6e4f2c", cx, gh + 1.56, cz, 1.06, 0.08, 0.1, 0, 0);
+            B.add("cone", TH.roof, cx, gh + 1.86, cz, 1.5, 0.55, 1.5, 0, 0);
+            B.add("box", "#7d5c34", cx + 0.12, gh + 1.1, cz, 0.16, 0.2, 0.16, 0.4, 0); // bucket
+            break;
+          }
+          case "M": {
+            // market stall with striped awning
+            const AWN = ["#a04038", "#3a6a8a", "#9a7a2a", "#5e7a3a"];
+            const awn = AWN[Math.floor(h1 * AWN.length)];
+            B.add("box", "#6e4f2c", cx, gh + 0.42, cz, 0.95, 0.5, 0.6, 0, 0);
+            B.add("box", "#7d5c34", cx, gh + 0.7, cz, 1.02, 0.07, 0.68, 0, 0);
+            for (const ox of [-0.44, 0.44]) for (const oz of [-0.32, 0.32])
+              B.add("box", "#55432a", cx + ox, gh + 0.8, cz + oz, 0.08, 1.7, 0.08, 0, 0);
+            B.add("box", awn, cx - 0.27, gh + 1.7, cz, 0.62, 0.06, 0.98, 0, 0.2);
+            B.add("box", "#e8e0cc", cx + 0.27, gh + 1.76, cz, 0.62, 0.06, 0.98, 0, -0.2);
+            B.add("ico", "#c8a04a", cx - 0.2, gh + 0.84, cz + 0.1, 0.18, 0.14, 0.18, h2 * 6, 0);
+            B.add("box", "#7a3030", cx + 0.22, gh + 0.82, cz - 0.08, 0.18, 0.15, 0.22, h3, 0);
+            break;
+          }
+          case "L": {
+            // iron lamp post (lit)
+            B.add("cyl", "#3a3a3e", cx, gh + 0.08, cz, 0.32, 0.16, 0.32, 0, 0);
+            B.add("cyl6", "#4a4a50", cx, gh + 0.8, cz, 0.09, 1.5, 0.09, 0, 0);
+            B.add("box", "#3a3a3e", cx, gh + 1.58, cz, 0.3, 0.06, 0.3, 0, 0);
+            B.add("box", "#2e2e32", cx, gh + 1.86, cz, 0.24, 0.06, 0.24, 0, 0);
+            flames.push({ x: cx, z: cz, y: gh + 1.52, phase: h1 * 6, lamp: true });
+            break;
+          }
+          case "A": {
+            // anvil on a stump + forge coals
+            B.add("cyl6", "#55432a", cx - 0.15, gh + 0.2, cz, 0.5, 0.4, 0.5, 0, 0);
+            B.add("box", "#3e3e44", cx - 0.15, gh + 0.5, cz, 0.46, 0.2, 0.26, 0, 0);
+            B.add("box", "#4a4a52", cx - 0.15, gh + 0.63, cz, 0.62, 0.09, 0.3, 0, 0);
+            B.add("cone", "#4a4a52", cx + 0.22, gh + 0.63, cz, 0.4, 0.3, 0.4, 0, -Math.PI / 2);
+            B.add("box", "#5e5852", cx + 0.34, gh + 0.25, cz + 0.32, 0.5, 0.5, 0.5, 0.3, 0);
+            flames.push({ x: cx + 0.34, z: cz + 0.32, y: gh + 0.5, phase: h1 * 6, lamp: true });
+            break;
+          }
+          case "B": {
+            // barrels and crates
+            B.add("cyl", "#6e4f2c", cx - 0.2, gh + 0.3, cz + 0.15, 0.5, 0.6, 0.5, 0, 0);
+            B.add("cyl", "#4e3a20", cx - 0.2, gh + 0.32, cz + 0.15, 0.53, 0.07, 0.53, 0, 0);
+            B.add("box", "#7d5c34", cx + 0.25, gh + 0.21, cz - 0.18, 0.42, 0.42, 0.42, h1, 0);
+            if (h2 > 0.45) B.add("box", "#8a6a3e", cx + 0.18, gh + 0.56, cz - 0.12, 0.3, 0.3, 0.3, h2 * 2, 0);
+            break;
+          }
+          case "Y": {
+            // canvas tent (themed color), open toward +z
+            const cv = TH.canvas;
+            const cvd = Sprites.shade(cv, -22);
+            B.add("box", cv, cx - 0.35, gh + 0.52, cz, 0.98, 0.07, 1.15, 0, 0.96);
+            B.add("box", cvd, cx + 0.35, gh + 0.52, cz, 0.98, 0.07, 1.15, 0, -0.96);
+            B.add("box", "#55432a", cx, gh + 0.92, cz, 0.07, 0.1, 1.28, 0, 0);
+            B.add("box", cvd, cx, gh + 0.4, cz - 0.52, 0.78, 0.8, 0.06, 0, 0);
+            break;
+          }
+          case "O": {
+            // ancient runestone
+            const oc = mixHex("#847f72", "#a8a396", h2);
+            B.add("box", oc, cx, gh + 0.8, cz, 0.6, 1.6, 0.42, h1 * 0.5, (h2 - 0.5) * 0.1);
+            B.add("box", oc, cx, gh + 1.66, cz, 0.42, 0.3, 0.34, h1 * 0.5, 0);
+            G.add("box", TH.rune, cx, gh + 0.95, cz + 0.21, 0.1, 0.7, 0.04, h1 * 0.5, 0);
+            G.add("box", TH.rune, cx, gh + 1.4, cz + 0.2, 0.18, 0.1, 0.04, h1 * 0.5, 0);
+            glows.push({ x: cx, y: gh + 1.1, z: cz, color: TH.rune, size: 1.5, opacity: 0.3 });
+            break;
+          }
+          case "u": {
+            // weathered statue of a fallen hero
+            const st = mixHex("#7e7e78", "#96968c", h1);
+            if (map.act === 3 && h3 > 0.4) st.lerp(new THREE.Color("#5a7a5e"), 0.3);
+            B.add("box", "#6a6a64", cx, gh + 0.15, cz, 0.84, 0.3, 0.84, 0, 0);
+            B.add("box", st, cx, gh + 0.45, cz, 0.52, 0.32, 0.52, 0, 0);
+            B.add("box", st, cx, gh + 0.95, cz, 0.34, 0.7, 0.26, 0, 0);
+            B.add("box", st, cx, gh + 1.44, cz, 0.44, 0.4, 0.3, 0, 0);
+            B.add("box", st, cx, gh + 1.76, cz, 0.25, 0.25, 0.25, 0, 0);
+            B.add("box", st, cx + 0.3, gh + 1.3, cz + 0.08, 0.12, 0.46, 0.12, 0, -0.35);
+            B.add("box", st, cx + 0.4, gh + 0.92, cz + 0.16, 0.07, 0.85, 0.09, 0, 0);
+            break;
+          }
+          case "n": {
+            // banner pole with themed cloth
+            B.add("cyl6", "#4a3a28", cx, gh + 1.15, cz, 0.09, 2.3, 0.09, 0, 0);
+            B.add("cone", "#c8a04a", cx, gh + 2.4, cz, 0.13, 0.2, 0.13, 0, 0);
+            B.add("box", "#5e4426", cx, gh + 2.2, cz, 0.8, 0.06, 0.08, 0, 0);
+            B.add("box", TH.banner, cx, gh + 1.68, cz, 0.62, 1.0, 0.045, 0, 0);
+            B.add("box", Sprites.shade(TH.banner, -26), cx, gh + 1.14, cz, 0.62, 0.12, 0.05, 0, 0);
+            G.add("box", "#e8c879", cx, gh + 1.74, cz + 0.04, 0.18, 0.26, 0.02, 0, 0);
+            break;
+          }
+          case "+": {
+            // leaning gravestone
+            const gc2 = mixHex("#73736b", "#8a8a80", h2);
+            if (h3 > 0.5) gc2.lerp(new THREE.Color("#5a7a4e"), 0.3);
+            B.add("box", gc2, cx, gh + 0.32, cz, 0.42, 0.62, 0.13, (h1 - 0.5) * 0.4, (h2 - 0.5) * 0.3);
+            B.add("box", gc2, cx, gh + 0.64, cz, 0.3, 0.16, 0.11, (h1 - 0.5) * 0.4, (h2 - 0.5) * 0.3);
+            if (h1 > 0.62) B.add("box", "#6a6a62", cx + (h2 - 0.5) * 0.4, gh + 0.06, cz + 0.3, 0.5, 0.12, 0.32, h3, 0);
+            break;
+          }
+          case "i": {
+            // glowing crystal shards
+            const cc2 = TH.crystal;
+            B.add("dodec", "#4a463e", cx, gh + 0.07, cz, 0.52, 0.2, 0.52, h2 * 6, 0);
+            G.add("ico", cc2, cx, gh + 0.5, cz, 0.3, 0.9, 0.3, h1 * 6, (h2 - 0.5) * 0.25);
+            G.add("ico", cc2, cx + (h2 - 0.5) * 0.55, gh + 0.22, cz + (h3 - 0.5) * 0.55, 0.16, 0.42, 0.16, h3 * 6, (h1 - 0.5) * 0.5);
+            glows.push({ x: cx, y: gh + 0.6, z: cz, color: cc2, size: 1.7, opacity: 0.42 });
+            break;
+          }
+          case "T": {
+            // charred dead tree
+            const ts = 0.8 + h1 * 0.45;
+            const tc = mixHex("#332b24", "#4a3e32", h2);
+            B.add("cyl6", tc, cx, gh + 0.65 * ts, cz, 0.15 * ts, 1.3 * ts, 0.15 * ts, h1 * 3, (h2 - 0.5) * 0.18);
+            B.add("cyl6", tc, cx + 0.2 * ts, gh + 1.3 * ts, cz, 0.06 * ts, 0.75 * ts, 0.06 * ts, 0, -0.7);
+            B.add("cyl6", tc, cx - 0.16 * ts, gh + 1.15 * ts, cz + 0.06, 0.05 * ts, 0.6 * ts, 0.05 * ts, 0.5, 0.75);
+            break;
+          }
+          case "Q": {
+            // throne of the old kingdom
+            B.add("box", "#6a665c", cx, gh + 0.12, cz, 1.0, 0.24, 1.0, 0, 0);
+            B.add("box", "#7a766a", cx, gh + 0.4, cz, 0.72, 0.32, 0.72, 0, 0);
+            B.add("box", "#8a8678", cx, gh + 1.05, cz - 0.3, 0.72, 1.4, 0.15, 0, 0);
+            B.add("box", "#7a2030", cx, gh + 1.0, cz - 0.21, 0.5, 1.0, 0.05, 0, 0);
+            B.add("box", "#c8a04a", cx, gh + 1.8, cz - 0.3, 0.78, 0.1, 0.17, 0, 0);
+            B.add("cone", "#c8a04a", cx - 0.33, gh + 1.95, cz - 0.3, 0.16, 0.2, 0.16, 0, 0);
+            B.add("cone", "#c8a04a", cx + 0.33, gh + 1.95, cz - 0.3, 0.16, 0.2, 0.16, 0, 0);
+            B.add("box", "#8a8678", cx - 0.32, gh + 0.66, cz + 0.1, 0.13, 0.3, 0.5, 0, 0);
+            B.add("box", "#8a8678", cx + 0.32, gh + 0.66, cz + 0.1, 0.13, 0.3, 0.5, 0, 0);
+            G.add("box", TH.crystal, cx, gh + 1.62, cz - 0.27, 0.12, 0.14, 0.04, 0, 0);
+            glows.push({ x: cx, y: gh + 1.6, z: cz - 0.2, color: TH.crystal, size: 1.2, opacity: 0.3 });
+            break;
+          }
+          case "k": {
+            // scribe's lectern with an open tome
+            B.add("cyl6", "#5e4426", cx, gh + 0.45, cz, 0.15, 0.9, 0.15, 0, 0);
+            B.add("box", "#4a3a28", cx, gh + 0.06, cz, 0.5, 0.12, 0.5, 0, 0);
+            B.add("box", "#6e4f2c", cx, gh + 0.96, cz, 0.62, 0.08, 0.46, 0, 0.22);
+            B.add("box", "#7a2020", cx, gh + 1.02, cz, 0.46, 0.05, 0.36, 0, 0.22);
+            B.add("box", "#e8dcc0", cx, gh + 1.06, cz, 0.4, 0.04, 0.3, 0, 0.22);
+            break;
+          }
+          case "j": {
+            // weapon rack with leaning blades
+            B.add("box", "#55432a", cx - 0.4, gh + 0.5, cz, 0.09, 1.0, 0.09, 0, 0);
+            B.add("box", "#55432a", cx + 0.4, gh + 0.5, cz, 0.09, 1.0, 0.09, 0, 0);
+            B.add("box", "#6e4f2c", cx, gh + 0.94, cz, 0.95, 0.08, 0.09, 0, 0);
+            for (let i = 0; i < 3; i++) {
+              const lx = cx - 0.24 + i * 0.24;
+              B.add("box", "#aab4bc", lx, gh + 0.52, cz + 0.07, 0.05, 0.95, 0.025, 0, 0.14 - i * 0.14);
+              B.add("box", "#6a5a2a", lx, gh + 0.24, cz + 0.07, 0.16, 0.04, 0.05, 0, 0.14 - i * 0.14);
+            }
+            break;
+          }
+          case "q": {
+            // bioluminescent mushroom cluster
+            const ms = 0.7 + h1 * 0.5;
+            B.add("cyl6", "#d8d0c0", cx, gh + 0.3 * ms, cz, 0.13 * ms, 0.6 * ms, 0.17 * ms, 0, (h2 - 0.5) * 0.2);
+            G.add("cone", "#5ac87a", cx, gh + 0.72 * ms, cz, 1.1 * ms, 0.42 * ms, 1.1 * ms, h1 * 3, 0);
+            B.add("cyl6", "#cfc6b4", cx + (h2 - 0.5) * 0.7, gh + 0.13, cz + (h3 - 0.5) * 0.7, 0.06, 0.26, 0.08, 0, (h1 - 0.5) * 0.4);
+            G.add("cone", "#6ad88a", cx + (h2 - 0.5) * 0.7, gh + 0.32, cz + (h3 - 0.5) * 0.7, 0.4, 0.18, 0.4, 0, (h1 - 0.5) * 0.4);
+            glows.push({ x: cx, y: gh + 0.7 * ms, z: cz, color: "#5ac87a", size: 1.5, opacity: 0.3 });
+            break;
+          }
+          case "^": {
+            // obsidian spike
+            const os = 0.7 + h1 * 0.6;
+            B.add("cone", "#1e181c", cx, gh + 0.6 * os, cz, 1.0 * os, 1.4 * os, 1.0 * os, h1 * 6, (h2 - 0.5) * 0.2);
+            B.add("cone", "#2a2228", cx + (h2 - 0.5) * 0.6, gh + 0.32, cz + (h3 - 0.5) * 0.6, 0.6, 0.75, 0.6, h3 * 6, (h1 - 0.5) * 0.3);
+            if (map.act === 5) glows.push({ x: cx, y: gh + 0.2, z: cz, color: 0xff7a30, size: 1.1, opacity: 0.22 });
+            break;
+          }
         }
       }
     }
     worldGroup.add(B.build());
+    worldGroup.add(G.build(true));
+    for (const gl of glows) {
+      const s = Models3D.makeGlowSprite(gl.color, gl.size, gl.opacity);
+      s.position.set(gl.x, gl.y, gl.z);
+      worldGroup.add(s);
+    }
 
-    // brazier flames (animated) + lights
+    // brazier / lamp flames (animated) + lights
     for (const f of flames) {
+      const sc = f.lamp ? 0.55 : 1;
+      f.s = sc;
       const grp = new THREE.Group();
       grp.position.set(f.x, f.y, f.z);
-      const outer = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.55, 6), new THREE.MeshBasicMaterial({ color: 0xff7a1a }));
-      outer.position.y = 0.27;
-      const inner = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.34, 6), new THREE.MeshBasicMaterial({ color: 0xffd23f }));
-      inner.position.y = 0.22;
-      const halo = Models3D.makeGlowSprite(0xff8a2a, 1.6, 0.55);
-      halo.position.y = 0.4;
-      const light = new THREE.PointLight(0xff8a3a, 1.15, 7.5, 2);
-      light.position.y = 0.7;
+      const outer = new THREE.Mesh(new THREE.ConeGeometry(0.17 * sc, 0.55 * sc, 6), new THREE.MeshBasicMaterial({ color: 0xff7a1a }));
+      outer.position.y = 0.27 * sc;
+      const inner = new THREE.Mesh(new THREE.ConeGeometry(0.09 * sc, 0.34 * sc, 6), new THREE.MeshBasicMaterial({ color: 0xffd23f }));
+      inner.position.y = 0.22 * sc;
+      const halo = Models3D.makeGlowSprite(0xff8a2a, 1.6 * sc, 0.55);
+      halo.position.y = 0.4 * sc;
+      const light = new THREE.PointLight(0xff8a3a, f.lamp ? 0.85 : 1.15, f.lamp ? 6 : 7.5, 2);
+      light.position.y = 0.7 * sc;
       grp.add(outer, inner, halo, light);
       worldGroup.add(grp);
       f.outer = outer; f.inner = inner; f.halo = halo; f.light = light;
@@ -589,6 +868,7 @@ window.Renderer = (function () {
   function buildParticles(kind) {
     if (!kind) return;
     const conf = {
+      pollen: { n: 40, color: 0xfff0c0, size: 0.09, opacity: 0.4, blending: THREE.AdditiveBlending, vy: 0.025, drift: 0.4, span: 26, hBase: 0.4, hSpan: 2.4 },
       fireflies: { n: 70, color: 0xcdf07a, size: 0.14, opacity: 0.8, blending: THREE.AdditiveBlending, vy: 0.06, drift: 0.35, span: 26, hBase: 0.4, hSpan: 2.2 },
       mist: { n: 55, color: 0x9ab8d8, size: 0.34, opacity: 0.09, blending: THREE.NormalBlending, vy: 0.03, drift: 0.25, span: 30, hBase: 0.2, hSpan: 1.6 },
       ash: { n: 110, color: 0xb8aFa6, size: 0.1, opacity: 0.5, blending: THREE.NormalBlending, vy: -0.22, drift: 0.3, span: 28, hBase: 0.5, hSpan: 5 },
@@ -734,7 +1014,6 @@ window.Renderer = (function () {
 
     /* ----- player ----- */
     const st = Game.state;
-    const wt = Game.weaponTint();
     const key = JSON.stringify(st.appearance) + "|" + st.name + "|" + (st.titleEarned || "");
     if (!playerRig || playerKey !== key) {
       if (playerRig) worldGroup.remove(playerRig.root);
@@ -743,7 +1022,8 @@ window.Renderer = (function () {
       playerKey = key;
       worldGroup.add(playerRig.root);
     }
-    playerRig.model.setWeaponTint(wt);
+    playerRig.model.setWeapon(Game.weaponVisual());
+    playerRig.model.setArmor(Game.armorVisual());
     const p = Game.player;
     const pwx = pxToWorld(p.px), pwz = pxToWorld(p.py);
     playerRig.root.position.set(pwx, heightAt(pwx, pwz), pwz);
@@ -860,7 +1140,7 @@ window.Renderer = (function () {
         f.outer.scale.set(fl, fl * (1 + Math.sin(t * 7 + f.phase) * 0.12), fl);
         f.inner.scale.copy(f.outer.scale);
         f.halo.material.opacity = 0.4 + fl * 0.12;
-        f.light.intensity = 0.95 + fl * 0.25;
+        f.light.intensity = (f.lamp ? 0.6 : 0.95) + fl * 0.25;
       }
     }
 

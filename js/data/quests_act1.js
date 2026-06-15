@@ -262,7 +262,7 @@ window.QUEST_DB.push(
 /* ---------------- py04 : BOSS — The Charred Gatekeeper ---------------- */
 {
   id: "py04", act: 1, title: "The Charred Gatekeeper", npc: "elder_maren", map: "village", boss: true,
-  bossEnemy: "boss_gatekeeper", bossSpot: { map: "village", x: 43, y: 11 },
+  bossEnemy: "boss_gatekeeper", bossSpot: { map: "village", x: 41, y: 10 },
   intro: [
     "It has begun. A knight of the First Kingdom stands at our east gate — dead a thousand years, yet armored in cinders. The Flame's return wakes the old servants first.",
     "He will not let you pass to Emberwood until you prove your speech. Everything you have learned — words, numbers, the weave — bring all of it.",

@@ -351,7 +351,7 @@ window.QUEST_DB.push(
 /* ---------------- py13 : BOSS — The Drowned King ---------------- */
 {
   id: "py13", act: 3, title: "The Drowned King", npc: "nyra", map: "ruins", boss: true,
-  bossEnemy: "boss_drowned_king", bossSpot: { map: "ruins", x: 39, y: 9 },
+  bossEnemy: "boss_drowned_king", bossSpot: { map: "ruins", x: 39, y: 7 },
   intro: [
     "It's awake. The throne room lights are burning blue and the water is flowing *upward*. The Drowned King has risen, and he is taking inventory.",
     "He was the kingdom's treasurer once — drowned in his own vault, counting as the water rose. He will not rest until someone proves the count can be done *right*.",
