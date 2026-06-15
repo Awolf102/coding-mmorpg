@@ -104,6 +104,7 @@ window.LOOT_TABLES = {
 /* shop inventories by npc id */
 window.SHOPS = {
   tobin:   ["ashen_salve", "scroll_of_insight", "padded_vest", "militia_shortsword", "splintered_cudgel"],
+  hesper:  ["ashen_salve", "scroll_of_insight", "tattered_cloak", "padded_vest", "splintered_cudgel"],
   wick:    ["ashen_salve", "flamewater_flask", "scroll_of_insight", "keen_iron_edge", "hardened_leather", "wickfire_torchblade"],
   korr:    ["flamewater_flask", "scroll_of_insight", "soldiers_sabre", "ashguard_mail", "emberforged_falchion", "ember_charm"],
   vulka:   ["flamewater_flask", "phoenix_draught", "scroll_of_insight", "watchmans_greatsword", "citadel_plate", "runic_warblade", "scribes_talisman"],

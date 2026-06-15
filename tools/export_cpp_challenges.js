@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const root = path.join(__dirname, "..");
 global.window = global;
+global.QUEST_DB = [];   // the cpp files append to this; in-game the Python files seed it first
 function load(p) { eval(fs.readFileSync(path.join(root, p), "utf8")); }
 load("js/engine/sprites.js");
 load("js/data/items.js");

@@ -45,7 +45,7 @@ window.SaveSystem = (function () {
         level: 1, xp: 0,
         maxHp: 20, hp: 20,
         coins: 30,
-        map: "village", x: 22, y: 24, facing: "down",
+        map: "village", x: 31, y: 27, facing: "down",
         inventory: [
           { id: "ashen_salve", qty: 2 }
         ],

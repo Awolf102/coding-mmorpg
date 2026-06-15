@@ -170,6 +170,85 @@ window.QUEST_DB.push(
   rewards: { xp: 220, coins: 65, items: [["ashguard_mail", 1]] }
 },
 
+/* ---------------- cpp10b : Sort the Salvage ---------------- */
+{
+  id: "cpp10b", faction: "cpp", act: 3, title: "Sort the Salvage", npc: "sael", map: "ruins",
+  intro: [
+    "Mind the silt — it bites. I'm Sael. The tide drags treasure up in heaps, and the heaps are my livelihood.",
+    "But silt serpents have fouled my sorting court, and a heap unsorted is just weight. I need a hand that can <i>pick</i> from a pile, keep what's worth keeping, and lay it out in order.",
+    "Clear <b>4 Silt Serpents</b> from the court, and I'll teach you to build a vector from nothing — gather, filter, and sort."
+  ],
+  acceptLabel: "I'll sort your salvage.",
+  midDialogue: "Serpents still in the silt, tangling my piles. Thin them.",
+  returnDialogue: [
+    "Better. Now the real skill — not reading a vector, but <i>building</i> one.",
+    "You start with an empty vector. You walk the heap. You keep what passes, and lay it out in order. That's the whole trade."
+  ],
+  doneDialogue: "You sort like a tidewife thrice your age. Build, filter, order — the heaps will never master you again.",
+  lesson: {
+    title: "Building a Vector — push_back, indexing & sort",
+    body: [
+      "Start with an **empty vector** and grow it with `.push_back()` — the build pattern:",
+      ">>>vector<int> keep;                 // an empty hand\nfor (int w : {5, 12, 8, 20}) {\n    if (w >= 10) keep.push_back(w);  // keep only the heavy finds\n}\n// keep is now {12, 20}",
+      "`.size()` is how many it holds; index it with `[ ]`, from 0:",
+      ">>>for (int i = 0; i < keep.size(); i++) {\n    cout << i << \": \" << keep[i] << \"\\n\";\n}",
+      "To order it, include `<algorithm>` and call `sort` over its range:",
+      ">>>#include <algorithm>\nsort(keep.begin(), keep.end());                  // ascending\nsort(keep.begin(), keep.end(), greater<int>());  // descending",
+      "A ranged-for visits every element without indexes — perfect for totals:",
+      ">>>int total = 0;\nfor (int w : keep) total += w;",
+      "So: an empty vector, `.push_back()` inside a loop, and a final `sort()` — that's how a heap becomes a catalogue."
+    ],
+    fragments: [
+      "**Fragment I** — The build pattern: declare `vector<int> v;` then `v.push_back(x);` inside the loop. The vector grows one item at a time.",
+      "**Fragment II** — Filter while you build: guard the push_back with an `if`. Only what passes joins the vector.",
+      "**Fragment III** — `v.size()` is the count; `v[i]` reads element i (from 0). A ranged-for `for (int x : v)` visits each without indexes.",
+      "**Fragment IV** — `#include <algorithm>`, then `sort(v.begin(), v.end());` orders ascending; add `greater<int>()` for largest-first."
+    ]
+  },
+  kills: { enemy: "silt_serpent", count: 4 },
+  questions: [
+    { type: "output", q: "Build and filter, then count:", code: "vector<int> v;\nfor (int w : {5, 12, 8, 20}) if (w >= 10) v.push_back(w);\ncout << v.size();",
+      answer: "2", why: "Only 12 and 20 pass w >= 10, so the vector holds 2 elements." },
+    { type: "output", q: "Sorted, then read the first:", code: "vector<int> v = {3, 1, 2};\nsort(v.begin(), v.end());\ncout << v[0];",
+      answer: "1", why: "After sorting ascending, v is {1, 2, 3}; v[0] is 1." },
+    { type: "mc", q: "Which header provides sort()?",
+      choices: ["<algorithm>", "<vector>", "<iostream>", "<string>"],
+      answer: 0, why: "std::sort lives in <algorithm>. <vector> gives the container itself." },
+    { type: "mc", q: "What does v.size() return?",
+      choices: ["how many elements v holds", "the largest element", "the last index", "always 0"],
+      answer: 0, why: "size() is the element count. The last valid index is size() - 1." },
+    { type: "output", q: "Ranged-for total:", code: "vector<int> v = {2, 3, 4};\nint t = 0;\nfor (int x : v) t += x;\ncout << t;",
+      answer: "9", why: "The ranged-for visits 2, 3, 4 and accumulates 9." },
+    { type: "output", q: "Largest-first:", code: "vector<int> v = {1, 3, 2};\nsort(v.begin(), v.end(), greater<int>());\ncout << v[0];",
+      answer: "3", why: "greater<int>() sorts descending, so v[0] is the largest, 3." }
+  ],
+  challenge: {
+    title: "Sort the Salvage",
+    story: "Sael upends a dripping net. \"Pick the heavy finds — ten weight or more. Count them, then lay them out in order, lightest to heaviest.\"",
+    prompt: [
+      "The input is an integer `n`, then `n` weights. The starter reads `n`.",
+      "Read the weights, keep only those that are **10 or more**, and print:",
+      "1. How many heavy finds there are.",
+      "2. The heavy finds, **sorted** lightest to heaviest, one per line.",
+      ">>>3\n10\n12\n20",
+      "(Example for the input `5` then `5 12 8 20 10`.)"
+    ],
+    mode: "program",
+    starter: "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> heavy;\n    // read n weights; push_back those >= 10; sort; print count then each\n\n    return 0;\n}\n",
+    tests: [
+      { stdin: "5\n5 12 8 20 10", expectOut: "3\n10\n12\n20", label: "the heavy net" },
+      { stdin: "3\n1 2 3", expectOut: "0", label: "all too light" },
+      { stdin: "3\n30 10 30", expectOut: "3\n10\n30\n30", label: "duplicates kept" }
+    ],
+    hints: [
+      "Read each: for (int i = 0; i < n; i++) { int w; cin >> w; if (w >= 10) heavy.push_back(w); }",
+      "sort(heavy.begin(), heavy.end()); then cout << heavy.size() << \"\\n\"; and loop printing each.",
+      "Full answer:\n#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> heavy;\n    for (int i = 0; i < n; i++) {\n        int w; cin >> w;\n        if (w >= 10) heavy.push_back(w);\n    }\n    sort(heavy.begin(), heavy.end());\n    cout << heavy.size() << \"\\n\";\n    for (int x : heavy) cout << x << \"\\n\";\n    return 0;\n}"
+    ]
+  },
+  rewards: { xp: 210, coins: 62, items: [["scroll_of_insight", 2]] }
+},
+
 /* ---------------- cpp11 : Names of the Dead ---------------- */
 {
   id: "cpp11", faction: "cpp", act: 3, title: "Names of the Dead", npc: "lumen", map: "ruins",
@@ -249,6 +328,84 @@ window.QUEST_DB.push(
     ]
   },
   rewards: { xp: 240, coins: 70, items: [["watchmans_greatsword", 1]] }
+},
+
+/* ---------------- cpp11b : Tally the Hoard ---------------- */
+{
+  id: "cpp11b", faction: "cpp", act: 3, title: "Tally the Hoard", npc: "orin", map: "ruins",
+  intro: [
+    "You there — marked one. Orin, tallymaster. I read hoards the way Lumen reads souls: by their shape.",
+    "The coral golems out east have grown <i>over</i> the king's hoard — accreting relics into their shells until no one can say what's there or how much. A ledger you cannot total is no ledger at all.",
+    "Break <b>4 Coral Golems</b> and free the count, and I'll teach you to read a whole ledger at once: its total, its kinds, and which entries truly matter."
+  ],
+  acceptLabel: "I'll free the count.",
+  midDialogue: "Golems still hoarding the relics in their shells. Crack them open.",
+  returnDialogue: [
+    "Good. Now — a map is a ledger, and a ledger has a shape.",
+    "How much, in total? How many kinds? Which entries clear the bar? Read all three from the pairs, and the hoard holds no more secrets."
+  ],
+  doneDialogue: "You total a hoard at a glance now. The dead kept careful books — and so, it seems, do you.",
+  lesson: {
+    title: "Reading the Ledger — std::map Aggregation",
+    body: [
+      "A `std::map<string,int>` is a ledger that keeps its keys **sorted**. Walk its pairs with a ranged-for and a structured binding:",
+      ">>>#include <map>\nmap<string,int> hoard = {{\"coin\", 3}, {\"mask\", 1}, {\"urn\", 2}};\nfor (auto& [name, count] : hoard)\n    cout << name << \" \" << count << \"\\n\";\n// coin 3 / mask 1 / urn 2  (always in key order)",
+      "Aggregate the values to read the hoard's **shape**:",
+      ">>>int total = 0;\nfor (auto& [k, v] : hoard) total += v;   // 6 - the grand total\ncout << hoard.size();                     // 3 - how many KINDS",
+      "Filter as you walk — report only the entries that clear the bar:",
+      ">>>for (auto& [name, count] : hoard) {\n    if (count >= 2) cout << name << \": \" << count << \"\\n\";\n}\n// coin: 3 / urn: 2",
+      "To test a key, `hoard.count(key)` is `1` if present, `0` if not. (`unordered_map` works the same but is **unordered** — reach for `map` when you need sorted output.)"
+    ],
+    fragments: [
+      "**Fragment I** — `map<string,int>` pairs keys with values and keeps the keys sorted. `m[\"key\"]` reads or creates an entry.",
+      "**Fragment II** — Walk with `for (auto& [k, v] : m)` — the structured binding splits each pair into key and value.",
+      "**Fragment III** — Aggregate: sum `v` across the loop for a total; `m.size()` is the number of kinds.",
+      "**Fragment IV** — `m.count(key)` is 1 if the key exists, else 0. A `map` iterates in key order; an `unordered_map` does not."
+    ]
+  },
+  kills: { enemy: "coral_golem", count: 4 },
+  questions: [
+    { type: "output", q: "The grand total:", code: "map<string,int> d = {{\"a\", 2}, {\"b\", 5}};\nint t = 0;\nfor (auto& [k, v] : d) t += v;\ncout << t;",
+      answer: "7", why: "The loop sums every value: 2 + 5 = 7." },
+    { type: "output", q: "How many kinds?", code: "map<string,int> d = {{\"a\", 2}, {\"b\", 5}, {\"c\", 1}};\ncout << d.size();",
+      answer: "3", why: "size() counts the pairs — three kinds." },
+    { type: "mc", q: "In what order does a ranged-for walk a std::map?",
+      choices: ["sorted by key", "insertion order", "random order", "by value"],
+      answer: 0, why: "std::map keeps keys in sorted order, so iteration is key-sorted. unordered_map gives no order." },
+    { type: "output", q: "Filter as you walk:", code: "map<string,int> d = {{\"x\", 1}, {\"y\", 4}};\nfor (auto& [k, v] : d)\n    if (v >= 2) cout << k << \" \" << v << \"\\n\";",
+      answer: "y 4", why: "Only y clears v >= 2; x (value 1) is skipped." },
+    { type: "mc", q: "What does d.count(\"k\") return when \"k\" is NOT in the map?",
+      choices: ["0", "1", "-1", "an error"],
+      answer: 0, why: "count returns 1 if the key is present, 0 if absent — handy as a presence test." },
+    { type: "output", q: "Structured binding in the loop:", code: "map<string,int> d = {{\"urn\", 2}, {\"bell\", 5}};\nfor (auto& [k, v] : d) cout << k << v << \"\\n\";",
+      answer: "bell5\nurn2", why: "map walks keys in sorted order: bell before urn; each pair prints key then value." }
+  ],
+  challenge: {
+    title: "Tally the Hoard",
+    story: "Orin spreads the freed ledger. \"Total it. Count its kinds. Then read me the entries that truly matter — two or more of a thing.\"",
+    prompt: [
+      "The input is an integer `n`, then `n` lines, each a relic `name` and a `count`. The starter reads `n`.",
+      "Build a `map<string,int>`, then print, in order:",
+      "1. The **total** of all counts.",
+      "2. The number of **distinct kinds**.",
+      "3. For each entry with a count of **2 or more** (in key order), print `name: count`.",
+      ">>>6\n3\ncoin: 3\nurn: 2",
+      "(Example for `3` then the lines `coin 3`, `mask 1`, `urn 2`.)"
+    ],
+    mode: "program",
+    starter: "#include <iostream>\n#include <map>\n#include <string>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    map<string,int> hoard;\n    // read n (name count) pairs; print total, kinds, then entries with count >= 2\n\n    return 0;\n}\n",
+    tests: [
+      { stdin: "3\ncoin 3\nmask 1\nurn 2", expectOut: "6\n3\ncoin: 3\nurn: 2", label: "the king's hoard" },
+      { stdin: "1\ngem 5", expectOut: "5\n1\ngem: 5", label: "a single kind" },
+      { stdin: "2\na 1\nb 1", expectOut: "2\n2", label: "nothing clears the bar" }
+    ],
+    hints: [
+      "Read pairs: for (int i = 0; i < n; i++) { string s; int c; cin >> s >> c; hoard[s] = c; }",
+      "Total: sum v in a loop. Kinds: hoard.size(). Then loop again printing those with count >= 2.",
+      "Full answer:\n#include <iostream>\n#include <map>\n#include <string>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    map<string,int> hoard;\n    for (int i = 0; i < n; i++) {\n        string s; int c;\n        cin >> s >> c;\n        hoard[s] = c;\n    }\n    int total = 0;\n    for (auto& [k, v] : hoard) total += v;\n    cout << total << \"\\n\";\n    cout << hoard.size() << \"\\n\";\n    for (auto& [k, v] : hoard)\n        if (v >= 2) cout << k << \": \" << v << \"\\n\";\n    return 0;\n}"
+    ]
+  },
+  rewards: { xp: 230, coins: 68, items: [["soldiers_sabre", 1]] }
 },
 
 /* ---------------- cpp12 : The Unrepeatable Rite ---------------- */
@@ -335,7 +492,7 @@ window.QUEST_DB.push(
 /* ---------------- cpp13 : BOSS — The Drowned King ---------------- */
 {
   id: "cpp13", faction: "cpp", act: 3, title: "The Drowned King", npc: "nyra", map: "ruins", boss: true,
-  bossEnemy: "boss_drowned_king", bossSpot: { map: "ruins", x: 39, y: 9 },
+  bossEnemy: "boss_drowned_king", bossSpot: { map: "ruins", x: 53, y: 11 },
   intro: [
     "It's awake. The throne room lights are burning blue and the water is flowing *upward*. The Drowned King has risen, and he is taking inventory.",
     "He was the kingdom's treasurer once — drowned in his own vault, counting as the water rose. He will not rest until someone proves the count can be done *right*.",

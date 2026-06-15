@@ -84,6 +84,84 @@ window.QUEST_DB.push(
   rewards: { xp: 420, coins: 120, items: [["aegis_of_the_first", 1]] }
 },
 
+/* ---------------- cpp19b : The Furnace Grid ---------------- */
+{
+  id: "cpp19b", faction: "cpp", act: 5, title: "The Furnace Grid", npc: "vesh", map: "sanctum",
+  intro: [
+    "Stand on the cold tiles, marked one — the others run hot. Vesh, cartographer. I map the furnace beneath the Flame.",
+    "The furnace is a grid: rows of fire, columns of ash. The furnace drakes nest in the hottest rows, and I cannot map what I cannot approach.",
+    "Scatter <b>4 Furnace Drakes</b> off the grid, and I'll teach you to read a grid the way the Flame does — not just cell by cell, but row by row, column by column."
+  ],
+  acceptLabel: "I'll read the furnace.",
+  midDialogue: "Drakes still nesting in the hot rows. Clear them so I can map.",
+  returnDialogue: [
+    "The grid lies bare. Now — counting cells is the beginning. Reading rows is the craft.",
+    "Sum a row. Sum a column. Find the hottest row of all. A grid that knows its own shape can be fought."
+  ],
+  doneDialogue: "You read the furnace like a cartographer now — every row, every column, the hottest cell. The Flame's maps hold no secrets from you.",
+  lesson: {
+    title: "The Furnace Grid — Rows, Columns & the Hottest Row",
+    body: [
+      "A `vector<vector<int>>` is a grid of rows. A row, `grid[r]`, is itself a vector — sum it with a ranged-for:",
+      ">>>vector<vector<int>> grid = {{1, 2, 3}, {4, 0, 1}};\nint s = 0;\nfor (int x : grid[0]) s += x;\ncout << s;            // 6 - the first row's total",
+      "`grid.size()` is the row count; `grid[0].size()` the column count.",
+      "To total a **column**, walk the rows and pluck the same index from each:",
+      ">>>int col = 0, total = 0;\nfor (auto& row : grid) total += row[col];\ncout << total;       // 1 + 4 = 5",
+      "To find the **hottest row** — greatest sum — keep a best-so-far as you go:",
+      ">>>int best_i = 0, best_sum = -1;\nfor (int r = 0; r < (int)grid.size(); r++) {\n    int rs = 0;\n    for (int x : grid[r]) rs += x;\n    if (rs > best_sum) { best_sum = rs; best_i = r; }\n}\ncout << best_i;",
+      "(`#include <numeric>` also gives `accumulate(grid[r].begin(), grid[r].end(), 0)` to sum a row in one call.)",
+      "Rows are vectors, columns are a walk, and 'biggest' is always best-so-far. That trio reads any grid the Flame can draw."
+    ],
+    fragments: [
+      "**Fragment I** — A row is a vector: sum `grid[r]` with a ranged-for (or `accumulate`). `grid.size()` rows, `grid[0].size()` columns.",
+      "**Fragment II** — A column total walks the rows: `for (auto& row : grid) total += row[c];` — same index c each row.",
+      "**Fragment III** — Hottest row = best-so-far: track best_sum and best_i; update when a row's sum beats the best.",
+      "**Fragment IV** — `accumulate(v.begin(), v.end(), 0)` from <numeric> sums a vector in one call — handy for a row."
+    ]
+  },
+  kills: { enemy: "furnace_drake", count: 4 },
+  questions: [
+    { type: "output", q: "Sum one row:", code: "vector<vector<int>> grid = {{1, 2, 3}, {4, 0, 1}};\nint s = 0;\nfor (int x : grid[1]) s += x;\ncout << s;",
+      answer: "5", why: "Row 1 is {4, 0, 1}; 4 + 0 + 1 = 5." },
+    { type: "output", q: "Total a column:", code: "vector<vector<int>> grid = {{1, 9}, {2, 8}, {3, 7}};\nint t = 0;\nfor (auto& row : grid) t += row[0];\ncout << t;",
+      answer: "6", why: "Column 0 is 1, 2, 3 across the rows: 6." },
+    { type: "mc", q: "What does grid[0].size() give for a rectangular grid?",
+      choices: ["the number of columns", "the number of rows", "the sum of row 0", "the biggest cell"],
+      answer: 0, why: "grid[0] is the first row (a vector); its size is the column count." },
+    { type: "output", q: "Best row sum:", code: "vector<vector<int>> g = {{1, 1}, {5, 0}, {2, 2}};\nint best = -1;\nfor (auto& r : g) {\n    int s = 0;\n    for (int x : r) s += x;\n    if (s > best) best = s;\n}\ncout << best;",
+      answer: "5", why: "Row sums are 2, 5, 4; the greatest is 5." },
+    { type: "mc", q: "Which header provides std::accumulate?",
+      choices: ["<numeric>", "<vector>", "<iostream>", "<algorithm>"],
+      answer: 0, why: "accumulate lives in <numeric>." },
+    { type: "output", q: "Grand total, double loop:", code: "vector<vector<int>> g = {{1, 2}, {3, 4}};\nint t = 0;\nfor (auto& row : g)\n    for (int x : row) t += x;\ncout << t;",
+      answer: "10", why: "Every cell added once: 1 + 2 + 3 + 4 = 10." }
+  ],
+  challenge: {
+    title: "The Hottest Row",
+    story: "Vesh spreads the furnace map — rows of heat readings. \"Find me the hottest row: the one whose readings sum highest. Give me its number, counting from zero.\"",
+    prompt: [
+      "The input is two integers `R` and `C` (rows, columns), then the `R*C` readings in row order. The starter reads `R` and `C`.",
+      "Print the **index** of the row with the greatest sum (exactly one row is greatest).",
+      ">>>1",
+      "(Example for `3 2` then `1 2 / 5 0 / 2 2` — row sums 3, 5, 4, so row 1.)"
+    ],
+    mode: "program",
+    starter: "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int R, C;\n    cin >> R >> C;\n    vector<vector<int>> grid(R, vector<int>(C));\n    // read the grid; find and print the index of the row with the greatest sum\n\n    return 0;\n}\n",
+    tests: [
+      { stdin: "3 2\n1 2\n5 0\n2 2", expectOut: "1", label: "middle row hottest" },
+      { stdin: "1 1\n9", expectOut: "0", label: "a single cell" },
+      { stdin: "3 2\n1 1\n0 0\n3 9", expectOut: "2", label: "last row hottest" },
+      { stdin: "3 2\n10 0\n1 2\n3 3", expectOut: "0", label: "first row hottest" }
+    ],
+    hints: [
+      "Read every cell: for r... for c... cin >> grid[r][c];",
+      "Best-so-far: track best_i and best_sum; for each row sum it and update if greater.",
+      "Full answer:\n#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int R, C;\n    cin >> R >> C;\n    vector<vector<int>> grid(R, vector<int>(C));\n    for (int r = 0; r < R; r++)\n        for (int c = 0; c < C; c++) cin >> grid[r][c];\n    int best_i = 0, best_sum = -1000000000;\n    for (int r = 0; r < R; r++) {\n        int s = 0;\n        for (int x : grid[r]) s += x;\n        if (s > best_sum) { best_sum = s; best_i = r; }\n    }\n    cout << best_i << \"\\n\";\n    return 0;\n}"
+    ]
+  },
+  rewards: { xp: 430, coins: 122, items: [["phoenix_draught", 2]] }
+},
+
 /* ---------------- cpp20 : Order from Ash ---------------- */
 {
   id: "cpp20", faction: "cpp", act: 5, title: "Order from Ash", npc: "herald", map: "sanctum",
@@ -244,10 +322,86 @@ window.QUEST_DB.push(
   rewards: { xp: 480, coins: 140, items: [["firstflame_edge", 1]] }
 },
 
+/* ---------------- cpp21b : The Verse That Contains Itself ---------------- */
+{
+  id: "cpp21b", faction: "cpp", act: 5, title: "The Verse That Contains Itself", npc: "quill", map: "sanctum",
+  intro: [
+    "Ilio sent you? Of course Ilio sent you. Ilio always sends you. I'm Quill — I keep the verses that recite themselves.",
+    "The verse wraiths in the south gallery are half-finished recitations: a verse that calls a smaller verse, which calls a smaller still — but the smallest was never written, so they loop forever, fraying.",
+    "Silence <b>4 Verse Wraiths</b>, and I'll show you what Ilio only gestured at: the everyday <i>shapes</i> of recursion — summing, reversing, folding a thing through itself."
+  ],
+  acceptLabel: "Recite it to me.",
+  midDialogue: "Wraiths still fraying in the south gallery, looping with no end. Give them one.",
+  returnDialogue: [
+    "Quiet. The unfinished verses rest.",
+    "Ilio taught you the rite; let me teach you its uses. A vector, summed by recursion. A word, reversed by recursion. The same shape, different cloth."
+  ],
+  doneDialogue: "You see the shape now, not just the trick: do the head, trust the tail. That is recursion's whole soul.",
+  lesson: {
+    title: "The Deeper Return — Recursive Patterns",
+    body: [
+      "The everyday recursion is *head and tail*: handle the first item, then **trust a smaller call** for the rest. C++ can't slice a vector cheaply, so pass an **index** that creeps forward:",
+      ">>>int total(vector<int>& v, int i) {\n    if (i == (int)v.size()) return 0;     // base: past the end\n    return v[i] + total(v, i + 1);        // head + the rest\n}\n\n// total(v, 0) sums the whole vector",
+      "The index `i` marks the head; `i + 1` hands a smaller problem onward, until `i` runs off the end — the base case.",
+      "Reverse a string the same way — `substr(1)` is the tail (everything after the first char):",
+      ">>>string rev(string s) {\n    if (s == \"\") return \"\";\n    return rev(s.substr(1)) + s[0];   // reverse the rest, put the head LAST\n}\n\n// rev(\"ash\") -> \"hsa\"",
+      "Read it: *reverse everything after the first letter, then stick the first letter on the end.* Trust the smaller reversal completely.",
+      "Every shape is the same two parts: a base case for the smallest piece, and a recursive case that does one step and delegates the rest."
+    ],
+    fragments: [
+      "**Fragment I** — Head-and-tail with an index: handle `v[i]`, recurse with `i + 1`. C++ passes an index because slicing a vector is costly.",
+      "**Fragment II** — Recursive sum: base `if (i == v.size()) return 0;`, then `return v[i] + total(v, i + 1);`.",
+      "**Fragment III** — Recursive reverse: `return rev(s.substr(1)) + s[0];`. `s.substr(1)` is the tail; base case is the empty string.",
+      "**Fragment IV** — Trust the smaller call. Don't trace to the bottom in your head — assume it's right and do YOUR one step."
+    ]
+  },
+  kills: { enemy: "verse_wraith", count: 4 },
+  questions: [
+    { type: "output", q: "Reverse by recursion:", code: "string rev(string s) {\n    if (s == \"\") return \"\";\n    return rev(s.substr(1)) + s[0];\n}\n// cout << rev(\"abc\");",
+      answer: "cba", why: "rev(\"abc\") = rev(\"bc\") + 'a' = (rev(\"c\")+'b')+'a' = \"cba\"." },
+    { type: "mc", q: "Why does the C++ recursive sum pass an INDEX rather than a smaller vector?",
+      choices: ["slicing a vector is costly; an index is cheap", "vectors cannot be passed", "indexes are required by recursion", "to make it slower"],
+      answer: 0, why: "C++ has no cheap slice, so we creep an index forward instead of copying the tail each call." },
+    { type: "mc", q: "What is the base case of `int total(vector<int>& v, int i)`?",
+      choices: ["i == v.size() -> return 0", "i == 0 -> return v[0]", "v is empty -> loop", "there is none"],
+      answer: 0, why: "When the index runs off the end, there is nothing left to add — return 0." },
+    { type: "output", q: "What is s.substr(1) of \"ash\"?", code: "string s = \"ash\";\ncout << s.substr(1);",
+      answer: "sh", why: "substr(1) is everything from index 1 onward — the tail \"sh\"." },
+    { type: "fill", q: "Fill the blank — recurse on the rest of the vector:", code: "return v[i] + total(v, ____);",
+      answer: "i + 1", accept: ["i+1", "i + 1"], why: "i + 1 moves the head forward, shrinking the remaining work." },
+    { type: "tf", q: "True or False — `s.substr(1)` is a shorter string than s (when s is non-empty).",
+      answer: true, why: "Dropping the first character leaves one fewer — that shrinkage lets the recursion reach its base case." }
+  ],
+  challenge: {
+    title: "The Recursive Tally",
+    story: "Quill unrolls a verse of numbers. \"Sum it — but not with a loop. Let the verse recite itself: the first number, plus the sum of all the rest.\"",
+    prompt: [
+      "The input is an integer `n`, then `n` numbers. The starter reads `n` and the numbers.",
+      "Print their sum, computed **recursively** — no `for` or `while` over the numbers; use a recursive helper that walks an index.",
+      ">>>6",
+      "(Example for `3` then `1 2 3`.)"
+    ],
+    mode: "program",
+    starter: "#include <iostream>\n#include <vector>\nusing namespace std;\n\n// int total(vector<int>& v, int i) { ... }\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> v(n);\n    for (int k = 0; k < n; k++) cin >> v[k];\n    // print total(v, 0)\n\n    return 0;\n}\n",
+    tests: [
+      { stdin: "3\n1 2 3", expectOut: "6", label: "three numbers" },
+      { stdin: "0", expectOut: "0", label: "the empty verse" },
+      { stdin: "1\n5", expectOut: "5", label: "a single number" },
+      { stdin: "5\n2 2 2 2 2", expectOut: "10", label: "five twos" }
+    ],
+    hints: [
+      "Helper: int total(vector<int>& v, int i) { if (i == (int)v.size()) return 0; return v[i] + total(v, i + 1); }",
+      "In main: cout << total(v, 0) << \"\\n\";",
+      "Full answer:\n#include <iostream>\n#include <vector>\nusing namespace std;\n\nint total(vector<int>& v, int i) {\n    if (i == (int)v.size()) return 0;\n    return v[i] + total(v, i + 1);\n}\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> v(n);\n    for (int k = 0; k < n; k++) cin >> v[k];\n    cout << total(v, 0) << \"\\n\";\n    return 0;\n}"
+    ]
+  },
+  rewards: { xp: 470, coins: 135, items: [["phoenix_draught", 2], ["scroll_of_insight", 2]] }
+},
+
 /* ---------------- cpp22 : BOSS — The Twin Flames ---------------- */
 {
   id: "cpp22", faction: "cpp", act: 5, title: "The Twin Flames", npc: "herald", map: "sanctum", boss: true,
-  bossEnemy: "boss_twin_flame", bossSpot: { map: "sanctum", x: 33, y: 8 },
+  bossEnemy: "boss_twin_flame", bossSpot: { map: "sanctum", x: 13, y: 7 },
   intro: [
     "The Flame is testing you directly now. It has split two of itself onto the lava isle — the Twin Flames, who burn only as a PAIR.",
     "The old riddle: among many runes, exactly two together equal the target power. Find WHERE they stand — their positions, not their values.",
@@ -313,7 +467,7 @@ window.QUEST_DB.push(
 /* ---------------- cpp23 : FINAL BOSS — The First King Ascendant ---------------- */
 {
   id: "cpp23", faction: "cpp", act: 5, title: "The First King Ascendant", npc: "herald", map: "sanctum", boss: true,
-  bossEnemy: "boss_first_king", bossSpot: { map: "sanctum", x: 36, y: 20 },
+  bossEnemy: "boss_first_king", bossSpot: { map: "sanctum", x: 51, y: 21 },
   intro: [
     "He has risen. The First King stands at the dais of the Eternal Flame, wearing a thousand years of dust like a coronation robe.",
     "He speaks only in the Verse of Ascension — the incantation that united every race under one banner. But his verse has *rotted*: letters repeat, and a repeated letter breaks the casting.",

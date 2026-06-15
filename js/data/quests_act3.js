@@ -176,6 +176,88 @@ window.QUEST_DB.push(
   rewards: { xp: 220, coins: 65, items: [["ashguard_mail", 1]] }
 },
 
+/* ---------------- py10b : Sort the Salvage ---------------- */
+{
+  id: "py10b", act: 3, title: "Sort the Salvage", npc: "sael", map: "ruins",
+  intro: [
+    "Mind the silt — it bites. I'm Sael. The tide drags treasure up in heaps, and the heaps are my livelihood.",
+    "But silt serpents have fouled my sorting court, and a heap unsorted is just weight. I need a hand that can <i>pick</i> from a pile, keep what's worth keeping, and lay it out in order.",
+    "Clear <b>4 Silt Serpents</b> from the court, and I'll teach you to build a list from nothing — gather, filter, and sort."
+  ],
+  acceptLabel: "I'll sort your salvage.",
+  midDialogue: "Serpents still in the silt, tangling my piles. Thin them.",
+  returnDialogue: [
+    "Better. Now the real skill — not reading a list, but <i>building</i> one.",
+    "You start with an empty hand. You walk the heap. You keep what passes, and lay it out in order. That's the whole trade."
+  ],
+  doneDialogue: "You sort like a tidewife thrice your age. Build, filter, order — the heaps will never master you again.",
+  lesson: {
+    title: "Building Lists — append, enumerate & sort",
+    body: [
+      "Start with an **empty list** and grow it with `.append()` — the build pattern:",
+      ">>>keep = []                # an empty hand\nfor w in [5, 12, 8, 20]:\n    if w >= 10:\n        keep.append(w)     # keep only the heavy finds\nprint(keep)                # [12, 20]",
+      "`enumerate` hands you the **index and the value** together — no manual counter needed:",
+      ">>>for i, name in enumerate([\"urn\", \"bell\"]):\n    print(i, name)\n# 0 urn / 1 bell",
+      "Start the count somewhere else with a second argument:",
+      ">>>for i, name in enumerate([\"urn\", \"bell\"], 1):\n    print(i, name)\n# 1 urn / 2 bell",
+      "To order a list, `sorted()` returns a **new** sorted list; `.sort()` reorders the list **in place**:",
+      ">>>print(sorted([3, 1, 2]))               # [1, 2, 3]  (a new list)\nprint(sorted([3, 1, 2], reverse=True))  # [3, 2, 1]  (descending)\nnums = [3, 1, 2]\nnums.sort()                              # nums is now [1, 2, 3]",
+      "So: an empty list, `.append()` inside a loop, and a final `sorted()` — that's how a heap becomes a catalogue."
+    ],
+    fragments: [
+      "**Fragment I** — The build pattern: `result = []` before the loop, `result.append(x)` inside it. The list grows one item at a time.",
+      "**Fragment II** — Filter while you build: guard the append with an `if`. Only what passes the test joins the list.",
+      "**Fragment III** — `enumerate(lst)` yields `(index, value)` pairs starting at 0; `enumerate(lst, 1)` starts at 1.",
+      "**Fragment IV** — `sorted(lst)` returns a NEW sorted list; `lst.sort()` reorders in place. Add `reverse=True` for largest-first."
+    ]
+  },
+  kills: { enemy: "silt_serpent", count: 4 },
+  questions: [
+    { type: "output", q: "The build pattern, filtering as it goes:", code: "keep = []\nfor w in [5, 12, 8, 20]:\n    if w >= 10:\n        keep.append(w)\nprint(keep)",
+      answer: "[12, 20]", why: "Only 12 and 20 pass w >= 10, so the list builds up to [12, 20]." },
+    { type: "output", q: "Index and value together:", code: "for i, c in enumerate([\"a\", \"b\", \"c\"]):\n    print(i, c)",
+      answer: "0 a\n1 b\n2 c", why: "enumerate yields (0,'a'), (1,'b'), (2,'c') — index then value." },
+    { type: "mc", q: "How do sorted(lst) and lst.sort() differ?",
+      choices: ["sorted() returns a NEW list; .sort() reorders in place", "They are identical", "sorted() is only for numbers", ".sort() returns a new list"],
+      answer: 0, why: "sorted() leaves the original alone and hands back a new list; .sort() rearranges the list itself and returns None." },
+    { type: "output", q: "Largest first:", code: "print(sorted([2, 9, 4], reverse=True))",
+      answer: "[9, 4, 2]", why: "reverse=True sorts in descending order." },
+    { type: "fill", q: "Fill the blank to add a find to the end of the list:", code: "keep.____(find)",
+      answer: "append", why: ".append(x) grows the list by one item at the end." },
+    { type: "output", q: "Counting from one:", code: "for i, name in enumerate([\"urn\", \"bell\"], 1):\n    print(i, name)",
+      answer: "1 urn\n2 bell", why: "The second argument to enumerate sets the starting index — here, 1." },
+    { type: "tf", q: "True or False — `lst.sort()` returns a new sorted list and leaves lst unchanged.",
+      answer: false, why: ".sort() reorders lst IN PLACE and returns None. It is sorted() that returns a new list." }
+  ],
+  challenge: {
+    title: "Sort the Salvage",
+    story: "Sael upends a dripping net. \"Pick the heavy finds — ten weight or more. Count them, then lay them out in order, lightest to heaviest.\"",
+    prompt: [
+      "You are **given** `weights` (a list of ints, possibly empty).",
+      "Build a new list of only the weights that are **10 or more**. Then print two lines:",
+      "1. How many heavy finds there are.",
+      "2. The heavy finds as a list, **sorted** lightest to heaviest.",
+      ">>>3\n[10, 12, 20]",
+      "(Example for weights = [5, 12, 8, 20, 10].)"
+    ],
+    mode: "program",
+    given: "weights",
+    starter: "# weights (a list of ints) is given.\n# Build a list of weights >= 10, then print: count, then the sorted list.\n\nheavy = []\n",
+    tests: [
+      { setup: "weights = [5, 12, 8, 20, 10]", expectOut: "3\n[10, 12, 20]", label: "the heavy net" },
+      { setup: "weights = [1, 2, 3]", expectOut: "0\n[]", label: "all too light" },
+      { setup: "weights = [30, 10, 30]", expectOut: "3\n[10, 30, 30]", label: "duplicates kept" }
+    ],
+    hints: [
+      "Build with the pattern: for w in weights: if w >= 10: heavy.append(w)",
+      "Then: print(len(heavy)) and print(sorted(heavy)).",
+      "Full answer:\nheavy = []\nfor w in weights:\n    if w >= 10:\n        heavy.append(w)\nprint(len(heavy))\nprint(sorted(heavy))"
+    ],
+    explain: "An empty list, an `append` guarded by `if w >= 10`, and the heavy finds gather themselves — the build-and-filter pattern in three lines. `sorted(heavy)` hands back a new list in order without disturbing the gathering, so the count and the catalogue both come out right."
+  },
+  rewards: { xp: 210, coins: 62, items: [["scroll_of_insight", 2]] }
+},
+
 /* ---------------- py11 : Names of the Dead ---------------- */
 {
   id: "py11", act: 3, title: "Names of the Dead", npc: "lumen", map: "ruins",
@@ -261,6 +343,88 @@ window.QUEST_DB.push(
     explain: "`len` counted the pairs BEFORE Maren joined. `.get` returned your default instead of raising KeyError for the missing soul. Assigning to a new key simply adds the pair, and `.items()` hands the loop both halves of each pair, in the order they were written."
   },
   rewards: { xp: 240, coins: 70, items: [["watchmans_greatsword", 1]] }
+},
+
+/* ---------------- py11b : Tally the Hoard ---------------- */
+{
+  id: "py11b", act: 3, title: "Tally the Hoard", npc: "orin", map: "ruins",
+  intro: [
+    "You there — marked one. Orin, tallymaster. I read hoards the way Lumen reads souls: by their shape.",
+    "The coral golems out east have grown <i>over</i> the king's hoard — accreting relics into their shells until no one can say what's there or how much. A ledger you cannot total is no ledger at all.",
+    "Break <b>4 Coral Golems</b> and free the count, and I'll teach you to read a whole ledger at once: its total, its kinds, and which entries truly matter."
+  ],
+  acceptLabel: "I'll free the count.",
+  midDialogue: "Golems still hoarding the relics in their shells. Crack them open.",
+  returnDialogue: [
+    "Good. Now — a dictionary is a ledger, and a ledger has a shape.",
+    "How much, in total? How many kinds? Which entries clear the bar? Read all three from the pairs, and the hoard holds no more secrets."
+  ],
+  doneDialogue: "You total a hoard at a glance now. The dead kept careful books — and so, it seems, do you.",
+  lesson: {
+    title: "Reading the Ledger — Dictionary Aggregation",
+    body: [
+      "A dictionary's halves come apart with `.keys()`, `.values()`, and `.items()`:",
+      ">>>hoard = {\"coin\": 3, \"mask\": 1, \"urn\": 2}\nprint(list(hoard.keys()))     # ['coin', 'mask', 'urn']\nprint(list(hoard.values()))   # [3, 1, 2]",
+      "Aggregate the values to read the hoard's **shape**:",
+      ">>>print(sum(hoard.values()))   # 6  - the grand total\nprint(len(hoard))             # 3  - how many KINDS",
+      "Walk the pairs to **filter** — report only the entries that matter:",
+      ">>>for name, count in hoard.items():\n    if count >= 2:\n        print(name, count)\n# coin 3 / urn 2   (mask, with 1, is skipped)",
+      "The values are just a list of numbers, so every list tool fits: `max(hoard.values())` is the largest count, `min(...)` the smallest.",
+      "Remember: `in` and iteration walk the **keys** by default — `for k in hoard:` is the same as `for k in hoard.keys()`."
+    ],
+    fragments: [
+      "**Fragment I** — `.keys()` gives the keys, `.values()` the values, `.items()` the (key, value) pairs. Wrap in `list(...)` to see them as a list.",
+      "**Fragment II** — `sum(d.values())` totals the values; `len(d)` counts the pairs (the number of kinds).",
+      "**Fragment III** — Filter while you walk: `for k, v in d.items(): if v >= 2: ...` reports only the entries that clear the bar.",
+      "**Fragment IV** — The values are a list of numbers — `max(d.values())` and `min(d.values())` measure them like any list."
+    ]
+  },
+  kills: { enemy: "coral_golem", count: 4 },
+  questions: [
+    { type: "output", q: "The grand total:", code: "d = {\"a\": 2, \"b\": 5}\nprint(sum(d.values()))",
+      answer: "7", why: "sum(d.values()) adds every value: 2 + 5 = 7." },
+    { type: "output", q: "How many kinds?", code: "d = {\"a\": 2, \"b\": 5, \"c\": 1}\nprint(len(d))",
+      answer: "3", why: "len(d) counts the pairs — three kinds." },
+    { type: "mc", q: "What does d.values() give you?",
+      choices: ["just the values", "just the keys", "the (key, value) pairs", "the number of pairs"],
+      answer: 0, why: ".values() yields the values alone; .keys() the keys; .items() the pairs." },
+    { type: "output", q: "Filter as you walk:", code: "d = {\"x\": 1, \"y\": 4}\nfor k, v in d.items():\n    if v >= 2:\n        print(k, v)",
+      answer: "y 4", why: "Only y clears v >= 2; x (value 1) is skipped." },
+    { type: "fill", q: "Fill the blank to total a dict's values:", code: "total = sum(d.______())",
+      answer: "values", why: "d.values() yields the values; sum() totals them." },
+    { type: "output", q: "Largest count:", code: "d = {\"a\": 3, \"b\": 9, \"c\": 5}\nprint(max(d.values()))",
+      answer: "9", why: "The values are 3, 9, 5; max picks 9." },
+    { type: "tf", q: "True or False — `for k in d:` walks the dictionary's keys.",
+      answer: true, why: "Iterating a dict directly walks its keys — the same as for k in d.keys()." }
+  ],
+  challenge: {
+    title: "Tally the Hoard",
+    story: "Orin spreads the freed ledger. \"Total it. Count its kinds. Then read me the entries that truly matter — two or more of a thing.\"",
+    prompt: [
+      "You are **given** `hoard` (a dict mapping relic names to counts).",
+      "Print, in order:",
+      "1. The **total** of all counts (`sum` the values).",
+      "2. The number of **distinct kinds** (`len`).",
+      "3. For each entry with a count of **2 or more**, in ledger order, print `name: count`.",
+      ">>>6\n3\ncoin: 3\nurn: 2",
+      "(Example for hoard = {\"coin\": 3, \"mask\": 1, \"urn\": 2}.)"
+    ],
+    mode: "program",
+    given: "hoard",
+    starter: "# hoard (a dict of name -> count) is given.\n# 1) total = sum of values  2) number of kinds  3) entries with count >= 2: name: count\n\n",
+    tests: [
+      { setup: "hoard = {\"coin\": 3, \"mask\": 1, \"urn\": 2}", expectOut: "6\n3\ncoin: 3\nurn: 2", label: "the king's hoard" },
+      { setup: "hoard = {\"gem\": 5}", expectOut: "5\n1\ngem: 5", label: "a single kind" },
+      { setup: "hoard = {\"a\": 1, \"b\": 1}", expectOut: "2\n2", label: "nothing clears the bar" }
+    ],
+    hints: [
+      "Line 1: print(sum(hoard.values())). Line 2: print(len(hoard)).",
+      "Lines 3+: for name, count in hoard.items(): if count >= 2: print(f\"{name}: {count}\")",
+      "Full answer:\nprint(sum(hoard.values()))\nprint(len(hoard))\nfor name, count in hoard.items():\n    if count >= 2:\n        print(f\"{name}: {count}\")"
+    ],
+    explain: "`sum(hoard.values())` totals the counts and `len(hoard)` counts the kinds — the hoard's whole shape in two words. Then `.items()` walks the pairs in ledger order, and the `if count >= 2` guard reports only the entries that matter, skipping the lonely singletons."
+  },
+  rewards: { xp: 230, coins: 68, items: [["soldiers_sabre", 1]] }
 },
 
 /* ---------------- py12 : The Unrepeatable Rite ---------------- */
@@ -351,7 +515,7 @@ window.QUEST_DB.push(
 /* ---------------- py13 : BOSS — The Drowned King ---------------- */
 {
   id: "py13", act: 3, title: "The Drowned King", npc: "nyra", map: "ruins", boss: true,
-  bossEnemy: "boss_drowned_king", bossSpot: { map: "ruins", x: 39, y: 9 },
+  bossEnemy: "boss_drowned_king", bossSpot: { map: "ruins", x: 53, y: 11 },
   intro: [
     "It's awake. The throne room lights are burning blue and the water is flowing *upward*. The Drowned King has risen, and he is taking inventory.",
     "He was the kingdom's treasurer once — drowned in his own vault, counting as the water rose. He will not rest until someone proves the count can be done *right*.",

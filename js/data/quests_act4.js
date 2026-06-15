@@ -88,6 +88,88 @@ window.QUEST_DB.push(
   rewards: { xp: 300, coins: 85, items: [["citadel_plate", 1]] }
 },
 
+/* ---------------- py14b : The Officer's Report ---------------- */
+{
+  id: "py14b", act: 4, title: "The Officer's Report", npc: "doran", map: "citadel",
+  intro: [
+    "Quartermaster Doran. You're Edric's new officer? Then you'll learn to report properly, or you'll learn to dig latrines.",
+    "The pact knights drilling the west barracks were bound to an unfinished order — sent to fetch an answer, they never learned to bring one <i>back</i>. Now they just march, reporting nothing.",
+    "Put down <b>4 Pact Knights</b>, and I'll teach you a proper report: a function that hands back not one answer, but as many as the order requires."
+  ],
+  acceptLabel: "I'll learn to report.",
+  midDialogue: "Knights still marching the barracks, reporting nothing. Finish them.",
+  returnDialogue: [
+    "Good. A soldier who can't report is just expensive noise.",
+    "A real order asks two things and expects both back. Learn to return many — and to keep your workings to yourself."
+  ],
+  doneDialogue: "Two answers, one report, no leakage. You report like a quartermaster now. Dismissed — with honors.",
+  lesson: {
+    title: "The Officer's Orders — Returning Many & Scope",
+    body: [
+      "A function can hand back **more than one value** — separate them with commas, and the caller **unpacks** them:",
+      ">>>def extremes(nums):\n    return min(nums), max(nums)\n\nlo, hi = extremes([3, 9, 1])\nprint(lo, hi)   # 1 9",
+      "What `return a, b` really hands back is a **tuple** `(a, b)` — unpacking just splits it into names.",
+      "Variables created inside a function are **local**: they live only during the call and never collide with names outside:",
+      ">>>def f():\n    x = 99        # local to f - a different x\n    return x\n\nx = 1\nf()\nprint(x)          # still 1 - the inner x was separate",
+      "Parameters are local too. A clean function reads its inputs, works on its own locals, and hands results back through `return` — it doesn't reach outside for stray variables.",
+      "This is why functions compose: each one is a sealed order. You give it inputs, it gives you outputs, and nothing leaks."
+    ],
+    fragments: [
+      "**Fragment I** — `return a, b` hands back two values at once (as a tuple). The caller unpacks: `x, y = f()`.",
+      "**Fragment II** — Unpacking splits a returned pair into names in order: `lo, hi = extremes(nums)`.",
+      "**Fragment III** — Variables made inside a function are LOCAL: they vanish when it returns and don't clash with outside names.",
+      "**Fragment IV** — A function should take inputs as parameters and give outputs via return — not depend on or change outside variables. Sealed orders compose."
+    ]
+  },
+  kills: { enemy: "pact_knight", count: 4 },
+  questions: [
+    { type: "output", q: "Two values, unpacked:", code: "def pair():\n    return 3, 7\n\na, b = pair()\nprint(a, b)",
+      answer: "3 7", why: "return 3, 7 hands back both; a, b = ... unpacks them in order." },
+    { type: "mc", q: "What does `return a, b` actually return?",
+      choices: ["a tuple (a, b)", "just a", "just b", "two separate functions"],
+      answer: 0, why: "Commas pack the values into a tuple; unpacking splits it back apart." },
+    { type: "output", q: "Local stays local:", code: "def f():\n    n = 99\n    return n\n\nn = 1\nf()\nprint(n)",
+      answer: "1", why: "The n inside f is a separate, local variable; the outer n is untouched." },
+    { type: "fill", q: "Fill the blanks to unpack the two returned values:", code: "lo, ____ = extremes(nums)",
+      answer: "hi", why: "Unpacking names each returned value in order: lo gets the first, hi the second." },
+    { type: "output", q: "Smallest and largest at once:", code: "def ends(xs):\n    return min(xs), max(xs)\n\nprint(ends([5, 2, 8]))",
+      answer: "(2, 8)", why: "The function returns the tuple (2, 8); printing a tuple shows its parentheses." },
+    { type: "mc", q: "Variables created inside a function are...",
+      choices: ["local — they vanish when the function returns", "global — visible everywhere", "saved forever", "shared with the caller"],
+      answer: 0, why: "Locals live only for the duration of the call; they don't leak outside." },
+    { type: "tf", q: "True or False — a function can return several values at once.",
+      answer: true, why: "Separate them with commas: `return a, b, c` hands back a tuple of all three." }
+  ],
+  challenge: {
+    title: "The Officer's Report",
+    story: "Doran taps the muster roll. \"One report, two numbers: how many stand ready, and how many are still recruits. Bring me BOTH at once.\"",
+    prompt: [
+      "Define a function `report(levels)`:",
+      "— `levels` is a list of soldier levels (ints).",
+      "— **Return two values**: the count of levels `>= 10` (ready), then the count `< 10` (recruits).",
+      "Examples:",
+      ">>>report([5, 12, 9, 30])   ->  (2, 2)\nreport([1, 2])           ->  (0, 2)\nreport([10, 20])         ->  (2, 0)",
+      "Use `return ready, recruits` — two values, one report."
+    ],
+    mode: "function",
+    funcName: "report",
+    starter: "def report(levels):\n    ready = 0\n    recruits = 0\n    # count each level into ready (>= 10) or recruits (< 10)\n    # then: return ready, recruits\n    \n",
+    tests: [
+      { args: [[5, 12, 9, 30]], expect: [2, 2], label: "mixed muster" },
+      { args: [[1, 2]], expect: [0, 2], label: "all recruits" },
+      { args: [[10, 20]], expect: [2, 0], label: "all ready" },
+      { args: [[]], expect: [0, 0], label: "empty muster" }
+    ],
+    hints: [
+      "Loop the levels: if lvl >= 10: ready += 1, else: recruits += 1.",
+      "Hand both back at once: return ready, recruits",
+      "Full answer:\ndef report(levels):\n    ready = 0\n    recruits = 0\n    for lvl in levels:\n        if lvl >= 10:\n            ready += 1\n        else:\n            recruits += 1\n    return ready, recruits"
+    ],
+    explain: "`return ready, recruits` packs both tallies into one tuple, so a single call answers the whole order — the caller unpacks it with `r, c = report(...)`. Both counters are locals, started fresh each call, so every report is clean and self-contained."
+  },
+  rewards: { xp: 310, coins: 88, items: [["scroll_of_insight", 2]] }
+},
+
 /* ---------------- py15 : Sigils of Binding ---------------- */
 {
   id: "py15", act: 4, title: "Sigils of Binding", npc: "wynn", map: "citadel",
@@ -343,10 +425,91 @@ window.QUEST_DB.push(
   rewards: { xp: 360, coins: 100, items: [["serpent_sigil", 1]] }
 },
 
+/* ---------------- py17b : The Living Banner ---------------- */
+{
+  id: "py17b", act: 4, title: "The Living Banner", npc: "isolde", map: "citadel",
+  intro: [
+    "Mind the standards — some of them bite now. I'm Isolde, bannerwright. I stitch standards that <i>remember</i>.",
+    "The gloom sentinels by the chapel were my finest work once: banners given so much memory they woke up wrong. A being that only remembers, and never forgets, becomes a monster.",
+    "Unmake <b>4 Gloom Sentinels</b>, and I'll teach you to give an object a memory it can <i>use</i> — state that changes, and a voice to report itself."
+  ],
+  acceptLabel: "Teach me the stitching.",
+  midDialogue: "Sentinels still brooding by the chapel, remembering old defeats. End them.",
+  returnDialogue: [
+    "Better. Now — an object is more than stored facts. It can <i>change</i>, and it can <i>speak itself</i>.",
+    "Give a banner a tally it grows over time, and a way to describe itself when asked. That is the difference between a record and a living thing."
+  ],
+  doneDialogue: "It remembers, it grows, it answers when asked — and it knows when to stop. You stitch living things now, bannerwright.",
+  lesson: {
+    title: "Living Objects — Changing State & __str__",
+    body: [
+      "An object's methods can **change its own attributes** — so the object remembers across calls:",
+      ">>>class Banner:\n    def __init__(self, name):\n        self.name = name\n        self.victories = 0      # starts at zero\n    def win(self):\n        self.victories += 1     # the memory grows\n\nb = Banner(\"Ash\")\nb.win()\nb.win()\nprint(b.victories)   # 2 - it remembered both",
+      "Notice `__init__` can set a starting value that the caller doesn't pass — `self.victories = 0`. Not every attribute comes from a parameter.",
+      "Give an object a **voice** with `__str__` — Python calls it whenever the object is printed or turned into a string:",
+      ">>>class Banner:\n    def __init__(self, name):\n        self.name = name\n        self.victories = 0\n    def __str__(self):\n        return f\"{self.name} ({self.victories})\"\n\nprint(Banner(\"Ash\"))   # Ash (0)  - __str__ supplied the words",
+      "Without `__str__`, printing an object shows an ugly `<__main__.Banner object at 0x...>`. With it, the object speaks for itself.",
+      "So a living object = attributes that **change** (state) + methods that change them + a `__str__` that reports them."
+    ],
+    fragments: [
+      "**Fragment I** — A method can change self's attributes: `self.victories += 1`. The object remembers the change for next time.",
+      "**Fragment II** — `__init__` may set defaults that aren't parameters: `self.victories = 0`. Not every attribute is passed in.",
+      "**Fragment III** — `__str__(self)` returns the object's words; Python calls it on `print(obj)` or `str(obj)`. Two underscores each side.",
+      "**Fragment IV** — Living object = changing state + methods that change it + a `__str__` voice. That's the whole pattern."
+    ]
+  },
+  kills: { enemy: "gloom_sentinel", count: 4 },
+  questions: [
+    { type: "output", q: "The object remembers:", code: "class Tally:\n    def __init__(self):\n        self.n = 0\n    def bump(self):\n        self.n += 1\n\nt = Tally()\nt.bump()\nt.bump()\nt.bump()\nprint(t.n)",
+      answer: "3", why: "Each bump() grows self.n; the object keeps the running total between calls." },
+    { type: "mc", q: "When does Python call an object's __str__ method?",
+      choices: ["when the object is printed or turned into a string", "when it is created", "every loop", "never automatically"],
+      answer: 0, why: "print(obj) and str(obj) call __str__ to get the object's words." },
+    { type: "output", q: "The object speaks:", code: "class Flag:\n    def __init__(self, c):\n        self.c = c\n    def __str__(self):\n        return f\"<{self.c}>\"\n\nprint(Flag(\"ash\"))",
+      answer: "<ash>", why: "__str__ returns \"<ash>\", which print then shows." },
+    { type: "mc", q: "Where can __init__ set an attribute the caller never passes?",
+      choices: ["self.count = 0 — a starting value not from a parameter", "only from parameters", "nowhere", "only with __str__"],
+      answer: 0, why: "__init__ can initialize any attribute, including constants like self.count = 0." },
+    { type: "output", q: "State plus voice:", code: "class Banner:\n    def __init__(self, name):\n        self.name = name\n        self.wins = 0\n    def win(self):\n        self.wins += 1\n    def __str__(self):\n        return f\"{self.name} ({self.wins})\"\n\nb = Banner(\"Vale\")\nb.win()\nprint(b)",
+      answer: "Vale (1)", why: "win() grows wins to 1; print(b) calls __str__, which reports \"Vale (1)\"." },
+    { type: "fill", q: "Fill the blank to give an object a printable voice:", code: "def ______(self):\n    return self.name",
+      answer: "__str__", why: "__str__ is the method Python calls to turn an object into a string." },
+    { type: "tf", q: "True or False — a method can change the object's own attributes, and the change persists for later calls.",
+      answer: true, why: "Methods mutate self's attributes; the object remembers the new values until changed again." }
+  ],
+  challenge: {
+    title: "The Living Banner",
+    story: "Isolde threads her needle. \"Stitch me a banner that counts its victories and can name them aloud — and starts, like all of us, at nothing.\"",
+    prompt: [
+      "Define a class `Banner`:",
+      "— `__init__(self, name)` stores `name` and sets `victories` to **0**.",
+      "— `win(self)` increases `victories` by 1.",
+      "— `__str__(self)` returns the string `\"NAME (VICTORIES)\"`, e.g. `\"Ash (2)\"`.",
+      ">>>b = Banner(\"Ash\")\nb.victories   ->  0\nb.win()\nb.win()\nstr(b)        ->  \"Ash (2)\""
+    ],
+    mode: "function",
+    funcName: "Banner",
+    starter: "class Banner:\n    def __init__(self, name):\n        # store name; set victories to 0\n        \n\n    def win(self):\n        # one more victory\n        \n\n    def __str__(self):\n        # return \"NAME (VICTORIES)\"\n        \n",
+    tests: [
+      { expr: "Banner('Ash').victories", expect: 0, label: "starts at 0 victories" },
+      { pysetup: "b = Banner('Ash')\nb.win()\nb.win()", expr: "b.victories", expect: 2, label: "two wins remembered" },
+      { expr: "str(Banner('Vale'))", expect: "Vale (0)", label: "__str__ at zero" },
+      { pysetup: "b = Banner('Ash')\nb.win()", expr: "str(b)", expect: "Ash (1)", label: "__str__ after a win" }
+    ],
+    hints: [
+      "__init__: self.name = name and self.victories = 0 (a starting value, not a parameter).",
+      "win: self.victories += 1. __str__: return f\"{self.name} ({self.victories})\".",
+      "Full answer:\nclass Banner:\n    def __init__(self, name):\n        self.name = name\n        self.victories = 0\n\n    def win(self):\n        self.victories += 1\n\n    def __str__(self):\n        return f\"{self.name} ({self.victories})\""
+    ],
+    explain: "`__init__` seeds `self.victories = 0` even though no one passes it — not every attribute is a parameter. `win()` mutates that attribute, so the banner remembers each victory, and `__str__` gives the object a voice: `print(banner)` reports its current state in words."
+  },
+  rewards: { xp: 350, coins: 98, items: [["phoenix_draught", 1]] }
+},
+
 /* ---------------- py18 : BOSS — Sir Kael, the Kingless ---------------- */
 {
   id: "py18", act: 4, title: "Sir Kael, the Kingless", npc: "edric", map: "citadel", boss: true,
-  bossEnemy: "boss_kael", bossSpot: { map: "citadel", x: 35, y: 24 },
+  bossEnemy: "boss_kael", bossSpot: { map: "citadel", x: 32, y: 20 },
   intro: [
     "He's here. Sir Kael — the First Kingdom's champion, who refused the crown three times and outlived everyone who didn't.",
     "The Flame has raised him in the great hall, and he is *interviewing* for someone worthy to pass to the Sanctum. The interviews are not going well. For the interviewees.",

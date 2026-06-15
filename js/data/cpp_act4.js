@@ -85,6 +85,84 @@ window.QUEST_DB.push(
   rewards: { xp: 300, coins: 85, items: [["citadel_plate", 1]] }
 },
 
+/* ---------------- cpp14b : The Officer's Report ---------------- */
+{
+  id: "cpp14b", faction: "cpp", act: 4, title: "The Officer's Report", npc: "doran", map: "citadel",
+  intro: [
+    "Quartermaster Doran. You're Edric's new officer? Then you'll learn to report properly, or you'll learn to dig latrines.",
+    "The pact knights drilling the west barracks were bound to an unfinished order — sent to fetch an answer, they never learned to bring one <i>back</i>. Now they just march, reporting nothing.",
+    "Put down <b>4 Pact Knights</b>, and I'll teach you a proper report: a function that hands back not one answer, but as many as the order requires."
+  ],
+  acceptLabel: "I'll learn to report.",
+  midDialogue: "Knights still marching the barracks, reporting nothing. Finish them.",
+  returnDialogue: [
+    "Good. A soldier who can't report is just expensive noise.",
+    "A real order asks two things and expects both back. Learn to return many — and to keep your workings to yourself."
+  ],
+  doneDialogue: "Two answers, one report, no leakage. You report like a quartermaster now. Dismissed — with honors.",
+  lesson: {
+    title: "The Officer's Orders — Returning a Pair & Scope",
+    body: [
+      "A function returns ONE value — but that value can be a `std::pair`, carrying two at once. Brace-pack them in the return:",
+      ">>>#include <utility>\npair<int,int> extremes(vector<int> v) {\n    int lo = v[0], hi = v[0];\n    for (int x : v) { if (x < lo) lo = x; if (x > hi) hi = x; }\n    return {lo, hi};        // two values, one pair\n}",
+      "Unpack it on the way out with a **structured binding**:",
+      ">>>auto [lo, hi] = extremes(nums);\ncout << lo << \" \" << hi;\n// or reach in by hand: p.first and p.second",
+      "Variables declared inside a function are **local** — they live only during the call and never collide with names outside:",
+      ">>>int f() {\n    int x = 99;   // local to f\n    return x;\n}",
+      "By default a parameter is passed **by value** — the function gets its own copy, so changing it doesn't touch the caller's variable. (References, which you'll meet next, are the exception.)",
+      "So a clean function takes inputs, works on its own locals, and reports results back — sealed, composable orders."
+    ],
+    fragments: [
+      "**Fragment I** — `pair<int,int>` carries two values. `return {a, b};` packs them; `p.first` and `p.second` read them.",
+      "**Fragment II** — `auto [x, y] = f();` is a structured binding — it unpacks a returned pair into two names at once.",
+      "**Fragment III** — Variables declared inside a function are local: they vanish when it returns and don't clash with outside names.",
+      "**Fragment IV** — Parameters are passed by value by default (the function gets a copy), so changing a parameter doesn't change the caller's variable."
+    ]
+  },
+  kills: { enemy: "pact_knight", count: 4 },
+  questions: [
+    { type: "mc", q: "How can a C++ function hand back TWO values at once?",
+      choices: ["return a std::pair", "with two return statements", "by printing them", "it cannot"],
+      answer: 0, why: "A function returns one value — make that value a pair (or struct) to carry two." },
+    { type: "output", q: "Reading a pair's halves:", code: "pair<int,int> p = {3, 7};\ncout << p.first << \" \" << p.second;",
+      answer: "3 7", why: ".first is the first value (3), .second the second (7)." },
+    { type: "mc", q: "What does `auto [a, b] = makePair();` do?",
+      choices: ["unpacks the returned pair into a and b", "creates two functions", "makes an array", "is a syntax error"],
+      answer: 0, why: "A structured binding splits a returned pair (or tuple/struct) into named variables." },
+    { type: "output", q: "By value — the caller's copy is safe:", code: "int f(int x) { x = 99; return 0; }\nint n = 5;\nf(n);\ncout << n;",
+      answer: "5", why: "x is a copy; changing it inside f doesn't touch n. (A reference would.)" },
+    { type: "mc", q: "Which header declares std::pair?",
+      choices: ["<utility>", "<vector>", "<string>", "<algorithm>"],
+      answer: 0, why: "std::pair lives in <utility>. (It also comes in transitively with <map>.)" },
+    { type: "output", q: "Pack two, then read one:", code: "pair<int,int> p = {2, 8};\nauto [lo, hi] = p;\ncout << hi;",
+      answer: "8", why: "The structured binding gives lo = 2, hi = 8; hi prints 8." }
+  ],
+  challenge: {
+    title: "The Officer's Report",
+    story: "Doran taps the muster roll. \"One report, two numbers: how many stand ready, and how many are still recruits. Bring me BOTH at once.\"",
+    prompt: [
+      "The input is an integer `n`, then `n` soldier levels. The starter reads `n`.",
+      "Count the levels `>= 10` (ready) and the levels `< 10` (recruits). Print **two lines**:",
+      "1. the ready count, then 2. the recruit count.",
+      ">>>2\n2",
+      "(Example for the input `4` then `5 12 9 30` — two ready, two recruits.)"
+    ],
+    mode: "program",
+    starter: "#include <iostream>\n#include <vector>\n#include <utility>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    // read n levels; count ready (>= 10) and recruits (< 10); print each on a line\n\n    return 0;\n}\n",
+    tests: [
+      { stdin: "4\n5 12 9 30", expectOut: "2\n2", label: "mixed muster" },
+      { stdin: "2\n1 2", expectOut: "0\n2", label: "all recruits" },
+      { stdin: "2\n10 20", expectOut: "2\n0", label: "all ready" }
+    ],
+    hints: [
+      "Tally as you read: for each level, if (l >= 10) ready++; else recruits++;",
+      "A pair-returning helper is idiomatic: pair<int,int> report(...) { ...; return {ready, recruits}; }",
+      "Full answer:\n#include <iostream>\n#include <vector>\n#include <utility>\nusing namespace std;\n\npair<int,int> report(vector<int> levels) {\n    int ready = 0, recruits = 0;\n    for (int l : levels) { if (l >= 10) ready++; else recruits++; }\n    return {ready, recruits};\n}\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> levels;\n    for (int i = 0; i < n; i++) { int l; cin >> l; levels.push_back(l); }\n    auto [r, c] = report(levels);\n    cout << r << \"\\n\" << c << \"\\n\";\n    return 0;\n}"
+    ]
+  },
+  rewards: { xp: 310, coins: 88, items: [["scroll_of_insight", 2]] }
+},
+
 /* ---------------- cpp15 : Sigils of Binding ---------------- */
 {
   id: "cpp15", faction: "cpp", act: 4, title: "Sigils of Binding", npc: "wynn", map: "citadel",
@@ -325,10 +403,86 @@ window.QUEST_DB.push(
   rewards: { xp: 360, coins: 100, items: [["serpent_sigil", 1]] }
 },
 
+/* ---------------- cpp17b : The Living Banner ---------------- */
+{
+  id: "cpp17b", faction: "cpp", act: 4, title: "The Living Banner", npc: "isolde", map: "citadel",
+  intro: [
+    "Mind the standards — some of them bite now. I'm Isolde, bannerwright. I stitch standards that <i>remember</i>.",
+    "The gloom sentinels by the chapel were my finest work once: banners given so much memory they woke up wrong. A being that only remembers, and never forgets, becomes a monster.",
+    "Unmake <b>4 Gloom Sentinels</b>, and I'll teach you to give an object a memory it can <i>use</i> — state that changes, and a voice to report itself."
+  ],
+  acceptLabel: "Teach me the stitching.",
+  midDialogue: "Sentinels still brooding by the chapel, remembering old defeats. End them.",
+  returnDialogue: [
+    "Better. Now — an object is more than stored fields. It can <i>change</i>, and it can <i>speak itself</i>.",
+    "Give a banner a tally it grows over time, and a way to describe itself when asked. That is the difference between a record and a living thing."
+  ],
+  doneDialogue: "It remembers, it grows, it answers when asked — and it knows when to stop. You stitch living things now, bannerwright.",
+  lesson: {
+    title: "Living Objects — Changing State & a Voice",
+    body: [
+      "A `struct` (or `class`) groups fields, and its **methods can change those fields** — so the object remembers across calls:",
+      ">>>struct Banner {\n    string name;\n    int victories = 0;        // an in-class default — not passed in\n    void win() { victories++; }   // the memory grows\n};\n\nBanner b{\"Ash\"};\nb.win();\nb.win();\ncout << b.victories;   // 2 - it remembered both",
+      "That `int victories = 0;` is an **in-class initializer**: a starting value the caller doesn't supply.",
+      "Give an object a **voice** with a method that returns its words. Build the string with `to_string` for the numbers:",
+      ">>>struct Banner {\n    string name;\n    int victories = 0;\n    string describe() {\n        return name + \" (\" + to_string(victories) + \")\";\n    }\n};\n\nBanner b{\"Ash\"};\ncout << b.describe();   // Ash (0)",
+      "(C++ has no `__str__`; the closest idioms are a `describe()` method like this, or overloading `operator<<` so `cout << b` works directly.)",
+      "So a living object = fields that **change** (state) + methods that change them + a method that **reports** them."
+    ],
+    fragments: [
+      "**Fragment I** — A method can change its object's fields: `void win() { victories++; }`. The object remembers the change for next time.",
+      "**Fragment II** — An in-class initializer sets a default field value: `int victories = 0;` — no constructor argument needed.",
+      "**Fragment III** — Give the object a voice with a method returning a string; use `to_string(n)` to fold numbers into text.",
+      "**Fragment IV** — Living object = changing state + methods that change it + a method (or operator<<) that reports it."
+    ]
+  },
+  kills: { enemy: "gloom_sentinel", count: 4 },
+  questions: [
+    { type: "output", q: "The object remembers:", code: "struct Tally { int n = 0; void bump() { n++; } };\nTally t;\nt.bump();\nt.bump();\nt.bump();\ncout << t.n;",
+      answer: "3", why: "Each bump() grows t.n; the object keeps the running total between calls." },
+    { type: "mc", q: "What does `int victories = 0;` inside a struct do?",
+      choices: ["gives the field a default value", "creates a global", "is a syntax error", "declares a function"],
+      answer: 0, why: "It is an in-class initializer — every Banner starts with victories = 0 unless set otherwise." },
+    { type: "output", q: "The object speaks:", code: "struct Flag { string c; string show() { return \"<\" + c + \">\"; } };\nFlag f{\"ash\"};\ncout << f.show();",
+      answer: "<ash>", why: "show() builds and returns \"<ash>\", which cout then prints." },
+    { type: "mc", q: "How do you fold an int into a string for a describe() method?",
+      choices: ["to_string(n)", "string(n)", "(string)n", "n.str()"],
+      answer: 0, why: "to_string(n) converts a number to its text form so it can be concatenated with +." },
+    { type: "output", q: "State plus voice:", code: "struct Banner {\n    string name; int wins = 0;\n    void win() { wins++; }\n    string describe() { return name + \" (\" + to_string(wins) + \")\"; }\n};\nBanner b{\"Vale\"};\nb.win();\ncout << b.describe();",
+      answer: "Vale (1)", why: "win() grows wins to 1; describe() reports \"Vale (1)\"." },
+    { type: "tf", q: "True or False — a method can change its object's fields, and the change persists for later calls.",
+      answer: true, why: "Methods mutate the object's own fields; it remembers the new values until changed again." }
+  ],
+  challenge: {
+    title: "The Living Banner",
+    story: "Isolde threads her needle. \"Stitch me a banner that counts its victories and can name them aloud — and starts, like all of us, at nothing.\"",
+    prompt: [
+      "The input is a `name` (one word) and a number of wins `w`. The starter reads them.",
+      "Build a Banner that starts with **0** victories, record `w` wins, then print its description in the form `NAME (VICTORIES)`:",
+      ">>>Ash (2)",
+      "(Example for the input `Ash 2`.)",
+      "Use a struct with a field that **changes** (a `win()` method) and a method that **reports** it."
+    ],
+    mode: "program",
+    starter: "#include <iostream>\n#include <string>\nusing namespace std;\n\nstruct Banner {\n    string name;\n    int victories = 0;\n    // void win() { ... }\n    // string describe() { return name + \" (\" + to_string(victories) + \")\"; }\n};\n\nint main() {\n    string name;\n    int w;\n    cin >> name >> w;\n    // make a Banner named name; win() it w times; print its description\n\n    return 0;\n}\n",
+    tests: [
+      { stdin: "Ash 2", expectOut: "Ash (2)", label: "two victories" },
+      { stdin: "Vale 0", expectOut: "Vale (0)", label: "an untested banner" },
+      { stdin: "Kingsfall 5", expectOut: "Kingsfall (5)", label: "five victories" }
+    ],
+    hints: [
+      "Give the struct: void win() { victories++; } and string describe() { return name + \" (\" + to_string(victories) + \")\"; }",
+      "In main: Banner b{name}; then loop w times calling b.win(); then cout << b.describe() << \"\\n\";",
+      "Full answer:\n#include <iostream>\n#include <string>\nusing namespace std;\n\nstruct Banner {\n    string name;\n    int victories = 0;\n    void win() { victories++; }\n    string describe() { return name + \" (\" + to_string(victories) + \")\"; }\n};\n\nint main() {\n    string name;\n    int w;\n    cin >> name >> w;\n    Banner b{name};\n    for (int i = 0; i < w; i++) b.win();\n    cout << b.describe() << \"\\n\";\n    return 0;\n}"
+    ]
+  },
+  rewards: { xp: 350, coins: 98, items: [["phoenix_draught", 1]] }
+},
+
 /* ---------------- cpp18 : BOSS — Sir Kael, the Kingless ---------------- */
 {
   id: "cpp18", faction: "cpp", act: 4, title: "Sir Kael, the Kingless", npc: "edric", map: "citadel", boss: true,
-  bossEnemy: "boss_kael", bossSpot: { map: "citadel", x: 35, y: 24 },
+  bossEnemy: "boss_kael", bossSpot: { map: "citadel", x: 32, y: 20 },
   intro: [
     "He's here. Sir Kael — the First Kingdom's champion, who refused the crown three times and outlived everyone who didn't.",
     "The Flame has raised him in the great hall, and he is *interviewing* for someone worthy to pass to the Sanctum. The interviews are not going well. For the interviewees.",

@@ -50,10 +50,12 @@ window.Renderer = (function () {
   const GROUND = {
     g: "#5d8a3f", G: "#3f672c", p: "#a48d58", d: "#7c6945", s: "#cdb87e",
     S: "#8b8674", c: "#6f6b5c", m: "#566036", b: "#8a6a3e",
-    w: "#1d4866", l: "#2a0a03", x: "#070605"
+    w: "#1d4866", l: "#2a0a03", x: "#070605",
+    // expanded biomes
+    o: "#b58f3c", a: "#544b43", q: "#5fa03a", u: "#3a5236"
   };
-  const PROPCH = "trfhRDWPF";       // props use the map's walk-tile ground color
-  const NATURAL = "gGdsmtrf";       // gets bigger height noise
+  const PROPCH = "trfhRDWPFkeC";    // props use the map's walk-tile ground color
+  const NATURAL = "gGdsmtrfoquake"; // gets bigger height noise
 
   function groundColor(ch) {
     if (PROPCH.includes(ch)) return GROUND[map.walk] || GROUND.g;
@@ -64,6 +66,7 @@ window.Renderer = (function () {
     if (ch === "l") return -0.42;
     if (ch === "x") return -0.85;
     if (ch === "m") return -0.07;
+    if (ch === "u") return -0.16;   // bog sits lower than marsh
     return 0;
   }
   function tileAt(x, y) {
@@ -528,6 +531,71 @@ window.Renderer = (function () {
               B.add("cone", gc, cx + (h2 - 0.5) * 0.6, gh + 0.12, cz + (h3 - 0.5) * 0.6, 0.1, 0.26, 0.1, 0, (h2 - 0.5) * 0.4);
               if (h2 > 0.8 && map.act === 1) B.add("box", h3 > 0.5 ? "#e8d23f" : "#d86a8a", cx + (h2 - 0.5) * 0.5, gh + 0.22, cz + (h3 - 0.5) * 0.5, 0.07, 0.07, 0.07, h1 * 3, 0);
             }
+            break;
+          }
+          case "o": {
+            // tilled farmland — rows of golden stalks
+            for (let i = 0; i < 3; i++) {
+              const rx = cx + (hash(x + i * 4, y * 3 + i) - 0.5) * 0.7;
+              const rz = cz + (hash(x * 3 + i, y + i * 7) - 0.5) * 0.7;
+              const hgt = 0.3 + hash(x + i, y + i) * 0.22;
+              B.add("cone", mixHex("#c4a246", "#e2c65e", hash(i + 1, x + y)), rx, gh + hgt / 2 + 0.04, rz, 0.05, hgt, 0.05, 0, (hash(rx, rz) - 0.5) * 0.2);
+            }
+            break;
+          }
+          case "a": {
+            // ash flats — charred mounds / stumps, sparse
+            if (h1 > 0.8) B.add("dodec", mixHex("#3b352f", "#4d453c", h2), cx + (h2 - 0.5) * 0.5, gh + 0.07, cz + (h3 - 0.5) * 0.5, 0.32, 0.16, 0.32, h1 * 6, 0);
+            else if (h1 > 0.6) B.add("cyl6", "#2a241f", cx, gh + 0.13, cz, 0.12, 0.26, 0.12, h2 * 3, (h3 - 0.5) * 0.15);
+            break;
+          }
+          case "q": {
+            // wild meadow / garden — lush tufts and bright blooms
+            B.add("cone", mixHex("#5aa03a", "#7cc04e", h2), cx + (h2 - 0.5) * 0.5, gh + 0.15, cz + (h3 - 0.5) * 0.5, 0.11, 0.32, 0.11, 0, (h3 - 0.5) * 0.4);
+            if (h1 > 0.45) {
+              const fc = ["#e8d23f", "#d86a8a", "#7ab8e0", "#e0843f", "#c478e0"][Math.floor(h3 * 5) % 5];
+              B.add("box", fc, cx + (h1 - 0.5) * 0.6, gh + 0.3, cz + (h2 - 0.5) * 0.6, 0.09, 0.09, 0.09, h1 * 3, 0);
+            }
+            break;
+          }
+          case "u": {
+            // bog — tall reeds rising from the murk
+            for (let i = 0; i < 2; i++) {
+              const rx = cx + (hash(x + i * 3, y * 2 + i) - 0.5) * 0.7;
+              const rz = cz + (hash(x * 2 + i, y + i * 5) - 0.5) * 0.7;
+              B.add("cone", mixHex("#4a5a30", "#6a7a40", h2), rx, heightAt(rx, rz) + 0.3, rz, 0.06, 0.58 + h2 * 0.35, 0.06, 0, (h3 - 0.5) * 0.35);
+            }
+            break;
+          }
+          case "k": {
+            // crag — tall rocky outcrop, larger than a boulder
+            const s = 0.8 + h1 * 0.6;
+            B.add("dodec", mixHex("#5f5a52", "#7a746a", h2), cx, gh + 0.4 * s, cz, s, 1.0 * s, s, h1 * 6, (h2 - 0.5) * 0.2);
+            B.add("dodec", mixHex("#6e685e", "#888073", h3), cx + (h2 - 0.5) * 0.3, gh + 0.9 * s, cz + (h3 - 0.5) * 0.3, 0.62 * s, 0.7 * s, 0.62 * s, h3 * 6, (h1 - 0.5) * 0.25);
+            break;
+          }
+          case "e": {
+            // evergreen pine — trunk + stacked conifer tiers
+            const s = 0.9 + h1 * 0.5;
+            B.add("cyl6", mixHex("#46301a", "#5e4326", h2), cx, gh + 0.4 * s, cz, 0.14 * s, 0.82 * s, 0.14 * s, 0, 0);
+            const dk = map.act >= 3;
+            const c1 = mixHex(dk ? "#1c3a18" : "#236022", dk ? "#274a20" : "#2f7a2c", h2);
+            B.add("cone", c1, cx, gh + (1.0 + 0.1 * h2) * s, cz, 1.0 * s, 1.15 * s, 1.0 * s, h1 * 6, 0);
+            B.add("cone", c1, cx, gh + (1.6 + 0.1 * h3) * s, cz, 0.74 * s, 0.98 * s, 0.74 * s, h2 * 6, 0);
+            B.add("cone", mixHex(c1, "#8fd07a", 0.22), cx, gh + (2.12 + 0.1 * h1) * s, cz, 0.48 * s, 0.82 * s, 0.48 * s, h3 * 6, 0);
+            break;
+          }
+          case "C": {
+            // crystal / relic shard — a glowing cluster
+            const tints = ["#7fe0e8", "#9a7fe8", "#7fb0e8"];
+            const tint = tints[Math.floor(h1 * 3) % 3];
+            const s = 0.7 + h1 * 0.5;
+            B.add("cone", mixHex(tint, "#ffffff", 0.25), cx, gh + 0.55 * s, cz, 0.26 * s, 1.1 * s, 0.26 * s, h1 * 6, (h2 - 0.5) * 0.12);
+            B.add("cone", tint, cx + 0.22 * s, gh + 0.36 * s, cz + (h3 - 0.5) * 0.3, 0.16 * s, 0.72 * s, 0.16 * s, h2 * 6, (h3 - 0.5) * 0.22);
+            B.add("cone", mixHex(tint, "#3a6a8a", 0.3), cx - 0.2 * s, gh + 0.3 * s, cz + (h2 - 0.5) * 0.3, 0.14 * s, 0.6 * s, 0.14 * s, h3 * 6, -(h1 - 0.5) * 0.22);
+            const halo = Models3D.makeGlowSprite(new THREE.Color(tint).getHex(), 1.1 * s, 0.4);
+            halo.position.set(cx, gh + 0.7 * s, cz);
+            worldGroup.add(halo);
             break;
           }
         }

@@ -86,6 +86,81 @@ window.QUEST_DB.push(
   rewards: { xp: 60, coins: 25, items: [["ashen_salve", 2]] }
 },
 
+/* ---------------- py01b : The Beacon's Rhythm ---------------- */
+{
+  id: "py01b", act: 1, title: "The Beacon's Rhythm", npc: "pip", map: "village",
+  intro: [
+    "You're the one Elder Maren marked? Good. I'm Pip — I keep the beacon tolling, and lately it tolls <i>crooked</i>.",
+    "Ash moths have got into the beacon-smoke. They scatter every word the Flame speaks until the lines run together into mush — no spacing, no breaks, no sense.",
+    "Swat <b>3 Ash Moths</b> off the green, and I'll teach you to make the Flame speak in clean, ordered lines — spacing, breaks, and the little marks that matter."
+  ],
+  acceptLabel: "Teach me clean lines.",
+  midDialogue: "Still moths in the smoke — hear how the words slur together? Clear them out.",
+  returnDialogue: [
+    "Listen — the smoke runs straight again. Now, the craft of clean speech.",
+    "Any fool can make the Flame shout. A bellhand makes it speak in <i>measured lines</i>. Mind the marks."
+  ],
+  doneDialogue: "Crisp as a struck bell. The beacon will keep your rhythm now, marked one.",
+  lesson: {
+    title: "Speaking in Clean Lines — print() in Depth",
+    body: [
+      "A single `print()` ends its own line — but you can also break a line from <i>inside</i> the words with `\\n`, the newline mark:",
+      ">>>print(\"Spark\\nFlame\")   # two lines from one print",
+      "`print()` can speak **several things at once** — separate them with commas, and it drops a single space between each:",
+      ">>>print(\"HP\", 12, \"MP\", 5)   # HP 12 MP 5",
+      "Two knobs tune how it speaks. `sep=` sets what goes <i>between</i> the pieces; `end=` sets what comes <i>after</i> the line (normally the newline):",
+      ">>>print(\"a\", \"b\", \"c\", sep=\"-\")   # a-b-c\nprint(\"loading\", end=\"...\")        # no line break after",
+      "A backslash `\\` begins an **escape** — one mark standing for something special: `\\n` a new line, `\\t` a tab, `\\\"` a literal quote, `\\\\` a literal backslash:",
+      ">>>print(\"Name:\\tAsh\")        # Name:   Ash\nprint(\"She said \\\"run\\\"\")     # She said \"run\"",
+      "Or sidestep quote-trouble entirely: wrap the text in the <i>other</i> kind of quote. `'She said \"run\"'` needs no escapes at all."
+    ],
+    fragments: [
+      "**Fragment I** — `\\n` inside a string breaks the line right there: `print(\"A\\nB\")` speaks A, then B. One print, two lines.",
+      "**Fragment II** — Commas make one `print()` speak many things with a space between: `print(\"HP\", 12)` → `HP 12`. `sep=\"x\"` changes that spacer; `end=\"\"` removes the line break at the end.",
+      "**Fragment III** — A backslash escapes the next mark: `\\t` tab, `\\\"` a quote, `\\\\` a backslash. Or wrap text in the <i>other</i> quote to use one kind freely inside."
+    ]
+  },
+  kills: { enemy: "ash_moth", count: 3 },
+  questions: [
+    { type: "output", q: "One print, with a newline mark inside it:", code: "print(\"Spark\\nFlame\")",
+      answer: "Spark\nFlame", why: "\\n breaks the line right inside the string, so one print speaks two lines." },
+    { type: "mc", q: "Which speaks exactly: HP 12 (one space between)?",
+      choices: ["print(\"HP\", 12)", "print(\"HP\"12)", "print(\"HP\", 12, sep=\"\")", "print(\"HP12\")"],
+      answer: 0, why: "Commas join items with a single space. sep=\"\" would give HP12, and \"HP12\" is already glued." },
+    { type: "output", q: "Changing the spacer:", code: "print(\"a\", \"b\", \"c\", sep=\"*\")",
+      answer: "a*b*c", why: "sep= replaces the space that normally sits between comma-separated items." },
+    { type: "fill", q: "Fill the blank so the line does NOT break after printing:", code: "print(\"Ash\", ____=\"\")",
+      answer: "end", why: "end= sets what follows the line; \"\" removes the usual newline." },
+    { type: "tf", q: "True or False — print(\"x\", \"y\") puts a space between x and y by default.",
+      answer: true, why: "print separates comma-separated items with a single space unless you change sep=." },
+    { type: "output", q: "Mind the end= on the middle line:", code: "print(\"Line1\")\nprint(\"Line2\", end=\"\")\nprint(\"Line3\")",
+      answer: "Line1\nLine2Line3", why: "end=\"\" removes the second print's newline, so Line3 follows Line2 with no break." }
+  ],
+  challenge: {
+    title: "The Beacon's Toll",
+    story: "Pip hands you the striker. \"Toll the status of the beacon — three lines, exactly. Spacing and breaks must ring true.\"",
+    prompt: [
+      "Print exactly these three lines:",
+      ">>>ASHVEIL\nspark-flame-ember\nready...go",
+      "Line 1: the word `ASHVEIL`.",
+      "Line 2: the words `spark`, `flame`, `ember` joined by dashes — try `print(\"spark\", \"flame\", \"ember\", sep=\"-\")`.",
+      "Line 3: `ready` and `go` on one line with `...` between — try `end=\"...\"`."
+    ],
+    mode: "program",
+    starter: "# Toll three clean lines:\n#   ASHVEIL\n#   spark-flame-ember\n#   ready...go\n\n",
+    tests: [
+      { expectOut: "ASHVEIL\nspark-flame-ember\nready...go", label: "The beacon's toll" }
+    ],
+    hints: [
+      "Line 2 is easiest with sep: print(\"spark\", \"flame\", \"ember\", sep=\"-\")",
+      "For line 3, stop the newline after 'ready': print(\"ready\", end=\"...\") then print(\"go\")",
+      "Full answer:\nprint(\"ASHVEIL\")\nprint(\"spark\", \"flame\", \"ember\", sep=\"-\")\nprint(\"ready\", end=\"...\")\nprint(\"go\")"
+    ],
+    explain: "`sep=\"-\"` slips a dash between each comma-separated word, and `end=\"...\"` swaps the line-break after `ready` for three dots — so `go` lands on the same line. The newline mark `\\n` inside a single string could do the very same work."
+  },
+  rewards: { xp: 70, coins: 25, items: [["scroll_of_insight", 1]] }
+},
+
 /* ---------------- py02 : The Merchant's Ledger ---------------- */
 {
   id: "py02", act: 1, title: "The Merchant's Ledger", npc: "tobin", map: "village",
@@ -259,10 +334,92 @@ window.QUEST_DB.push(
   rewards: { xp: 100, coins: 35, items: [["padded_vest", 1]] }
 },
 
+/* ---------------- py03b : The Granary Count ---------------- */
+{
+  id: "py03b", act: 1, title: "The Granary Count", npc: "hesper", map: "village",
+  intro: [
+    "Marked or not, you look like someone who can count. Good — because something cannot.",
+    "Tallow grubs are in my granary, and every sack they touch comes back labelled in <i>words</i> instead of <i>numbers</i>. \"Twelve\" you cannot add. `12` you can. The whole harvest tally is ruined.",
+    "Clear out <b>3 Tallow Grubs</b> from the stores and the fields, and I'll teach you the keeper's secret: how the Flame <i>listens</i>, and how to turn a spoken word into a number you can actually reckon with."
+  ],
+  acceptLabel: "I'll set the count right.",
+  midDialogue: "Still grubs in the grain — and still words where numbers ought to be. Go on.",
+  returnDialogue: [
+    "Stores are clear. Now — the reckoning.",
+    "The Flame can <i>listen</i> as well as speak. But everything it hears comes back as words. A keeper's first task is turning those words into true numbers."
+  ],
+  doneDialogue: "Tallied to the grain. You've the makings of a quartermaster, marked one — don't let the Citadel hear, they're always short.",
+  lesson: {
+    title: "The Flame Listens — input() & Type Conversion",
+    body: [
+      "`input()` makes the Flame <i>listen</i>: it waits for a line and hands it back to you. You usually store it in a pouch:",
+      ">>>name = input()\nprint(f\"Hail {name}\")",
+      "But beware — **everything `input()` returns is a string**, even if it looks like a number. Quoted digits are just writing:",
+      ">>>print(\"5\" + \"5\")   # 55  (glued text, not math!)\nprint(5 + 5)       # 10  (real numbers)",
+      "To do math on a typed-in number, **convert** it. `int()` makes a whole number, `float()` a decimal, `str()` turns a number back into text:",
+      ">>>age = int(\"12\")      # the number 12\nprint(age + 1)         # 13\nprice = float(\"3.5\")   # the number 3.5",
+      "So the keeper's pattern is: listen, then convert — often in one breath:",
+      ">>>sacks = int(input())   # read a line AND make it a number\nprint(sacks * 2)",
+      "Mixing types is an error: `\"5\" + 5` makes the Flame recoil (TypeError). Convert first — `int(\"5\") + 5` is `10`, and `str(5) + \"5\"` is `\"55\"`."
+    ],
+    fragments: [
+      "**Fragment I** — `input()` reads one line and returns it **as a string** — always. `n = input()` puts whatever was typed into n, as text.",
+      "**Fragment II** — `int(\"12\")` is the number 12; `float(\"3.5\")` is 3.5; `str(12)` is the text \"12\". Convert a typed number before doing math on it.",
+      "**Fragment III** — `\"5\" + \"5\"` is `\"55\"` (text glued); `5 + 5` is `10` (math). And `\"5\" + 5` is an error — never mix words and numbers without converting."
+    ]
+  },
+  kills: { enemy: "tallow_grub", count: 3 },
+  questions: [
+    { type: "output", q: "Two strings, glued — not added:", code: "print(\"5\" + \"5\")",
+      answer: "55", why: "Quoted digits are text. + glues them into \"55\". Only unquoted numbers do math." },
+    { type: "mc", q: "input() always returns a value of what type?",
+      choices: ["a string (text)", "an int", "a float", "whatever type you typed"],
+      answer: 0, why: "input() hands back a string every time, even \"12\". Convert it with int() to do math." },
+    { type: "output", q: "Convert, then add one:", code: "n = int(\"12\")\nprint(n + 1)",
+      answer: "13", why: "int(\"12\") becomes the number 12; 12 + 1 is 13." },
+    { type: "mc", q: "Which turns the text \"7\" into a number you can multiply?",
+      choices: ["int(\"7\")", "str(\"7\")", "\"7\" * 1", "print(\"7\")"],
+      answer: 0, why: "int(\"7\") gives the number 7. str() keeps it text; \"7\" * 1 just repeats the text once." },
+    { type: "output", q: "Listen, convert, reckon (here input() returns \"4\"):", code: "sacks = int(input())\nprint(sacks * 3)",
+      answer: "12", why: "input() reads \"4\", int() makes it the number 4, and 4 * 3 is 12." },
+    { type: "tf", q: "True or False — `\"5\" + 5` raises an error in Python.",
+      answer: true, why: "You can't add text and a number. Convert first: int(\"5\") + 5 is 10." },
+    { type: "fill", q: "Fill the blank to turn typed text into a whole number:", code: "count = ____(input())",
+      answer: "int", why: "int() converts the string from input() into a whole number." }
+  ],
+  challenge: {
+    title: "The Harvest Tally",
+    story: "Hesper sets three slips before you. \"The Flame will read you the count: a name, then two numbers of sacks. Give me the keeper's tally.\"",
+    prompt: [
+      "Your program must **read three lines** with `input()`, in this order:",
+      ">>>a farmer's name\nthe morning sacks (a whole number)\nthe evening sacks (a whole number)",
+      "Then print exactly two lines:",
+      ">>>Ledger for Bryn\nTotal sacks: 12",
+      "Line 1: `Ledger for ` then the name.",
+      "Line 2: `Total sacks: ` then the two counts **added as numbers** (remember to convert!).",
+      "(Example is for the inputs Bryn, 5, 7 → 5 + 7 = 12.)"
+    ],
+    mode: "program",
+    starter: "# Read three lines with input():\n#   name    = input()\n#   morning = ...convert to a number...\n#   evening = ...convert to a number...\n# Then print the two ledger lines.\n\n",
+    tests: [
+      { inputs: ["Bryn", "5", "7"], expectOut: "Ledger for Bryn\nTotal sacks: 12", label: "Bryn: 5 + 7" },
+      { inputs: ["Sora", "10", "14"], expectOut: "Ledger for Sora\nTotal sacks: 24", label: "Sora: 10 + 14" },
+      { inputs: ["Kael", "0", "9"], expectOut: "Ledger for Kael\nTotal sacks: 9", label: "Kael: 0 + 9" }
+    ],
+    hints: [
+      "Read the name first: name = input(). It is already text, so use it as-is.",
+      "Convert each number as you read it: morning = int(input()), then evening = int(input())",
+      "Full answer:\nname = input()\nmorning = int(input())\nevening = int(input())\nprint(f\"Ledger for {name}\")\nprint(f\"Total sacks: {morning + evening}\")"
+    ],
+    explain: "`input()` hands back text, so the name prints as-is — but the two counts must pass through `int()` before they add as numbers, or `\"5\" + \"7\"` would glue into `57`. Convert on the way in, and the tally is always true."
+  },
+  rewards: { xp: 110, coins: 35, items: [["ember_charm", 1]] }
+},
+
 /* ---------------- py04 : BOSS — The Charred Gatekeeper ---------------- */
 {
   id: "py04", act: 1, title: "The Charred Gatekeeper", npc: "elder_maren", map: "village", boss: true,
-  bossEnemy: "boss_gatekeeper", bossSpot: { map: "village", x: 43, y: 11 },
+  bossEnemy: "boss_gatekeeper", bossSpot: { map: "village", x: 57, y: 19 },
   intro: [
     "It has begun. A knight of the First Kingdom stands at our east gate — dead a thousand years, yet armored in cinders. The Flame's return wakes the old servants first.",
     "He will not let you pass to Emberwood until you prove your speech. Everything you have learned — words, numbers, the weave — bring all of it.",

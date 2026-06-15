@@ -1,0 +1,1240 @@
+[
+  {
+    "id": "py01",
+    "title": "The Words of Kindling",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "expectOut": "Spark\nFlame\nASHVEIL ENDURES",
+        "label": "The rite of kindling"
+      }
+    ],
+    "solution": "print(\"Spark\")\nprint(\"Flame\")\nprint(\"ASHVEIL ENDURES\")"
+  },
+  {
+    "id": "py01b",
+    "title": "The Beacon's Toll",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "expectOut": "ASHVEIL\nspark-flame-ember\nready...go",
+        "label": "The beacon's toll"
+      }
+    ],
+    "solution": "print(\"ASHVEIL\")\nprint(\"spark\", \"flame\", \"ember\", sep=\"-\")\nprint(\"ready\", end=\"...\")\nprint(\"go\")"
+  },
+  {
+    "id": "py02",
+    "title": "Rebuild the Ledger",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "swords = 3\nprice = 10\ntax = 4",
+        "expectOut": "34",
+        "label": "3 swords at 10c, tax 4"
+      },
+      {
+        "setup": "swords = 7\nprice = 12\ntax = 9",
+        "expectOut": "93",
+        "label": "7 swords at 12c, tax 9"
+      },
+      {
+        "setup": "swords = 0\nprice = 50\ntax = 2",
+        "expectOut": "2",
+        "label": "slow market day"
+      }
+    ],
+    "solution": "print(swords * price + tax)"
+  },
+  {
+    "id": "py03",
+    "title": "The Hero's Introduction",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "name = \"Bryn\"\nfoe = \"ash\"",
+        "expectOut": "I am Bryn, bane of ash!\nBRYN RISES!\n4",
+        "label": "Bryn vs ash"
+      },
+      {
+        "setup": "name = \"Kaelis\"\nfoe = \"the dark\"",
+        "expectOut": "I am Kaelis, bane of the dark!\nKAELIS RISES!\n6",
+        "label": "Kaelis vs the dark"
+      }
+    ],
+    "solution": "print(f\"I am {name}, bane of {foe}!\")\nprint(f\"{name.upper()} RISES!\")\nprint(len(name))"
+  },
+  {
+    "id": "py03b",
+    "title": "The Harvest Tally",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "inputs": [
+          "Bryn",
+          "5",
+          "7"
+        ],
+        "expectOut": "Ledger for Bryn\nTotal sacks: 12",
+        "label": "Bryn: 5 + 7"
+      },
+      {
+        "inputs": [
+          "Sora",
+          "10",
+          "14"
+        ],
+        "expectOut": "Ledger for Sora\nTotal sacks: 24",
+        "label": "Sora: 10 + 14"
+      },
+      {
+        "inputs": [
+          "Kael",
+          "0",
+          "9"
+        ],
+        "expectOut": "Ledger for Kael\nTotal sacks: 9",
+        "label": "Kael: 0 + 9"
+      }
+    ],
+    "solution": "name = input()\nmorning = int(input())\nevening = int(input())\nprint(f\"Ledger for {name}\")\nprint(f\"Total sacks: {morning + evening}\")"
+  },
+  {
+    "id": "py04",
+    "title": "The Rite of Unbinding",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "hero = \"Bryn\"\nblade = \"Dull Blade\"\nsparks = 3\nembers = 5",
+        "expectOut": "Bryn bears the Dull Blade!\nFlame power: 15\nBRYN PREVAILS!",
+        "label": "Bryn's rite"
+      },
+      {
+        "setup": "hero = \"Sora\"\nblade = \"Keen Iron Edge\"\nsparks = 7\nembers = 2",
+        "expectOut": "Sora bears the Keen Iron Edge!\nFlame power: 14\nSORA PREVAILS!",
+        "label": "Sora's rite"
+      }
+    ],
+    "solution": "print(f\"{hero} bears the {blade}!\")\nprint(f\"Flame power: {sparks * embers}\")\nprint(f\"{hero.upper()} PREVAILS!\")"
+  },
+  {
+    "id": "py05",
+    "title": "Reading the Howls",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "howls = 12",
+        "expectOut": "The pack hunts",
+        "label": "howls = 12"
+      },
+      {
+        "setup": "howls = 10",
+        "expectOut": "The pack hunts",
+        "label": "howls = 10 (the edge!)"
+      },
+      {
+        "setup": "howls = 9",
+        "expectOut": "Wolves stir",
+        "label": "howls = 9 (just under the edge)"
+      },
+      {
+        "setup": "howls = 7",
+        "expectOut": "Wolves stir",
+        "label": "howls = 7"
+      },
+      {
+        "setup": "howls = 5",
+        "expectOut": "Wolves stir",
+        "label": "howls = 5 (the other edge)"
+      },
+      {
+        "setup": "howls = 2",
+        "expectOut": "The woods sleep",
+        "label": "howls = 2"
+      }
+    ],
+    "solution": "if howls >= 10:\n    print(\"The pack hunts\")\nelif howls >= 5:\n    print(\"Wolves stir\")\nelse:\n    print(\"The woods sleep\")"
+  },
+  {
+    "id": "py05b",
+    "title": "Honest Snares",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "tracks = 3\ncover = 7",
+        "expectOut": "SET THE SNARE",
+        "label": "fresh tracks, good cover"
+      },
+      {
+        "setup": "tracks = 3\ncover = 2",
+        "expectOut": "STALK",
+        "label": "tracks, but thin cover"
+      },
+      {
+        "setup": "tracks = 0\ncover = 9",
+        "expectOut": "MOVE ON",
+        "label": "no tracks"
+      },
+      {
+        "setup": "tracks = 0\ncover = 0",
+        "expectOut": "MOVE ON",
+        "label": "nothing"
+      },
+      {
+        "setup": "tracks = 1\ncover = 5",
+        "expectOut": "SET THE SNARE",
+        "label": "just enough cover"
+      }
+    ],
+    "solution": "if tracks > 0 and cover >= 5:\n    print(\"SET THE SNARE\")\nelif tracks > 0:\n    print(\"STALK\")\nelse:\n    print(\"MOVE ON\")"
+  },
+  {
+    "id": "py06",
+    "title": "Light the Ward Stones",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "n = 3",
+        "expectOut": "Ward 1 lit\nWard 2 lit\nWard 3 lit\nAll wards burn",
+        "label": "three stones"
+      },
+      {
+        "setup": "n = 1",
+        "expectOut": "Ward 1 lit\nAll wards burn",
+        "label": "a single stone"
+      },
+      {
+        "setup": "n = 5",
+        "expectOut": "Ward 1 lit\nWard 2 lit\nWard 3 lit\nWard 4 lit\nWard 5 lit\nAll wards burn",
+        "label": "five stones"
+      }
+    ],
+    "solution": "for i in range(1, n + 1):\n    print(f\"Ward {i} lit\")\nprint(\"All wards burn\")"
+  },
+  {
+    "id": "py07",
+    "title": "When the Curse Breaks",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "hp = 10\ndrain = 3",
+        "expectOut": "4",
+        "label": "hp 10, drain 3"
+      },
+      {
+        "setup": "hp = 12\ndrain = 4",
+        "expectOut": "3",
+        "label": "hp 12, drain 4"
+      },
+      {
+        "setup": "hp = 1\ndrain = 1",
+        "expectOut": "1",
+        "label": "a weak curse"
+      },
+      {
+        "setup": "hp = 20\ndrain = 6",
+        "expectOut": "4",
+        "label": "hp 20, drain 6"
+      }
+    ],
+    "solution": "nights = 0\nwhile hp > 0:\n    hp -= drain\n    nights += 1\nprint(nights)"
+  },
+  {
+    "id": "py07b",
+    "title": "The Broken Lamps",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "n = 5",
+        "expectOut": "Lamp 1 lit\nLamp 2 lit\nLamp 4 lit\nLamp 5 lit",
+        "label": "n = 5 (skip 3)"
+      },
+      {
+        "setup": "n = 7",
+        "expectOut": "Lamp 1 lit\nLamp 2 lit\nLamp 4 lit\nLamp 5 lit\nLamp 7 lit",
+        "label": "n = 7 (skip 3, 6)"
+      },
+      {
+        "setup": "n = 2",
+        "expectOut": "Lamp 1 lit\nLamp 2 lit",
+        "label": "n = 2 (none broken)"
+      },
+      {
+        "setup": "n = 3",
+        "expectOut": "Lamp 1 lit\nLamp 2 lit",
+        "label": "n = 3 (skip the last)"
+      }
+    ],
+    "solution": "for i in range(1, n + 1):\n    if i % 3 == 0:\n        continue\n    print(f\"Lamp {i} lit\")"
+  },
+  {
+    "id": "py08",
+    "title": "The Warden's Count",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "n = 5",
+        "expectOut": "1\n2\nEmber\n4\nAsh",
+        "label": "n = 5"
+      },
+      {
+        "setup": "n = 15",
+        "expectOut": "1\n2\nEmber\n4\nAsh\nEmber\n7\n8\nEmber\nAsh\n11\nEmber\n13\n14\nEmberAsh",
+        "label": "n = 15 (the full law)"
+      },
+      {
+        "setup": "n = 3",
+        "expectOut": "1\n2\nEmber",
+        "label": "n = 3"
+      }
+    ],
+    "solution": "for i in range(1, n + 1):\n    if i % 3 == 0 and i % 5 == 0:\n        print(\"EmberAsh\")\n    elif i % 3 == 0:\n        print(\"Ember\")\n    elif i % 5 == 0:\n        print(\"Ash\")\n    else:\n        print(i)"
+  },
+  {
+    "id": "py09",
+    "title": "Catalogue the Crate",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "relics = [\"Crown Shard\", \"Old Coin\"]",
+        "expectOut": "2\nCrown Shard\nOld Coin\nCatalogued: Crown Shard\nCatalogued: Old Coin\nCatalogued: Flame Sigil",
+        "label": "two relics"
+      },
+      {
+        "setup": "relics = [\"Mask\", \"Urn\", \"Bell\"]",
+        "expectOut": "3\nMask\nBell\nCatalogued: Mask\nCatalogued: Urn\nCatalogued: Bell\nCatalogued: Flame Sigil",
+        "label": "three relics"
+      }
+    ],
+    "solution": "print(len(relics))\nprint(relics[0])\nprint(relics[-1])\nrelics.append(\"Flame Sigil\")\nfor r in relics:\n    print(\"Catalogued:\", r)"
+  },
+  {
+    "id": "py10",
+    "title": "The Depth Survey",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "depths = [5, 13, 2, 8, 21]",
+        "expectOut": "49\n21\n2\n[5, 13, 2]\nTrue",
+        "label": "the flooded vault"
+      },
+      {
+        "setup": "depths = [4, 4, 4, 9]",
+        "expectOut": "21\n9\n4\n[4, 4, 4]\nFalse",
+        "label": "the still pool"
+      }
+    ],
+    "solution": "print(sum(depths))\nprint(max(depths))\nprint(min(depths))\nprint(depths[:3])\nprint(13 in depths)"
+  },
+  {
+    "id": "py10b",
+    "title": "Sort the Salvage",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "weights = [5, 12, 8, 20, 10]",
+        "expectOut": "3\n[10, 12, 20]",
+        "label": "the heavy net"
+      },
+      {
+        "setup": "weights = [1, 2, 3]",
+        "expectOut": "0\n[]",
+        "label": "all too light"
+      },
+      {
+        "setup": "weights = [30, 10, 30]",
+        "expectOut": "3\n[10, 30, 30]",
+        "label": "duplicates kept"
+      }
+    ],
+    "solution": "heavy = []\nfor w in weights:\n    if w >= 10:\n        heavy.append(w)\nprint(len(heavy))\nprint(sorted(heavy))"
+  },
+  {
+    "id": "py11",
+    "title": "Amend the Ledger",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "souls = {\"Bryn\": 3, \"Sora\": 7}",
+        "expectOut": "2\nunjudged\nBryn owes 3\nSora owes 7\nMaren owes 0",
+        "label": "two souls"
+      },
+      {
+        "setup": "souls = {\"Edda\": 1}",
+        "expectOut": "1\nunjudged\nEdda owes 1\nMaren owes 0",
+        "label": "one soul"
+      }
+    ],
+    "solution": "print(len(souls))\nprint(souls.get(\"Unknown\", \"unjudged\"))\nsouls[\"Maren\"] = 0\nfor name, debt in souls.items():\n    print(f\"{name} owes {debt}\")"
+  },
+  {
+    "id": "py11b",
+    "title": "Tally the Hoard",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "hoard = {\"coin\": 3, \"mask\": 1, \"urn\": 2}",
+        "expectOut": "6\n3\ncoin: 3\nurn: 2",
+        "label": "the king's hoard"
+      },
+      {
+        "setup": "hoard = {\"gem\": 5}",
+        "expectOut": "5\n1\ngem: 5",
+        "label": "a single kind"
+      },
+      {
+        "setup": "hoard = {\"a\": 1, \"b\": 1}",
+        "expectOut": "2\n2",
+        "label": "nothing clears the bar"
+      }
+    ],
+    "solution": "print(sum(hoard.values()))\nprint(len(hoard))\nfor name, count in hoard.items():\n    if count >= 2:\n        print(f\"{name}: {count}\")"
+  },
+  {
+    "id": "py12",
+    "title": "Distill the True Sigils",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "sigils = [\"ash\", \"flame\", \"ash\", \"oak\", \"flame\"]",
+        "expectOut": "3\n['ash', 'flame', 'oak']\nTrue",
+        "label": "the forged sack"
+      },
+      {
+        "setup": "sigils = [\"a\", \"a\", \"a\"]",
+        "expectOut": "1\n['a']\nFalse",
+        "label": "one true name"
+      }
+    ],
+    "solution": "unique = set(sigils)\nprint(len(unique))\nprint(sorted(unique))\nprint(\"flame\" in unique)"
+  },
+  {
+    "id": "py13",
+    "title": "The Final Audit",
+    "mode": "program",
+    "funcName": null,
+    "tests": [
+      {
+        "setup": "relics = [\"coin\", \"crown\", \"coin\", \"mask\", \"coin\"]",
+        "expectOut": "coin\n3",
+        "label": "the coin hoard"
+      },
+      {
+        "setup": "relics = [\"urn\", \"urn\", \"mask\"]",
+        "expectOut": "urn\n2",
+        "label": "the urn pair"
+      },
+      {
+        "setup": "relics = [\"sigil\"]",
+        "expectOut": "sigil\n1",
+        "label": "a single relic"
+      }
+    ],
+    "solution": "counts = {}\nfor r in relics:\n    counts[r] = counts.get(r, 0) + 1\nbest = None\nfor k, v in counts.items():\n    if best is None or v > counts[best]:\n        best = k\nprint(best)\nprint(counts[best])"
+  },
+  {
+    "id": "py14",
+    "title": "Codify the Strike",
+    "mode": "function",
+    "funcName": "strike",
+    "tests": [
+      {
+        "args": [
+          5,
+          3
+        ],
+        "expect": 13,
+        "label": "strike(5, 3)"
+      },
+      {
+        "args": [
+          0,
+          7
+        ],
+        "expect": 7,
+        "label": "strike(0, 7)"
+      },
+      {
+        "args": [
+          10,
+          0
+        ],
+        "expect": 20,
+        "label": "strike(10, 0)"
+      },
+      {
+        "args": [
+          12,
+          6
+        ],
+        "expect": 30,
+        "label": "strike(12, 6)"
+      }
+    ],
+    "solution": "def strike(strength, bonus):\n    return strength * 2 + bonus"
+  },
+  {
+    "id": "py14b",
+    "title": "The Officer's Report",
+    "mode": "function",
+    "funcName": "report",
+    "tests": [
+      {
+        "args": [
+          [
+            5,
+            12,
+            9,
+            30
+          ]
+        ],
+        "expect": [
+          2,
+          2
+        ],
+        "label": "mixed muster"
+      },
+      {
+        "args": [
+          [
+            1,
+            2
+          ]
+        ],
+        "expect": [
+          0,
+          2
+        ],
+        "label": "all recruits"
+      },
+      {
+        "args": [
+          [
+            10,
+            20
+          ]
+        ],
+        "expect": [
+          2,
+          0
+        ],
+        "label": "all ready"
+      },
+      {
+        "args": [
+          []
+        ],
+        "expect": [
+          0,
+          0
+        ],
+        "label": "empty muster"
+      }
+    ],
+    "solution": "def report(levels):\n    ready = 0\n    recruits = 0\n    for lvl in levels:\n        if lvl >= 10:\n            ready += 1\n        else:\n            recruits += 1\n    return ready, recruits"
+  },
+  {
+    "id": "py15",
+    "title": "The Garrison Count",
+    "mode": "function",
+    "funcName": "count_ready",
+    "tests": [
+      {
+        "args": [
+          [
+            5,
+            12,
+            9,
+            30
+          ]
+        ],
+        "expect": 2,
+        "label": "default threshold (10)"
+      },
+      {
+        "args": [
+          [
+            1,
+            2,
+            3
+          ],
+          2
+        ],
+        "expect": 2,
+        "label": "threshold 2"
+      },
+      {
+        "args": [
+          [],
+          5
+        ],
+        "expect": 0,
+        "label": "an empty muster"
+      },
+      {
+        "args": [
+          [
+            10
+          ],
+          10
+        ],
+        "expect": 1,
+        "label": "exactly at the threshold"
+      }
+    ],
+    "solution": "def count_ready(levels, threshold=10):\n    count = 0\n    for lvl in levels:\n        if lvl >= threshold:\n            count += 1\n    return count"
+  },
+  {
+    "id": "py16",
+    "title": "Empower the Veterans",
+    "mode": "function",
+    "funcName": "empower",
+    "tests": [
+      {
+        "args": [
+          [
+            12,
+            3,
+            10
+          ]
+        ],
+        "expect": [
+          24,
+          20
+        ],
+        "label": "two veterans"
+      },
+      {
+        "args": [
+          [
+            1,
+            2
+          ]
+        ],
+        "expect": [],
+        "label": "all recruits"
+      },
+      {
+        "args": [
+          [
+            10
+          ]
+        ],
+        "expect": [
+          20
+        ],
+        "label": "exactly level 10"
+      },
+      {
+        "args": [
+          [
+            30,
+            9,
+            15,
+            2
+          ]
+        ],
+        "expect": [
+          60,
+          30
+        ],
+        "label": "mixed muster"
+      }
+    ],
+    "solution": "def empower(levels):\n    return [lvl * 2 for lvl in levels if lvl >= 10]"
+  },
+  {
+    "id": "py17",
+    "title": "Write the Knight",
+    "mode": "function",
+    "funcName": "Knight",
+    "tests": [
+      {
+        "expr": "Knight('Bors', 10).power",
+        "expect": 10,
+        "label": "stores power"
+      },
+      {
+        "expr": "Knight('Bors', 10).name",
+        "expect": "Bors",
+        "label": "stores name"
+      },
+      {
+        "expr": "Knight('Mira', 7).rally()",
+        "expect": "Mira stands!",
+        "label": "rally()"
+      },
+      {
+        "expr": "Knight('Mira', 7).strike(5)",
+        "expect": 12,
+        "label": "strike(5)"
+      }
+    ],
+    "solution": "class Knight:\n    def __init__(self, name, power):\n        self.name = name\n        self.power = power\n\n    def rally(self):\n        return f\"{self.name} stands!\"\n\n    def strike(self, bonus):\n        return self.power + bonus"
+  },
+  {
+    "id": "py17b",
+    "title": "The Living Banner",
+    "mode": "function",
+    "funcName": "Banner",
+    "tests": [
+      {
+        "expr": "Banner('Ash').victories",
+        "expect": 0,
+        "label": "starts at 0 victories"
+      },
+      {
+        "pysetup": "b = Banner('Ash')\nb.win()\nb.win()",
+        "expr": "b.victories",
+        "expect": 2,
+        "label": "two wins remembered"
+      },
+      {
+        "expr": "str(Banner('Vale'))",
+        "expect": "Vale (0)",
+        "label": "__str__ at zero"
+      },
+      {
+        "pysetup": "b = Banner('Ash')\nb.win()",
+        "expr": "str(b)",
+        "expect": "Ash (1)",
+        "label": "__str__ after a win"
+      }
+    ],
+    "solution": "class Banner:\n    def __init__(self, name):\n        self.name = name\n        self.victories = 0\n\n    def win(self):\n        self.victories += 1\n\n    def __str__(self):\n        return f\"{self.name} ({self.victories})\""
+  },
+  {
+    "id": "py18",
+    "title": "The Champion's Form",
+    "mode": "function",
+    "funcName": "Hero",
+    "tests": [
+      {
+        "pysetup": "h = Hero('Bryn', 30)\nh.take_damage(10)",
+        "expr": "h.hp",
+        "expect": 20,
+        "label": "take_damage(10): 30 -> 20"
+      },
+      {
+        "pysetup": "h = Hero('Bryn', 30)\nh.take_damage(50)",
+        "expr": "h.hp",
+        "expect": 0,
+        "label": "overkill floors at 0"
+      },
+      {
+        "pysetup": "h = Hero('Bryn', 30)\nh.take_damage(50)",
+        "expr": "h.is_alive()",
+        "expect": false,
+        "label": "fallen hero is_alive() False"
+      },
+      {
+        "pysetup": "h = Hero('Sora', 5)\nh.heal(7)",
+        "expr": "h.hp",
+        "expect": 12,
+        "label": "heal(7): 5 -> 12"
+      },
+      {
+        "pysetup": "h = Hero('Sora', 5)",
+        "expr": "h.is_alive()",
+        "expect": true,
+        "label": "standing hero is_alive() True"
+      }
+    ],
+    "solution": "class Hero:\n    def __init__(self, name, hp):\n        self.name = name\n        self.hp = hp\n\n    def take_damage(self, n):\n        self.hp = max(0, self.hp - n)\n\n    def heal(self, n):\n        self.hp += n\n\n    def is_alive(self):\n        return self.hp > 0"
+  },
+  {
+    "id": "py19",
+    "title": "Count the Living Embers",
+    "mode": "function",
+    "funcName": "count_embers",
+    "tests": [
+      {
+        "args": [
+          [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "expect": 2,
+        "label": "2x2 labyrinth"
+      },
+      {
+        "args": [
+          [
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        "expect": 0,
+        "label": "a cold corridor"
+      },
+      {
+        "args": [
+          [
+            [
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        ],
+        "expect": 6,
+        "label": "fully ablaze"
+      },
+      {
+        "args": [
+          [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ]
+        ],
+        "expect": 4,
+        "label": "the ember cross"
+      }
+    ],
+    "solution": "def count_embers(grid):\n    count = 0\n    for row in grid:\n        for cell in row:\n            if cell == 1:\n                count += 1\n    return count"
+  },
+  {
+    "id": "py19b",
+    "title": "The Hottest Row",
+    "mode": "function",
+    "funcName": "hottest_row",
+    "tests": [
+      {
+        "args": [
+          [
+            [
+              1,
+              2
+            ],
+            [
+              5,
+              0
+            ],
+            [
+              2,
+              2
+            ]
+          ]
+        ],
+        "expect": 1,
+        "label": "middle row hottest"
+      },
+      {
+        "args": [
+          [
+            [
+              9
+            ]
+          ]
+        ],
+        "expect": 0,
+        "label": "a single cell"
+      },
+      {
+        "args": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              3,
+              9
+            ]
+          ]
+        ],
+        "expect": 2,
+        "label": "last row hottest"
+      },
+      {
+        "args": [
+          [
+            [
+              10,
+              0
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              3
+            ]
+          ]
+        ],
+        "expect": 0,
+        "label": "first row hottest"
+      }
+    ],
+    "solution": "def hottest_row(grid):\n    best_i = 0\n    best_sum = sum(grid[0])\n    for i in range(len(grid)):\n        s = sum(grid[i])\n        if s > best_sum:\n            best_sum = s\n            best_i = i\n    return best_i"
+  },
+  {
+    "id": "py20",
+    "title": "Rank the Champions",
+    "mode": "function",
+    "funcName": "rank_champions",
+    "tests": [
+      {
+        "args": [
+          [
+            [
+              "Bryn",
+              12
+            ],
+            [
+              "Sora",
+              30
+            ],
+            [
+              "Edda",
+              7
+            ]
+          ]
+        ],
+        "expect": [
+          "Sora",
+          "Bryn",
+          "Edda"
+        ],
+        "label": "three champions"
+      },
+      {
+        "args": [
+          [
+            [
+              "A",
+              1
+            ]
+          ]
+        ],
+        "expect": [
+          "A"
+        ],
+        "label": "a lineage of one"
+      },
+      {
+        "args": [
+          [
+            [
+              "X",
+              5
+            ],
+            [
+              "Y",
+              9
+            ]
+          ]
+        ],
+        "expect": [
+          "Y",
+          "X"
+        ],
+        "label": "two rivals"
+      },
+      {
+        "args": [
+          [
+            [
+              "Kael",
+              40
+            ],
+            [
+              "Maren",
+              40.5
+            ]
+          ]
+        ],
+        "expect": [
+          "Maren",
+          "Kael"
+        ],
+        "label": "a close contest"
+      }
+    ],
+    "solution": "def rank_champions(champions):\n    ranked = sorted(champions, key=lambda c: c[1], reverse=True)\n    return [c[0] for c in ranked]"
+  },
+  {
+    "id": "py21",
+    "title": "Forge the Flame Chain",
+    "mode": "function",
+    "funcName": "flame_chain",
+    "tests": [
+      {
+        "args": [
+          1
+        ],
+        "expect": 1,
+        "label": "one link"
+      },
+      {
+        "args": [
+          4
+        ],
+        "expect": 24,
+        "label": "four links"
+      },
+      {
+        "args": [
+          6
+        ],
+        "expect": 720,
+        "label": "six links"
+      },
+      {
+        "args": [
+          0
+        ],
+        "expect": 1,
+        "label": "the empty chain"
+      }
+    ],
+    "solution": "def flame_chain(n):\n    if n <= 1:\n        return 1\n    return n * flame_chain(n - 1)"
+  },
+  {
+    "id": "py21b",
+    "title": "The Recursive Tally",
+    "mode": "function",
+    "funcName": "total",
+    "tests": [
+      {
+        "args": [
+          [
+            1,
+            2,
+            3
+          ]
+        ],
+        "expect": 6,
+        "label": "three numbers"
+      },
+      {
+        "args": [
+          []
+        ],
+        "expect": 0,
+        "label": "the empty verse"
+      },
+      {
+        "args": [
+          [
+            5
+          ]
+        ],
+        "expect": 5,
+        "label": "a single number"
+      },
+      {
+        "args": [
+          [
+            10,
+            -2,
+            4
+          ]
+        ],
+        "expect": 12,
+        "label": "with a negative"
+      },
+      {
+        "args": [
+          [
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        ],
+        "expect": 10,
+        "label": "five twos"
+      }
+    ],
+    "solution": "def total(nums):\n    if not nums:\n        return 0\n    return nums[0] + total(nums[1:])"
+  },
+  {
+    "id": "py22",
+    "title": "The Riddle of the Twin Marks",
+    "mode": "function",
+    "funcName": "twin_marks",
+    "tests": [
+      {
+        "args": [
+          [
+            2,
+            7,
+            11,
+            15
+          ],
+          9
+        ],
+        "expect": [
+          0,
+          1
+        ],
+        "label": "the classic"
+      },
+      {
+        "args": [
+          [
+            3,
+            2,
+            4
+          ],
+          6
+        ],
+        "expect": [
+          1,
+          2
+        ],
+        "label": "not always the first two"
+      },
+      {
+        "args": [
+          [
+            3,
+            3
+          ],
+          6
+        ],
+        "expect": [
+          0,
+          1
+        ],
+        "label": "twin twins"
+      },
+      {
+        "args": [
+          [
+            1,
+            5,
+            9,
+            13
+          ],
+          22
+        ],
+        "expect": [
+          2,
+          3
+        ],
+        "label": "deep in the list"
+      },
+      {
+        "args": [
+          [
+            5,
+            75,
+            25
+          ],
+          100
+        ],
+        "expect": [
+          1,
+          2
+        ],
+        "label": "the vault code"
+      }
+    ],
+    "solution": "def twin_marks(runes, target):\n    seen = {}\n    for i in range(len(runes)):\n        partner = target - runes[i]\n        if partner in seen:\n            return [seen[partner], i]\n        seen[runes[i]] = i"
+  },
+  {
+    "id": "py23",
+    "title": "The Verse of Ascension",
+    "mode": "function",
+    "funcName": "clean_verse",
+    "tests": [
+      {
+        "args": [
+          "abcabcbb"
+        ],
+        "expect": 3,
+        "label": "abcabcbb -> 3"
+      },
+      {
+        "args": [
+          "bbbbb"
+        ],
+        "expect": 1,
+        "label": "bbbbb -> 1"
+      },
+      {
+        "args": [
+          "pwwkew"
+        ],
+        "expect": 3,
+        "label": "pwwkew -> 3"
+      },
+      {
+        "args": [
+          ""
+        ],
+        "expect": 0,
+        "label": "the empty verse"
+      },
+      {
+        "args": [
+          "firstking"
+        ],
+        "expect": 7,
+        "label": "firstking -> 7 (rstking)"
+      },
+      {
+        "args": [
+          "au"
+        ],
+        "expect": 2,
+        "label": "au -> 2"
+      }
+    ],
+    "solution": "def clean_verse(s):\n    best = 0\n    for i in range(len(s)):\n        seen = set()\n        for ch in s[i:]:\n            if ch in seen:\n                break\n            seen.add(ch)\n        best = max(best, len(seen))\n    return best"
+  }
+]

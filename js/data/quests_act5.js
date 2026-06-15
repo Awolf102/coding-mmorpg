@@ -88,6 +88,89 @@ window.QUEST_DB.push(
   rewards: { xp: 420, coins: 120, items: [["aegis_of_the_first", 1]] }
 },
 
+/* ---------------- py19b : The Furnace Grid ---------------- */
+{
+  id: "py19b", act: 5, title: "The Furnace Grid", npc: "vesh", map: "sanctum",
+  intro: [
+    "Stand on the cold tiles, marked one — the others run hot. Vesh, cartographer. I map the furnace beneath the Flame.",
+    "The furnace is a grid: rows of fire, columns of ash. The furnace drakes nest in the hottest rows, and I cannot map what I cannot approach.",
+    "Scatter <b>4 Furnace Drakes</b> off the grid, and I'll teach you to read a grid the way the Flame does — not just cell by cell, but row by row, column by column."
+  ],
+  acceptLabel: "I'll read the furnace.",
+  midDialogue: "Drakes still nesting in the hot rows. Clear them so I can map.",
+  returnDialogue: [
+    "The grid lies bare. Now — counting cells is the beginning. Reading rows is the craft.",
+    "Sum a row. Sum a column. Find the hottest row of all. A grid that knows its own shape can be fought."
+  ],
+  doneDialogue: "You read the furnace like a cartographer now — every row, every column, the hottest cell. The Flame's maps hold no secrets from you.",
+  lesson: {
+    title: "The Furnace Grid — Rows, Columns & the Hottest Cell",
+    body: [
+      "A row of a grid is just a list — sum it directly:",
+      ">>>grid = [[1, 2, 3],\n        [4, 0, 1]]\nprint(sum(grid[0]))   # 6  - the first row's total\nprint(len(grid))      # 2  - number of rows\nprint(len(grid[0]))   # 3  - number of columns",
+      "To total a **column**, walk the rows and pluck the same index from each:",
+      ">>>col = 0\ntotal = 0\nfor row in grid:\n    total += row[col]\nprint(total)   # 1 + 4 = 5",
+      "To find the **hottest row** — the row with the greatest sum — keep a best-so-far as you go:",
+      ">>>best_i = 0\nbest_sum = sum(grid[0])\nfor i in range(len(grid)):\n    s = sum(grid[i])\n    if s > best_sum:\n        best_sum = s\n        best_i = i\nprint(best_i)   # the index of the hottest row",
+      "The grand total is every row summed: `sum(sum(row) for row in grid)`, or a plain double loop.",
+      "Rows are lists, columns are a walk, and 'biggest' is always best-so-far. That trio reads any grid the Flame can draw."
+    ],
+    fragments: [
+      "**Fragment I** — A row IS a list: `sum(grid[r])` totals row r. `len(grid)` is the row count; `len(grid[0])` the column count.",
+      "**Fragment II** — A column total walks the rows: `for row in grid: total += row[c]` — same index c from every row.",
+      "**Fragment III** — Hottest row = best-so-far: track `best_sum` and `best_i`, update when a row's sum beats the best.",
+      "**Fragment IV** — Grand total = sum of every row's sum: `sum(sum(row) for row in grid)`, or a double loop adding each cell."
+    ]
+  },
+  kills: { enemy: "furnace_drake", count: 4 },
+  questions: [
+    { type: "output", q: "Sum one row:", code: "grid = [[1, 2, 3], [4, 0, 1]]\nprint(sum(grid[1]))",
+      answer: "5", why: "Row 1 is [4, 0, 1]; sum is 4 + 0 + 1 = 5." },
+    { type: "output", q: "Total a column:", code: "grid = [[1, 9], [2, 8], [3, 7]]\ntotal = 0\nfor row in grid:\n    total += row[0]\nprint(total)",
+      answer: "6", why: "Column 0 is 1, 2, 3 across the rows: 1 + 2 + 3 = 6." },
+    { type: "mc", q: "What does len(grid[0]) give for a rectangular grid?",
+      choices: ["the number of columns", "the number of rows", "the total of row 0", "the biggest cell"],
+      answer: 0, why: "grid[0] is the first row (a list); its length is the column count." },
+    { type: "output", q: "Best-so-far over rows:", code: "grid = [[1, 1], [5, 0], [2, 2]]\nbest = sum(grid[0])\nfor r in grid:\n    best = max(best, sum(r))\nprint(best)",
+      answer: "5", why: "Row sums are 2, 5, 4; the greatest is 5." },
+    { type: "output", q: "The grand total:", code: "grid = [[1, 2], [3, 4]]\nprint(sum(sum(row) for row in grid))",
+      answer: "10", why: "Row sums 3 and 7, summed: 10 — every cell added once." },
+    { type: "mc", q: "To total column c, you...",
+      choices: ["add row[c] from every row", "sum(grid[c])", "take grid[c][c]", "len(grid)"],
+      answer: 0, why: "A column cuts across the rows: pluck index c from each row and add them." },
+    { type: "tf", q: "True or False — in a rectangular grid, every row has the same length.",
+      answer: true, why: "A rectangular grid's rows are equal-length, so len(grid[0]) is the column count for all of them." }
+  ],
+  challenge: {
+    title: "The Hottest Row",
+    story: "Vesh spreads the furnace map — rows of heat readings. \"Find me the hottest row: the one whose readings sum highest. Give me its number, counting from zero.\"",
+    prompt: [
+      "Define `hottest_row(grid)`:",
+      "— `grid` is a 2D list of ints (at least one row).",
+      "— Return the **index** of the row with the greatest sum.",
+      "— Exactly one row has the greatest sum.",
+      "Examples:",
+      ">>>hottest_row([[1, 2], [5, 0], [2, 2]])   ->  1   (row sums 3, 5, 4)\nhottest_row([[9]])                      ->  0\nhottest_row([[1, 1], [0, 0], [3, 9]])   ->  2"
+    ],
+    mode: "function",
+    funcName: "hottest_row",
+    starter: "def hottest_row(grid):\n    best_i = 0\n    best_sum = sum(grid[0])\n    # check each row's sum; keep the index of the greatest\n    \n    return best_i\n",
+    tests: [
+      { args: [[[1, 2], [5, 0], [2, 2]]], expect: 1, label: "middle row hottest" },
+      { args: [[[9]]], expect: 0, label: "a single cell" },
+      { args: [[[1, 1], [0, 0], [3, 9]]], expect: 2, label: "last row hottest" },
+      { args: [[[10, 0], [1, 2], [3, 3]]], expect: 0, label: "first row hottest" }
+    ],
+    hints: [
+      "Loop the row indices: for i in range(len(grid)): s = sum(grid[i])",
+      "Best-so-far: if s > best_sum: best_sum = s; best_i = i",
+      "Full answer:\ndef hottest_row(grid):\n    best_i = 0\n    best_sum = sum(grid[0])\n    for i in range(len(grid)):\n        s = sum(grid[i])\n        if s > best_sum:\n            best_sum = s\n            best_i = i\n    return best_i"
+    ],
+    explain: "Each row is a list, so `sum(grid[i])` is its heat in one word. The best-so-far pattern carries the hottest index through the sweep: start by assuming row 0 wins, then promote any row whose sum beats the current best. One pass, and the hottest row names itself."
+  },
+  rewards: { xp: 430, coins: 122, items: [["phoenix_draught", 2]] }
+},
+
 /* ---------------- py20 : Order from Ash ---------------- */
 {
   id: "py20", act: 5, title: "Order from Ash", npc: "herald", map: "sanctum",
@@ -260,10 +343,93 @@ window.QUEST_DB.push(
   rewards: { xp: 480, coins: 140, items: [["firstflame_edge", 1]] }
 },
 
+/* ---------------- py21b : The Verse That Contains Itself ---------------- */
+{
+  id: "py21b", act: 5, title: "The Verse That Contains Itself", npc: "quill", map: "sanctum",
+  intro: [
+    "Ilio sent you? Of course Ilio sent you. Ilio always sends you. I'm Quill — I keep the verses that recite themselves.",
+    "The verse wraiths in the south gallery are half-finished recitations: a verse that calls a smaller verse, which calls a smaller still — but the smallest was never written, so they loop forever, fraying.",
+    "Silence <b>4 Verse Wraiths</b>, and I'll show you what Ilio only gestured at: the everyday <i>shapes</i> of recursion — summing, reversing, folding a thing through itself."
+  ],
+  acceptLabel: "Recite it to me.",
+  midDialogue: "Wraiths still fraying in the south gallery, looping with no end. Give them one.",
+  returnDialogue: [
+    "Quiet. The unfinished verses rest.",
+    "Ilio taught you the rite; let me teach you its uses. A list, summed by recursion. A word, reversed by recursion. The same shape, different cloth."
+  ],
+  doneDialogue: "You see the shape now, not just the trick: do the head, trust the tail. That is recursion's whole soul.",
+  lesson: {
+    title: "The Deeper Return — Recursive Patterns",
+    body: [
+      "The everyday recursion is *head and tail*: handle the first item, then **trust a smaller call** for the rest.",
+      "Sum a list without a loop — the empty list is the base case:",
+      ">>>def total(lst):\n    if not lst:              # base: an empty list sums to 0\n        return 0\n    return lst[0] + total(lst[1:])   # first + the sum of the rest\n\nprint(total([2, 3, 4]))   # 9",
+      "`lst[1:]` is the **tail** — the list minus its head. Each call hands a smaller list onward, until nothing is left.",
+      "Reverse a word the same way — base case is the empty string:",
+      ">>>def rev(s):\n    if s == \"\":\n        return \"\"\n    return rev(s[1:]) + s[0]   # reverse the rest, put the head LAST\n\nprint(rev(\"ash\"))   # hsa",
+      "Read it: *reverse everything after the first letter, then stick the first letter on the end.* Trust the smaller reversal completely.",
+      "Every shape is the same two parts: a base case for the smallest piece, and a recursive case that does one step and delegates the rest."
+    ],
+    fragments: [
+      "**Fragment I** — Head-and-tail: handle `lst[0]` (the head), recurse on `lst[1:]` (the tail). Each call shrinks the work.",
+      "**Fragment II** — Recursive sum: `if not lst: return 0` then `return lst[0] + total(lst[1:])`. The empty list is the floor.",
+      "**Fragment III** — Recursive reverse: `return rev(s[1:]) + s[0]` — reverse the rest, then append the head. Base case: the empty string.",
+      "**Fragment IV** — Trust the smaller call. Don't trace it to the bottom in your head — assume it's right, and just do YOUR one step."
+    ]
+  },
+  kills: { enemy: "verse_wraith", count: 4 },
+  questions: [
+    { type: "output", q: "Sum by recursion:", code: "def total(lst):\n    if not lst:\n        return 0\n    return lst[0] + total(lst[1:])\n\nprint(total([1, 2, 3]))",
+      answer: "6", why: "1 + total([2,3]) = 1 + 2 + total([3]) = 1 + 2 + 3 + 0 = 6." },
+    { type: "mc", q: "In head-and-tail recursion on a list, what is the 'tail'?",
+      choices: ["lst[1:] — the list without its first item", "lst[-1] — the last item", "lst[0] — the first item", "the whole list again"],
+      answer: 0, why: "The tail is everything after the head: lst[1:]. Recursing on it shrinks the problem." },
+    { type: "output", q: "Reverse by recursion:", code: "def rev(s):\n    if s == \"\":\n        return \"\"\n    return rev(s[1:]) + s[0]\n\nprint(rev(\"abc\"))",
+      answer: "cba", why: "rev(\"abc\") = rev(\"bc\") + \"a\" = (rev(\"c\")+\"b\")+\"a\" = \"cba\"." },
+    { type: "mc", q: "What is the base case when summing a list recursively?",
+      choices: ["the empty list -> return 0", "a list of one -> loop", "the largest list", "there is none"],
+      answer: 0, why: "An empty list sums to 0 without recursing — the floor the recursion stands on." },
+    { type: "fill", q: "Fill the blank — recurse on the tail of the list:", code: "return lst[0] + total(lst[____])",
+      answer: "1:", accept: ["1:"], why: "lst[1:] is the tail — the list minus its first item." },
+    { type: "output", q: "Count the items recursively:", code: "def size(lst):\n    if not lst:\n        return 0\n    return 1 + size(lst[1:])\n\nprint(size([9, 9, 9, 9]))",
+      answer: "4", why: "Each call adds 1 and drops the head: 1 + 1 + 1 + 1 + 0 = 4." },
+    { type: "tf", q: "True or False — `lst[1:]` is a smaller list than `lst` (when lst is non-empty).",
+      answer: true, why: "Slicing off the head leaves one fewer item — that shrinkage is what lets the recursion end." }
+  ],
+  challenge: {
+    title: "The Recursive Tally",
+    story: "Quill unrolls a verse of numbers. \"Sum it — but not with a loop. Let the verse recite itself: the first number, plus the sum of all the rest.\"",
+    prompt: [
+      "Define `total(nums)` **recursively** (no `for`, no `while`):",
+      "— If `nums` is empty: return `0` (the base case).",
+      "— Otherwise: return `nums[0] + total(nums[1:])`.",
+      "Examples:",
+      ">>>total([1, 2, 3])     ->  6\ntotal([])            ->  0\ntotal([5])           ->  5\ntotal([10, -2, 4])   ->  12"
+    ],
+    mode: "function",
+    funcName: "total",
+    starter: "def total(nums):\n    # base case: empty list -> 0\n    # recursive case: nums[0] + total(nums[1:])\n    \n",
+    tests: [
+      { args: [[1, 2, 3]], expect: 6, label: "three numbers" },
+      { args: [[]], expect: 0, label: "the empty verse" },
+      { args: [[5]], expect: 5, label: "a single number" },
+      { args: [[10, -2, 4]], expect: 12, label: "with a negative" },
+      { args: [[2, 2, 2, 2, 2]], expect: 10, label: "five twos" }
+    ],
+    hints: [
+      "Base case first: if not nums: return 0",
+      "Recursive case: return nums[0] + total(nums[1:]) — head plus the sum of the tail.",
+      "Full answer:\ndef total(nums):\n    if not nums:\n        return 0\n    return nums[0] + total(nums[1:])"
+    ],
+    explain: "The empty list is the floor: it sums to 0 without recursing. Every other call peels off the head (`nums[0]`) and trusts `total(nums[1:])` for the tail — the list shrinks by one each time until it empties, then the answers add back up the chain. Same head-and-tail shape that reverses a word or counts a list."
+  },
+  rewards: { xp: 470, coins: 135, items: [["phoenix_draught", 2], ["scroll_of_insight", 2]] }
+},
+
 /* ---------------- py22 : BOSS — The Twin Flames ---------------- */
 {
   id: "py22", act: 5, title: "The Twin Flames", npc: "herald", map: "sanctum", boss: true,
-  bossEnemy: "boss_twin_flame", bossSpot: { map: "sanctum", x: 33, y: 8 },
+  bossEnemy: "boss_twin_flame", bossSpot: { map: "sanctum", x: 13, y: 7 },
   intro: [
     "The Flame is testing you directly now. It has split two of itself onto the lava isle — the Twin Flames, who burn only as a PAIR.",
     "The old riddle: among many runes, exactly two together equal the target power. Find WHERE they stand — their positions, not their values.",
@@ -334,7 +500,7 @@ window.QUEST_DB.push(
 /* ---------------- py23 : FINAL BOSS — The First King Ascendant ---------------- */
 {
   id: "py23", act: 5, title: "The First King Ascendant", npc: "herald", map: "sanctum", boss: true,
-  bossEnemy: "boss_first_king", bossSpot: { map: "sanctum", x: 36, y: 20 },
+  bossEnemy: "boss_first_king", bossSpot: { map: "sanctum", x: 51, y: 21 },
   intro: [
     "He has risen. The First King stands at the dais of the Eternal Flame, wearing a thousand years of dust like a coronation robe.",
     "He speaks only in the Verse of Ascension — the incantation that united every race under one banner. But his verse has *rotted*: letters repeat, and a repeated letter breaks the casting.",

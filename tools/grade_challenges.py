@@ -33,6 +33,9 @@ for ch in CHALLENGES:
             if ch["mode"] == "program":
                 if t.get("setup"):
                     exec(t["setup"], ns)
+                if t.get("inputs") is not None:           # feed input() like the game harness
+                    _feed = iter(list(t["inputs"]))
+                    ns["input"] = lambda prompt="": next(_feed)
                 buf = io.StringIO()
                 old = sys.stdout
                 sys.stdout = buf

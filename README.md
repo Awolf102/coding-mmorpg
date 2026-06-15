@@ -36,32 +36,32 @@ then open http://localhost:8000
 | Sidebar tabs | Inventory 🎒 · Equipment ⚔ · Skills 📊 · Quests 📜 · Settings ⚙ |
 | Re-read a lesson | Quest Journal → click the quest → your **Tome of Embers** |
 
-## 🐍 The Python Chronicle — 23 chapters, 5 acts
+## 🐍 The Python Chronicle — 33 chapters, 5 acts
 
 | Act | Region | You learn |
 |---|---|---|
-| I | Ashveil Village | `print`, strings, variables, arithmetic, f-strings |
-| II | Emberwood Forest | booleans, `if/elif/else`, `for`+`range`, `while` |
-| III | The Sunken Ruins | lists, slices, `in`, dicts, sets, tuples, the tally pattern |
-| IV | Kingsfall Citadel | functions, defaults, list comprehensions, classes & objects |
-| V | The Flame Sanctum | nested loops & grids, sorting & lambdas, recursion |
+| I | Ashveil Village | `print`, strings, variables, arithmetic, f-strings · `print` formatting (`sep`/`end`/`\n`/escapes) · `input()` & type conversion (`int`/`float`/`str`) |
+| II | Emberwood Forest | booleans, `if/elif/else`, `for`+`range`, `while` · combining conditions (`and`/`or`/`not`, chaining, truthiness) · loop control (`break`/`continue`/steps) |
+| III | The Sunken Ruins | lists, slices, `in`, dicts, sets, tuples, the tally pattern · building & filtering lists (`enumerate`, `sort`) · dict aggregation (`.values()`/`sum`/filter) |
+| IV | Kingsfall Citadel | functions, defaults, list comprehensions, classes & objects · returning multiple values & scope · stateful objects with `__str__` |
+| V | The Flame Sanctum | nested loops & grids, sorting & lambdas, recursion · 2D row/column sums & argmax · recursive patterns (recursive sum/reverse) |
 
 Boss trials are full programs: **FizzBuzz** (Act II), **most-frequent-element** (Act III),
 a **class with damage/heal logic** (Act IV), **Two Sum** (Act V), and the final boss —
 **Longest Substring Without Repeating Characters**, a genuine LeetCode-medium.
 
-## ⚙ The C++ Chronicle — 23 chapters, 5 acts
+## ⚙ The C++ Chronicle — 33 chapters, 5 acts
 
 The **Iron Concord** teaches **real, idiomatic C++** across the same five regions — the world is
 shared, but the Concord smith learns a different tongue (all trials compile on real GCC):
 
 | Act | Region | You learn |
 |---|---|---|
-| I | Ashveil Village | `#include`, `cout`, `int`/`double` & integer division, `cin`, `std::string` |
-| II | Emberwood Forest | `bool` & comparisons, `if/else if/else`, `for`, `while` |
-| III | The Sunken Ruins | `std::vector`, measuring (`accumulate`/`max_element`/`find`), `unordered_map`, `set` |
-| IV | Kingsfall Citadel | functions, default args & references, building vectors, `struct`/`class` & methods |
-| V | The Flame Sanctum | nested loops & 2D `vector<vector<int>>`, `std::sort` & lambdas, recursion |
+| I | Ashveil Village | `#include`, `cout`, `int`/`double` & integer division, `cin`, `std::string` · `cout` formatting (`\n`/`endl`/escapes) · conversion (`stoi`/`to_string`/`static_cast`) |
+| II | Emberwood Forest | `bool` & comparisons, `if/else if/else`, `for`, `while` · combining conditions (`&&`/`\|\|`/`!`, ternary) · loop control (`break`/`continue`/steps) |
+| III | The Sunken Ruins | `std::vector`, measuring (`accumulate`/`max_element`/`find`), `unordered_map`, `set` · building & sorting vectors · `std::map` aggregation |
+| IV | Kingsfall Citadel | functions, default args & references, building vectors, `struct`/`class` & methods · returning a `std::pair` & scope · stateful structs with a `describe()` voice |
+| V | The Flame Sanctum | nested loops & 2D `vector<vector<int>>`, `std::sort` & lambdas, recursion · 2D row sums & argmax · recursive patterns |
 
 It ends on the same algorithms — FizzBuzz, most-frequent-element, a damage/heal class, **Two Sum**,
 and the finale **Longest Substring Without Repeating Characters** — written as real C++ read from stdin.
@@ -102,5 +102,5 @@ At the end, the choice is yours: **restore** the kingdom, **destroy** the Flame,
 - C++ execution & grading: real GCC on the [Wandbox](https://wandbox.org) compiler service, with a
   stdin→stdout test harness, transient-overload retries, and friendly compile/runtime error reporting.
 - Factions are data-driven — one quest file per language in `js/data/` (e.g. `cpp_act1.js`), tagged
-  with a `faction` field. **Python** and **C++** ship full 23-chapter chronicles; JavaScript and Rust
+  with a `faction` field. **Python** and **C++** ship full 33-chapter chronicles; JavaScript and Rust
   remain sealed. To verify C++ reference solutions: `python3 tools/grade_cpp_challenges.py`.

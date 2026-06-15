@@ -85,6 +85,84 @@ window.QUEST_DB.push(
   rewards: { xp: 130, coins: 40, items: [["hardened_leather", 1]] }
 },
 
+/* ---------------- cpp05b : Snares and Signs ---------------- */
+{
+  id: "cpp05b", faction: "cpp", act: 2, title: "Snares and Signs", npc: "fenn", map: "forest",
+  intro: [
+    "Easy, marked one — mind your step, there are snares everywhere. I'm Fenn. I read the forest's signs, and the forest feeds me.",
+    "The bramble crawlers keep springing my snares blind — tripping every wire whether there's prey or not. A snare should fire on a <i>true</i> reading, and only a true one.",
+    "Clear <b>4 Bramble Crawlers</b> from the west glade, and I'll teach you to weigh two signs at once — <b>&&</b>, <b>||</b>, <b>!</b> — so your conditions never misfire."
+  ],
+  acceptLabel: "Show me the signs.",
+  midDialogue: "Still crawlers in the brambles, springing my wires. Thin them out.",
+  returnDialogue: [
+    "Good. The glade's quiet enough to think in.",
+    "Now — a single sign can lie. Two signs together rarely do. Learn to read them as one, and your snares will be honest."
+  ],
+  doneDialogue: "You read the forest like a trapper now. Two signs, one true answer. The deep paths won't fool you.",
+  lesson: {
+    title: "Reading the Signs — Combining Conditions",
+    body: [
+      "A single comparison is one sign. Join signs with **&&** (and), **||** (or), **!** (not):",
+      ">>>cout << (true && false);   // 0  - && needs BOTH true\ncout << (true || false);   // 1  - || needs EITHER true\ncout << (!true);           // 0  - ! flips it",
+      "Weigh two signs in one `if`:",
+      ">>>int tracks = 3, cover = 7;\nif (tracks > 0 && cover >= 5) {\n    cout << \"Set the snare\";\n}",
+      "Beware: unlike some tongues, C++ does **not** chain comparisons. `1 <= x <= 10` is a trap — write it as two signs joined by `&&`:",
+      ">>>if (1 <= x && x <= 10) { ... }   // 'between 1 and 10', the C++ way",
+      "An `int` is itself a truth value: **zero is false, anything else is true**. So `if (n)` means 'if n is not zero':",
+      ">>>int arrows = 0;\nif (!arrows) cout << \"Out of arrows\";   // !0 is true",
+      "And the **ternary** picks one of two values in a single stroke — `condition ? a : b`:",
+      ">>>int hi = (a > b) ? a : b;   // the larger of a and b"
+    ],
+    fragments: [
+      "**Fragment I** — `&&` is true only when BOTH sides are; `||` when EITHER is; `!` flips. `x > 0 && x < 10` needs both.",
+      "**Fragment II** — C++ does NOT chain comparisons. Never `1 <= x <= 10`; write `1 <= x && x <= 10`.",
+      "**Fragment III** — An int is a truth value: 0 is false, non-zero is true. `if (n)` is 'if n != 0'; `if (!n)` is 'if n == 0'.",
+      "**Fragment IV** — The ternary `c ? a : b` yields a when c is true, else b: `int hi = (a > b) ? a : b;`."
+    ]
+  },
+  kills: { enemy: "bramble_crawler", count: 4 },
+  questions: [
+    { type: "output", q: "Both must be true (cout prints 1/0):", code: "cout << (3 > 1 && 2 > 5);",
+      answer: "0", why: "3 > 1 is true but 2 > 5 is false; && needs both, so false, printed as 0." },
+    { type: "output", q: "Either will do:", code: "cout << (2 > 5 || 4 > 1);",
+      answer: "1", why: "|| is true when at least one side is — 4 > 1 is true, printed as 1." },
+    { type: "mc", q: "How do you write 'x is between 1 and 10' in C++?",
+      choices: ["1 <= x && x <= 10", "1 <= x <= 10", "x in [1, 10]", "1 < x < 10"],
+      answer: 0, why: "C++ does not chain comparisons; join two with &&. 1 <= x <= 10 silently mis-evaluates." },
+    { type: "output", q: "An int as a truth value:", code: "int n = 0;\ncout << (!n);",
+      answer: "1", why: "0 is false, so !0 is true, which cout prints as 1." },
+    { type: "mc", q: "What does the ternary (a > b) ? a : b give?",
+      choices: ["the larger of a and b", "always a", "always b", "true or false"],
+      answer: 0, why: "If a > b it yields a, otherwise b — the larger value." },
+    { type: "output", q: "Two signs decide:", code: "int tracks = 2, cover = 3;\nif (tracks > 0 && cover >= 5) cout << \"snare\";\nelse cout << \"stalk\";",
+      answer: "stalk", why: "tracks > 0 is true but cover >= 5 is false; && fails, so the else runs." }
+  ],
+  challenge: {
+    title: "Honest Snares",
+    story: "Fenn crouches by a tripwire. \"Two signs decide a snare: fresh `tracks`, and good `cover`. Read them both, and tell my wire what to do.\"",
+    prompt: [
+      "Two integers are given: `tracks` and `cover`. The starter reads them.",
+      "Print exactly one line:",
+      ">>>SET THE SNARE   (when tracks > 0 AND cover >= 5)\nSTALK          (when there are tracks, but too little cover)\nMOVE ON        (when there are no tracks at all)"
+    ],
+    mode: "program",
+    starter: "#include <iostream>\nusing namespace std;\n\nint main() {\n    int tracks, cover;\n    cin >> tracks >> cover;\n    // tracks > 0 && cover >= 5 -> SET THE SNARE\n    // tracks > 0               -> STALK\n    // otherwise                -> MOVE ON\n\n    return 0;\n}\n",
+    tests: [
+      { stdin: "3 7", expectOut: "SET THE SNARE", label: "fresh tracks, good cover" },
+      { stdin: "3 2", expectOut: "STALK", label: "tracks, but thin cover" },
+      { stdin: "0 9", expectOut: "MOVE ON", label: "no tracks" },
+      { stdin: "1 5", expectOut: "SET THE SNARE", label: "just enough cover" }
+    ],
+    hints: [
+      "Strongest condition first: if (tracks > 0 && cover >= 5) cout << \"SET THE SNARE\\n\";",
+      "else if (tracks > 0) -> STALK; else -> MOVE ON.",
+      "Full answer:\n#include <iostream>\nusing namespace std;\n\nint main() {\n    int tracks, cover;\n    cin >> tracks >> cover;\n    if (tracks > 0 && cover >= 5) cout << \"SET THE SNARE\\n\";\n    else if (tracks > 0) cout << \"STALK\\n\";\n    else cout << \"MOVE ON\\n\";\n    return 0;\n}"
+    ]
+  },
+  rewards: { xp: 140, coins: 42, items: [["scroll_of_insight", 1]] }
+},
+
 /* ---------------- cpp06 : The Counting Curse ---------------- */
 {
   id: "cpp06", faction: "cpp", act: 2, title: "The Counting Curse", npc: "aldous", map: "forest",
@@ -243,6 +321,83 @@ window.QUEST_DB.push(
     ]
   },
   rewards: { xp: 170, coins: 50, items: [["wickfire_torchblade", 1]] }
+},
+
+/* ---------------- cpp07b : The Long Patrol ---------------- */
+{
+  id: "cpp07b", faction: "cpp", act: 2, title: "The Long Patrol", npc: "bryony", map: "forest",
+  intro: [
+    "Lamp's out ahead — careful. I'm Bryony; I keep the lamps along the deep paths. It's a long patrol.",
+    "Mire lurkers have crept up from the pool and snuffed half my lamps. Worse, some lamps are <i>broken</i> — light them and they burst. A patrol is knowing which to light, which to skip, and when to simply stop.",
+    "Drive off <b>4 Mire Lurkers</b> around the east glade, and I'll teach you to steer a loop: <b>skip</b> a pass, <b>stop</b> early, or <b>step</b> in strides."
+  ],
+  acceptLabel: "Teach me the patrol.",
+  midDialogue: "Lurkers still in the reeds, snuffing my lamps. Push them back.",
+  returnDialogue: [
+    "The pool's quiet. The lamps can wait a moment — this matters more.",
+    "A loop needn't trudge every step the same. Skip what's broken, halt when you've found your mark. That's the whole art of a long patrol."
+  ],
+  doneDialogue: "You walk a loop like a lamplighter now — skipping, halting, striding. The deep paths will always be lit for you.",
+  lesson: {
+    title: "The Long Patrol — break, continue & steps",
+    body: [
+      "Inside a loop, **continue** abandons the current pass and jumps to the loop's step:",
+      ">>>for (int i = 1; i < 6; i++) {\n    if (i == 3) continue;   // skip 3\n    cout << i << \"\\n\";\n}\n// 1, 2, 4, 5",
+      "**break** leaves the loop entirely — ideal for *searching*, stopping the moment you find your mark:",
+      ">>>for (int i = 1; i < 100; i++) {\n    if (i * i > 20) {\n        cout << i;   // first i whose square passes 20\n        break;\n    }\n}\n// 5",
+      "A `for` loop's step can **stride**: `i += 2` moves by twos:",
+      ">>>for (int i = 0; i < 10; i += 2) cout << i << \"\\n\";\n// 0, 2, 4, 6, 8",
+      "Or count **down** with `i--` and a `>` condition:",
+      ">>>for (int i = 5; i > 0; i--) cout << i << \"\\n\";\n// 5, 4, 3, 2, 1",
+      "So: **continue** to skip, **break** to stop, the **step** to stride. A loop you can steer."
+    ],
+    fragments: [
+      "**Fragment I** — `continue;` skips the rest of THIS pass and jumps to the loop's step. The loop goes on; only this turn is cut short.",
+      "**Fragment II** — `break;` ends the whole loop at once. Pair it with a test to 'loop until found': check, then break.",
+      "**Fragment III** — The step strides: `i += 2` moves by two; `i += 3` by three. The condition still decides when to stop.",
+      "**Fragment IV** — Count down with `i--` (or `i -= 1`) and a `>` condition: `for (int i = 5; i > 0; i--)`."
+    ]
+  },
+  kills: { enemy: "mire_lurker", count: 4 },
+  questions: [
+    { type: "output", q: "One pass is skipped:", code: "for (int i = 1; i < 5; i++) {\n    if (i == 2) continue;\n    cout << i << \"\\n\";\n}",
+      answer: "1\n3\n4", why: "When i is 2, continue skips the cout; 1, 3, 4 still print." },
+    { type: "output", q: "Striding by twos:", code: "for (int i = 0; i < 8; i += 2) cout << i << \"\\n\";",
+      answer: "0\n2\n4\n6", why: "i strides 0,2,4,6; at 8 the condition i < 8 fails." },
+    { type: "mc", q: "What does break; do inside a loop?",
+      choices: ["Stops the loop entirely", "Skips to the next pass", "Restarts from the top", "Pauses one second"],
+      answer: 0, why: "break exits the whole loop at once. (continue is the one that skips a single pass.)" },
+    { type: "output", q: "Counting down:", code: "for (int i = 3; i > 0; i--) cout << i << \"\\n\";",
+      answer: "3\n2\n1", why: "i-- counts down from 3 while i > 0: 3, 2, 1." },
+    { type: "mc", q: "Which step makes a for loop move by 3 each pass?",
+      choices: ["i += 3", "i == 3", "i * 3", "i =+ 3"],
+      answer: 0, why: "i += 3 adds three to i each pass. (i =+ 3 is a typo that just assigns 3.)" },
+    { type: "output", q: "Stop the moment it's found:", code: "for (int i = 1; i < 9; i++) {\n    if (i * i >= 16) {\n        cout << i;\n        break;\n    }\n}",
+      answer: "4", why: "4*4 = 16 is the first square to reach 16; print 4, then break ends the loop." }
+  ],
+  challenge: {
+    title: "The Broken Lamps",
+    story: "Bryony hands you the lighting-pole. \"Walk the lamps, one to n. But every third lamp is broken — skip it, or it bursts. Light the rest in order.\"",
+    prompt: [
+      "The input is one integer, `n` (the number of lamps). The starter reads it.",
+      "Walk the lamps 1 to n. **Skip every lamp whose number is divisible by 3** (use `continue`). For each lamp you do light, print:",
+      ">>>Lamp 1 lit\nLamp 2 lit\nLamp 4 lit\nLamp 5 lit\n(example for n = 5 — lamp 3 is skipped)"
+    ],
+    mode: "program",
+    starter: "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    // Light 1..n, but skip every lamp divisible by 3 (continue).\n    for (int i = 1; i <= n; i++) {\n\n    }\n    return 0;\n}\n",
+    tests: [
+      { stdin: "5", expectOut: "Lamp 1 lit\nLamp 2 lit\nLamp 4 lit\nLamp 5 lit", label: "n = 5 (skip 3)" },
+      { stdin: "7", expectOut: "Lamp 1 lit\nLamp 2 lit\nLamp 4 lit\nLamp 5 lit\nLamp 7 lit", label: "n = 7 (skip 3, 6)" },
+      { stdin: "2", expectOut: "Lamp 1 lit\nLamp 2 lit", label: "n = 2 (none broken)" },
+      { stdin: "3", expectOut: "Lamp 1 lit\nLamp 2 lit", label: "n = 3 (skip the last)" }
+    ],
+    hints: [
+      "Skip the broken ones first: if (i % 3 == 0) continue;",
+      "Then light the rest: cout << \"Lamp \" << i << \" lit\\n\";",
+      "Full answer:\n#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    for (int i = 1; i <= n; i++) {\n        if (i % 3 == 0) continue;\n        cout << \"Lamp \" << i << \" lit\\n\";\n    }\n    return 0;\n}"
+    ]
+  },
+  rewards: { xp: 160, coins: 48, items: [["flamewater_flask", 1]] }
 },
 
 /* ---------------- cpp08 : BOSS — Warden of the Embers ---------------- */

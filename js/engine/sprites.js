@@ -30,7 +30,15 @@ window.Sprites = (function () {
     "m": { solid: false, mini: "#566036" },  // marsh
     "l": { solid: true,  mini: "#d4541b" },  // lava
     "x": { solid: true,  mini: "#0c0a0a" },  // void
-    "F": { solid: true,  mini: "#ff8a2a" }   // brazier flame
+    "F": { solid: true,  mini: "#ff8a2a" },  // brazier flame
+    // ---- expanded biomes (added for the larger worlds) ----
+    "o": { solid: false, mini: "#c2a13e" },  // farmland / tilled crops
+    "a": { solid: false, mini: "#5a5048" },  // ash flats (scorched ground)
+    "q": { solid: false, mini: "#6fae4a" },  // meadow / wild garden
+    "u": { solid: false, mini: "#3f5740" },  // bog (deep marsh)
+    "k": { solid: true,  mini: "#6b6258" },  // crag (rocky outcrop)
+    "e": { solid: true,  mini: "#1f3d1c" },  // evergreen / pine
+    "C": { solid: true,  mini: "#7fd0e0" }   // crystal / relic shard
   };
 
   function hash(x, y) {

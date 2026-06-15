@@ -86,6 +86,80 @@ window.QUEST_DB.push(
   rewards: { xp: 60, coins: 25, items: [["ashen_salve", 2]] }
 },
 
+/* ---------------- cpp01b : The Beacon's Rhythm ---------------- */
+{
+  id: "cpp01b", faction: "cpp", act: 1, title: "The Beacon's Rhythm", npc: "pip", map: "village",
+  intro: [
+    "You're the one Elder Maren marked? Good. I'm Pip — I keep the beacon tolling, and lately it tolls <i>crooked</i>.",
+    "Ash moths have got into the beacon-smoke. They scatter every word the Flame speaks until the lines run together into mush — no spacing, no breaks, no sense.",
+    "Swat <b>3 Ash Moths</b> off the green, and I'll teach you to make the forge speak in clean, ordered lines — spacing, breaks, and the little marks that matter."
+  ],
+  acceptLabel: "Teach me clean lines.",
+  midDialogue: "Still moths in the smoke — hear how the words slur together? Clear them out.",
+  returnDialogue: [
+    "Listen — the smoke runs straight again. Now, the craft of clean speech.",
+    "Any fool can make the forge shout. A bellhand makes it speak in <i>measured lines</i>. Mind the marks."
+  ],
+  doneDialogue: "Crisp as a struck bell. The beacon will keep your rhythm now, marked one.",
+  lesson: {
+    title: "Speaking in Clean Lines — cout in Depth",
+    body: [
+      "Each push with `<<` adds exactly what you give it — and **nothing else**. Unlike some tongues, `cout` never inserts spaces for you. You place every space yourself, inside the quotes:",
+      ">>>cout << \"HP \" << 12 << \" MP \" << 5 << \"\\n\";   // HP 12 MP 5",
+      "Chain as many pushes as you like in one statement; the arrows flow left to right. Text and numbers mix freely — numbers wear no quotes:",
+      ">>>cout << \"Level \" << 9 << \"!\\n\";",
+      "End a line with `\\n` inside the quotes, or with `<< endl`. Both drop to the next line (`endl` also flushes the stream):",
+      ">>>cout << \"Spark\" << endl;\ncout << \"Flame\\n\";",
+      "A backslash `\\` begins an **escape**: `\\n` a new line, `\\t` a tab, `\\\"` a literal quote, `\\\\` a literal backslash. A bare `\"` would end your string early — so escape it:",
+      ">>>cout << \"Name:\\tAsh\\n\";          // Name:   Ash\ncout << \"She said \\\"run\\\"\\n\";    // She said \"run\""
+    ],
+    fragments: [
+      "**Fragment I** — `cout` adds nothing between pushes: `cout << \"HP\" << 12;` prints `HP12`. Put spaces in yourself: `cout << \"HP \" << 12;`.",
+      "**Fragment II** — Chain freely with `<<`, mixing text and numbers (numbers wear no quotes): `cout << \"Level \" << 9 << \"!\";`.",
+      "**Fragment III** — End lines with `\\n` or `<< endl`. Escape special marks: `\\t` tab, `\\\"` a quote, `\\\\` a backslash."
+    ]
+  },
+  kills: { enemy: "ash_moth", count: 3 },
+  questions: [
+    { type: "output", q: "Remember — cout adds no spaces of its own:", code: "cout << \"HP\" << 12;",
+      answer: "HP12", why: "Each << pushes exactly what you give. No space appears unless you add one inside the quotes." },
+    { type: "mc", q: "Which prints exactly: HP 12 (with a space)?",
+      choices: ["cout << \"HP \" << 12;", "cout << \"HP\" << 12;", "cout << \"HP\", 12;", "cout << \"HP\" + 12;"],
+      answer: 0, why: "You must include the space yourself inside the quotes. C++ chains with << (not commas), and \"HP\"+12 is not valid here." },
+    { type: "output", q: "Mixing text and a number in one chain:", code: "cout << \"Level \" << 9 << \"!\";",
+      answer: "Level 9!", why: "The arrows push each piece in order: the text, the number 9, then the !." },
+    { type: "fill", q: "Fill the blank to end the line (push a newline):", code: "cout << \"Ash\" << \"____\";",
+      answer: "\\n", why: "\\n inside the quotes ends the line. << endl would also work." },
+    { type: "mc", q: "Inside a double-quoted string, how do you print a literal \" mark?",
+      choices: ["\\\"", "\"\"", "'\"'", "you can't"],
+      answer: 0, why: "Escape it: \\\" prints one double-quote. A bare \" would end the string early." },
+    { type: "output", q: "An escaped quote in the stream:", code: "cout << \"She said \\\"go\\\"\";",
+      answer: "She said \"go\"", why: "Each \\\" becomes one literal double-quote in the output." }
+  ],
+  challenge: {
+    title: "The Beacon's Toll",
+    story: "Pip hands you the striker. \"Toll the beacon's status — three lines, exactly. Spacing and breaks must ring true.\"",
+    prompt: [
+      "Print exactly these three lines:",
+      ">>>ASHVEIL\nHP 30 MP 10\nbeacon: \"lit\"",
+      "Line 1: the word `ASHVEIL`.",
+      "Line 2: `HP 30 MP 10` — push the text and the numbers in one chain, and mind the spaces.",
+      "Line 3: `beacon: \"lit\"` — the word lit must appear in real double-quotes (escape them with `\\\"`)."
+    ],
+    mode: "program",
+    starter: "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Toll three clean lines:\n    //   ASHVEIL\n    //   HP 30 MP 10\n    //   beacon: \"lit\"\n\n    return 0;\n}\n",
+    tests: [
+      { stdin: "", expectOut: "ASHVEIL\nHP 30 MP 10\nbeacon: \"lit\"", label: "The beacon's toll" }
+    ],
+    hints: [
+      "Line 2 chains text and numbers with spaces inside the quotes: cout << \"HP \" << 30 << \" MP \" << 10 << \"\\n\";",
+      "Line 3 needs escaped quotes: cout << \"beacon: \\\"lit\\\"\\n\";",
+      "Full answer:\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"ASHVEIL\\n\";\n    cout << \"HP \" << 30 << \" MP \" << 10 << \"\\n\";\n    cout << \"beacon: \\\"lit\\\"\\n\";\n    return 0;\n}"
+    ]
+  },
+  rewards: { xp: 70, coins: 25, items: [["scroll_of_insight", 1]] }
+},
+
 /* ---------------- cpp02 : The Merchant's Ledger ---------------- */
 {
   id: "cpp02", faction: "cpp", act: 1, title: "The Merchant's Ledger", npc: "tobin", map: "village",
@@ -252,10 +326,86 @@ window.QUEST_DB.push(
   rewards: { xp: 100, coins: 35, items: [["padded_vest", 1]] }
 },
 
+/* ---------------- cpp03b : The Granary Count ---------------- */
+{
+  id: "cpp03b", faction: "cpp", act: 1, title: "The Granary Count", npc: "hesper", map: "village",
+  intro: [
+    "Marked or not, you look like someone who can count. Good — because something cannot.",
+    "Tallow grubs are in my granary, and every sack they touch comes back labelled in <i>words</i> instead of <i>numbers</i>. The text \"12\" you cannot add; the number `12` you can. The whole harvest tally is ruined.",
+    "Clear out <b>3 Tallow Grubs</b> from the stores and the fields, and I'll teach you the keeper's secret: how a value's <i>type</i> decides what it can do — and how to turn one type into another."
+  ],
+  acceptLabel: "I'll set the count right.",
+  midDialogue: "Still grubs in the grain — and still words where numbers ought to be. Go on.",
+  returnDialogue: [
+    "Stores are clear. Now — the reckoning.",
+    "You've taught the forge to listen with `cin`. But everything wears a type, and a keeper's real art is turning a word into a number, or a number into a word, exactly when it's needed."
+  ],
+  doneDialogue: "Tallied to the grain. You've the makings of a quartermaster, marked one — don't let the Citadel hear, they're always short.",
+  lesson: {
+    title: "The Keeper's Conversions — Types & Casting",
+    body: [
+      "Every value wears a **type**, and the type decides what it can do. A `string` of digits only <i>glues</i>; real numbers do <i>math</i>:",
+      ">>>string s = \"5\";\ncout << s + s;     // 55  (text glued together)\ncout << 5 + 5;     // 10  (real arithmetic)",
+      "When the forge listens with `cin >> n` into an `int`, it converts the text to a number for you. But often you must convert **by hand**. `stoi` parses text into an int; `to_string` turns a number into text:",
+      ">>>int n = stoi(\"12\");        // the number 12\ncout << n + 1;               // 13\nstring tag = to_string(7);   // the text \"7\"",
+      "`static_cast<double>(x)` makes a whole number into a decimal — the cure for the integer-division trap you met before:",
+      ">>>int a = 7;\ncout << a / 2;                       // 3    (int division floors)\ncout << static_cast<double>(a) / 2;  // 3.5  (now a decimal)",
+      "And `static_cast<int>(3.9)` chops a decimal down to `3` — it **truncates**, it does not round."
+    ],
+    fragments: [
+      "**Fragment I** — Type decides behavior: `string \"5\" + \"5\"` is `\"55\"` (glued text); `5 + 5` is `10` (math). Quoted digits are not numbers.",
+      "**Fragment II** — Convert by hand when needed: `stoi(\"12\")` turns text into the int 12; `to_string(7)` turns a number into the text \"7\".",
+      "**Fragment III** — `static_cast<double>(n)` forces a decimal (so `n / 2` won't floor); `static_cast<int>(3.9)` truncates to 3."
+    ]
+  },
+  kills: { enemy: "tallow_grub", count: 3 },
+  questions: [
+    { type: "output", q: "Text glued, not added:", code: "string s = \"5\";\ncout << s + s;",
+      answer: "55", why: "A string of digits is still text; + glues it into \"55\". Only real numbers do math." },
+    { type: "mc", q: "Which turns the text \"12\" into the number 12?",
+      choices: ["stoi(\"12\")", "to_string(\"12\")", "static_cast<int>(\"12\")", "\"12\" + 0"],
+      answer: 0, why: "stoi parses a string into an int. to_string goes the other way; you cannot static_cast text into a number." },
+    { type: "output", q: "Parse, then add one:", code: "int n = stoi(\"12\");\ncout << n + 1;",
+      answer: "13", why: "stoi(\"12\") is the number 12; 12 + 1 is 13." },
+    { type: "output", q: "Forcing a decimal before dividing:", code: "int a = 7;\ncout << static_cast<double>(a) / 2;",
+      answer: "3.5", why: "static_cast<double>(7) is 7.0, so 7.0 / 2 is 3.5 — not the floored 3 of int division." },
+    { type: "mc", q: "What does to_string(7) return?",
+      choices: ["the text \"7\"", "the number 7", "7.0", "an error"],
+      answer: 0, why: "to_string turns a number into its text form: the string \"7\"." },
+    { type: "output", q: "A cast that truncates:", code: "cout << static_cast<int>(3.9);",
+      answer: "3", why: "Casting a double to int chops off the decimal part — it truncates to 3, it does not round to 4." }
+  ],
+  challenge: {
+    title: "The Harvest Tally",
+    story: "Hesper sets three slips before you. \"The Flame will read you the count: a name, then two numbers of sacks. Give me the keeper's tally.\"",
+    prompt: [
+      "Read from stdin, in order: a name (one word), the morning sacks (a whole number), the evening sacks (a whole number).",
+      "Then print exactly two lines:",
+      ">>>Ledger for Bryn\nTotal sacks: 12",
+      "Line 1: `Ledger for ` then the name.",
+      "Line 2: `Total sacks: ` then the two counts **added as numbers**.",
+      "(Example is for the input `Bryn 5 7` → 5 + 7 = 12.)"
+    ],
+    mode: "program",
+    starter: "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string name;\n    int morning, evening;\n    // read name, morning, evening with cin >> ...\n    // then print the two ledger lines\n\n    return 0;\n}\n",
+    tests: [
+      { stdin: "Bryn 5 7", expectOut: "Ledger for Bryn\nTotal sacks: 12", label: "Bryn: 5 + 7" },
+      { stdin: "Sora 10 14", expectOut: "Ledger for Sora\nTotal sacks: 24", label: "Sora: 10 + 14" },
+      { stdin: "Kael 0 9", expectOut: "Ledger for Kael\nTotal sacks: 9", label: "Kael: 0 + 9" }
+    ],
+    hints: [
+      "Read all three in one chain: cin >> name >> morning >> evening;",
+      "cin >> already converts the two numbers to int — just add them with morning + evening.",
+      "Full answer:\n#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string name;\n    int morning, evening;\n    cin >> name >> morning >> evening;\n    cout << \"Ledger for \" << name << \"\\n\";\n    cout << \"Total sacks: \" << (morning + evening) << \"\\n\";\n    return 0;\n}"
+    ]
+  },
+  rewards: { xp: 110, coins: 35, items: [["ember_charm", 1]] }
+},
+
 /* ---------------- cpp04 : BOSS — The Charred Gatekeeper ---------------- */
 {
   id: "cpp04", faction: "cpp", act: 1, title: "The Charred Gatekeeper", npc: "elder_maren", map: "village", boss: true,
-  bossEnemy: "boss_gatekeeper", bossSpot: { map: "village", x: 43, y: 11 },
+  bossEnemy: "boss_gatekeeper", bossSpot: { map: "village", x: 57, y: 19 },
   intro: [
     "It has begun. A knight of the First Kingdom stands at our east gate — dead a thousand years, yet armored in cinders. The Flame's return wakes the old servants first.",
     "He will not let you pass to Emberwood until you prove your speech. Everything you have forged — words, numbers, the weave — bring all of it.",

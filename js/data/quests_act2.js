@@ -93,6 +93,88 @@ window.QUEST_DB.push(
   rewards: { xp: 130, coins: 40, items: [["hardened_leather", 1]] }
 },
 
+/* ---------------- py05b : Snares and Signs ---------------- */
+{
+  id: "py05b", act: 2, title: "Snares and Signs", npc: "fenn", map: "forest",
+  intro: [
+    "Easy, marked one — mind your step, there are snares everywhere. I'm Fenn. I read the forest's signs, and the forest feeds me.",
+    "The bramble crawlers keep springing my snares blind — tripping every wire whether there's prey or not. A snare should fire on a <i>true</i> reading, and only a true one.",
+    "Clear <b>4 Bramble Crawlers</b> from the west glade, and I'll teach you to weigh two signs at once — <b>and</b>, <b>or</b>, <b>not</b> — so your conditions never misfire."
+  ],
+  acceptLabel: "Show me the signs.",
+  midDialogue: "Still crawlers in the brambles, springing my wires. Thin them out.",
+  returnDialogue: [
+    "Good. The glade's quiet enough to think in.",
+    "Now — a single sign can lie. Two signs together rarely do. Learn to read them as one, and your snares will be honest."
+  ],
+  doneDialogue: "You read the forest like a trapper now. Two signs, one true answer. The deep paths won't fool you.",
+  lesson: {
+    title: "Reading the Signs — Combining Conditions",
+    body: [
+      "A single comparison is one sign. Join signs with **and**, **or**, **not**:",
+      ">>>print(True and False)   # False  - and needs BOTH true\nprint(True or False)    # True   - or needs EITHER true\nprint(not True)         # False  - not flips it",
+      "Weigh two signs in one `if`:",
+      ">>>tracks = 3\ncover = 7\nif tracks > 0 and cover >= 5:\n    print(\"Set the snare\")",
+      "Python lets you **chain** comparisons the way you'd say them aloud — `1 <= x <= 10` means 'x is between 1 and 10':",
+      ">>>x = 6\nprint(1 <= x <= 10)   # True",
+      "Values themselves are **truthy** or **falsy**. `0`, `\"\"` (empty text), `[]` (empty list) and `None` count as False; everything else as True:",
+      ">>>name = \"\"\nif not name:\n    print(\"No name given\")   # an empty string is falsy",
+      "When mixing them, `not` binds tightest, then `and`, then `or`. Parenthesize to make your meaning plain: `(a or b) and c`."
+    ],
+    fragments: [
+      "**Fragment I** — `and` is true only when BOTH sides are; `or` when EITHER is; `not` flips True/False. `x > 0 and x < 10` needs both.",
+      "**Fragment II** — Chain comparisons like speech: `1 <= x <= 10` is 'between 1 and 10' — shorthand for `1 <= x and x <= 10`.",
+      "**Fragment III** — Truthiness: `0`, `\"\"`, `[]`, `None` are falsy; everything else is truthy. `if items:` runs when the list is non-empty.",
+      "**Fragment IV** — Precedence: `not` before `and` before `or`. When in doubt, parenthesize: `(a or b) and c`."
+    ]
+  },
+  kills: { enemy: "bramble_crawler", count: 4 },
+  questions: [
+    { type: "output", q: "Both must be true:", code: "print(3 > 1 and 2 > 5)",
+      answer: "False", why: "3 > 1 is True but 2 > 5 is False; `and` needs both, so the whole is False." },
+    { type: "output", q: "Either will do:", code: "print(2 > 5 or 4 > 1)",
+      answer: "True", why: "`or` is True when at least one side is — 4 > 1 is True." },
+    { type: "mc", q: "What does `not (5 == 5)` give?",
+      choices: ["False", "True", "5", "Error"],
+      answer: 0, why: "5 == 5 is True, and `not` flips it to False." },
+    { type: "output", q: "Chained between two bounds:", code: "x = 4\nprint(0 < x < 10)",
+      answer: "True", why: "0 < 4 and 4 < 10 are both true, so the chain is True." },
+    { type: "mc", q: "Which value is FALSY (counts as False)?",
+      choices: ["0", "1", "\"a\"", "[1]"],
+      answer: 0, why: "0, \"\", [] and None are falsy. Non-zero numbers and non-empty strings/lists are truthy." },
+    { type: "output", q: "A snare with two signs:", code: "tracks = 2\ncover = 3\nif tracks > 0 and cover >= 5:\n    print(\"snare\")\nelse:\n    print(\"stalk\")",
+      answer: "stalk", why: "tracks > 0 is True but cover >= 5 is False; `and` fails, so the else runs." },
+    { type: "tf", q: "True or False — an empty string \"\" is treated as False by an if.",
+      answer: true, why: "Empty containers (\"\", [], {}), 0 and None are falsy. `if name:` is False when name is empty." }
+  ],
+  challenge: {
+    title: "Honest Snares",
+    story: "Fenn crouches by a tripwire. \"Two signs decide a snare: fresh `tracks`, and good `cover`. Read them both, and tell my wire what to do.\"",
+    prompt: [
+      "You are **given** `tracks` and `cover` (ints).",
+      "Print exactly one line:",
+      ">>>SET THE SNARE   (when tracks is above 0 AND cover is 5 or more)\nSTALK          (when there are tracks, but too little cover)\nMOVE ON        (when there are no tracks at all)"
+    ],
+    mode: "program",
+    given: "tracks, cover",
+    starter: "# tracks and cover are given. Read both signs:\n#   tracks > 0 and cover >= 5  -> SET THE SNARE\n#   tracks > 0                 -> STALK\n#   otherwise                  -> MOVE ON\n\n",
+    tests: [
+      { setup: "tracks = 3\ncover = 7", expectOut: "SET THE SNARE", label: "fresh tracks, good cover" },
+      { setup: "tracks = 3\ncover = 2", expectOut: "STALK", label: "tracks, but thin cover" },
+      { setup: "tracks = 0\ncover = 9", expectOut: "MOVE ON", label: "no tracks" },
+      { setup: "tracks = 0\ncover = 0", expectOut: "MOVE ON", label: "nothing" },
+      { setup: "tracks = 1\ncover = 5", expectOut: "SET THE SNARE", label: "just enough cover" }
+    ],
+    hints: [
+      "The strongest condition first: if tracks > 0 and cover >= 5: -> SET THE SNARE",
+      "elif tracks > 0: catches 'tracks but poor cover' -> STALK. else: -> MOVE ON.",
+      "Full answer:\nif tracks > 0 and cover >= 5:\n    print(\"SET THE SNARE\")\nelif tracks > 0:\n    print(\"STALK\")\nelse:\n    print(\"MOVE ON\")"
+    ],
+    explain: "`and` makes one verdict from two signs: the snare sets only when there are tracks AND enough cover. Order matters — the strict 'both' case is checked first, so by the time `elif tracks > 0` is asked, only the thin-cover case remains, and `else` catches the trackless quiet."
+  },
+  rewards: { xp: 140, coins: 42, items: [["scroll_of_insight", 1]] }
+},
+
 /* ---------------- py06 : The Counting Curse ---------------- */
 {
   id: "py06", act: 2, title: "The Counting Curse", npc: "aldous", map: "forest",
@@ -261,6 +343,87 @@ window.QUEST_DB.push(
     explain: "Every pass drains the curse and tallies one night; the moment hp sinks to 0 or below, the `while hp > 0` question turns False and the loop releases. The counter — started before, grown inside, read after — is the vigil's whole answer."
   },
   rewards: { xp: 170, coins: 50, items: [["wickfire_torchblade", 1]] }
+},
+
+/* ---------------- py07b : The Long Patrol ---------------- */
+{
+  id: "py07b", act: 2, title: "The Long Patrol", npc: "bryony", map: "forest",
+  intro: [
+    "Lamp's out ahead — careful. I'm Bryony; I keep the lamps along the deep paths. It's a long patrol.",
+    "Mire lurkers have crept up from the pool and snuffed half my lamps. Worse, some lamps are <i>broken</i> — light them and they burst. A patrol is knowing which to light, which to skip, and when to simply stop.",
+    "Drive off <b>4 Mire Lurkers</b> around the east glade, and I'll teach you to steer a loop: <b>skip</b> a pass, <b>stop</b> early, or <b>step</b> in strides."
+  ],
+  acceptLabel: "Teach me the patrol.",
+  midDialogue: "Lurkers still in the reeds, snuffing my lamps. Push them back.",
+  returnDialogue: [
+    "The pool's quiet. The lamps can wait a moment — this matters more.",
+    "A loop needn't trudge every step the same. Skip what's broken, halt when you've found your mark. That's the whole art of a long patrol."
+  ],
+  doneDialogue: "You walk a loop like a lamplighter now — skipping, halting, striding. The deep paths will always be lit for you.",
+  lesson: {
+    title: "The Long Patrol — break, continue & steps",
+    body: [
+      "Inside a loop, **continue** abandons the current pass and jumps straight to the next:",
+      ">>>for i in range(1, 6):\n    if i == 3:\n        continue          # skip 3\n    print(i)\n# 1, 2, 4, 5  - the 3 is skipped",
+      "**break** leaves the loop entirely — perfect for *searching*, when you can stop the moment you find what you want:",
+      ">>>for i in range(1, 100):\n    if i * i > 20:\n        print(i)          # first i whose square passes 20\n        break             # found it - stop walking\n# 5",
+      "`range` can take a **step** — a stride between values: `range(start, stop, step)`:",
+      ">>>for i in range(0, 10, 2):\n    print(i)\n# 0, 2, 4, 6, 8  - stride by 2",
+      "A negative step counts **down**:",
+      ">>>for i in range(5, 0, -1):\n    print(i)\n# 5, 4, 3, 2, 1",
+      "So: **continue** to skip, **break** to stop, a **step** to stride. A loop you can steer."
+    ],
+    fragments: [
+      "**Fragment I** — `continue` skips the rest of THIS pass and moves to the next. The loop keeps going; only this one turn is cut short.",
+      "**Fragment II** — `break` ends the whole loop at once. Pair it with a test to 'loop until found': check, then `break`.",
+      "**Fragment III** — `range(start, stop, step)` strides: `range(0, 10, 2)` is 0,2,4,6,8. The stop is still excluded.",
+      "**Fragment IV** — A negative step counts down: `range(5, 0, -1)` is 5,4,3,2,1. Mind the direction, or the loop runs zero times."
+    ]
+  },
+  kills: { enemy: "mire_lurker", count: 4 },
+  questions: [
+    { type: "output", q: "One pass is skipped:", code: "for i in range(1, 5):\n    if i == 2:\n        continue\n    print(i)",
+      answer: "1\n3\n4", why: "When i is 2, continue skips the print and moves on; 1, 3, 4 still print." },
+    { type: "output", q: "Striding by twos:", code: "for i in range(0, 8, 2):\n    print(i)",
+      answer: "0\n2\n4\n6", why: "range(0,8,2) strides 0,2,4,6 — stop (8) is excluded." },
+    { type: "mc", q: "What does `break` do inside a loop?",
+      choices: ["Stops the loop entirely", "Skips to the next pass", "Restarts from the top", "Pauses one second"],
+      answer: 0, why: "break exits the whole loop at once. (continue is the one that skips a single pass.)" },
+    { type: "output", q: "Counting down:", code: "for i in range(3, 0, -1):\n    print(i)",
+      answer: "3\n2\n1", why: "A negative step counts down: 3, 2, 1 (stop 0 excluded)." },
+    { type: "mc", q: "Which numbers does range(1, 10, 3) produce?",
+      choices: ["1, 4, 7", "1, 4, 7, 10", "1, 3, 6, 9", "3, 6, 9"],
+      answer: 0, why: "Start 1, stride 3, stop before 10: 1, 4, 7." },
+    { type: "output", q: "Stop the moment it's found:", code: "for i in range(1, 9):\n    if i * i >= 16:\n        print(i)\n        break",
+      answer: "4", why: "4*4 = 16 is the first square to reach 16; print 4, then break ends the loop." },
+    { type: "tf", q: "True or False — `continue` ends the whole loop.",
+      answer: false, why: "continue ends only the current pass; the loop keeps running. `break` ends the whole loop." }
+  ],
+  challenge: {
+    title: "The Broken Lamps",
+    story: "Bryony hands you the lighting-pole. \"Walk the lamps, one to n. But every third lamp is broken — skip it, or it bursts. Light the rest in order.\"",
+    prompt: [
+      "You are **given** `n` (an int): the number of lamps.",
+      "Walk the lamps numbered 1 to n. **Skip every lamp whose number is divisible by 3** (use `continue`). For each lamp you do light, print:",
+      ">>>Lamp 1 lit\nLamp 2 lit\nLamp 4 lit\nLamp 5 lit\n(example for n = 5 — lamp 3 is skipped)"
+    ],
+    mode: "program",
+    given: "n",
+    starter: "# n lamps. Light 1..n, but skip every lamp divisible by 3 (continue).\n# Print: Lamp i lit  for each lamp you light.\n\n",
+    tests: [
+      { setup: "n = 5", expectOut: "Lamp 1 lit\nLamp 2 lit\nLamp 4 lit\nLamp 5 lit", label: "n = 5 (skip 3)" },
+      { setup: "n = 7", expectOut: "Lamp 1 lit\nLamp 2 lit\nLamp 4 lit\nLamp 5 lit\nLamp 7 lit", label: "n = 7 (skip 3, 6)" },
+      { setup: "n = 2", expectOut: "Lamp 1 lit\nLamp 2 lit", label: "n = 2 (none broken)" },
+      { setup: "n = 3", expectOut: "Lamp 1 lit\nLamp 2 lit", label: "n = 3 (skip the last)" }
+    ],
+    hints: [
+      "Loop the lamps: for i in range(1, n + 1):",
+      "Skip the broken ones first: if i % 3 == 0: continue — then print(f\"Lamp {i} lit\") for the rest.",
+      "Full answer:\nfor i in range(1, n + 1):\n    if i % 3 == 0:\n        continue\n    print(f\"Lamp {i} lit\")"
+    ],
+    explain: "`continue` is the skip: when a lamp's number divides by 3, the loop abandons that pass before the print and moves to the next lamp. Every other lamp falls through to `print`, so the broken thirds are silently passed over while the patrol marches on."
+  },
+  rewards: { xp: 160, coins: 48, items: [["flamewater_flask", 1]] }
 },
 
 /* ---------------- py08 : BOSS — Warden of the Embers ---------------- */
